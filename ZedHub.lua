@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
-    - UI Murni milikmu dengan perbaikan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell (Merespons centang real-time & Backpack Full)
+    - UI Murni milikmu dengan perbaikan callback CreateToggle ON/OFF
+    - Backend Auto Sell dengan Safety Stop (OFF langsung berhenti total)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,7 +522,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE
+-- MASTER BACKEND AUTOMATION ENGINE (Dengan Safety Stop)
 -- =========================================================================
 local IsSelling = false
 
@@ -558,25 +558,32 @@ local function SellInventory()
     IsSelling = true
 
     Character:PivotTo(CFrame.new(62, 4, -26))
-    while task.wait() do
+    
+    -- Looping dengan pengecekan real-time agar bisa berhenti seketika saat tombol dimatikan (OFF)
+    while task.wait(0.1) do
+        local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
+        local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
+        if not backpackOn and not fruitOn then 
+            break 
+        end
+
         if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
         if GameEvents and GameEvents:FindFirstChild("Sell_Inventory") then
             GameEvents.Sell_Inventory:FireServer()
         end
     end
+    
     Character:PivotTo(Previous)
-
     task.wait(0.2)
     IsSelling = false
 end
 
--- Looping Auto Sell (Benar-benar merespons ON/OFF centang UI)
+-- Looping Auto Sell Utama
 task.spawn(function()
-    while task.wait(2) do
+    while task.wait(1.5) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        -- Jika tidak dicentang (OFF), abaikan loop dan jangan lakukan apa pun
         if backpackOn or fruitOn then
             local CropCount = #GetInvCrops()
 
@@ -591,18 +598,6 @@ task.spawn(function()
         end
     end
 end)
-
--- Event instan saat item bertambah di backpack jika opsi Backpack Full dicentang
-if Backpack then
-    Backpack.ChildAdded:Connect(function()
-        if getgenv().ZedHubConfig.AutoSellBackpack then
-            local CropCount = #GetInvCrops()
-            if CropCount >= 12 then
-                SellInventory()
-            end
-        end
-    end)
-end
 
 -- Auto Buy Engine (Main Shop & 4 Fall Market: Selected & Buy All)
 task.spawn(function()
