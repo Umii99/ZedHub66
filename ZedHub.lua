@@ -1,8 +1,8 @@
 --[[
-    ZEDHUB - FINAL FULL FIXED EDITION (GROW A GARDEN)
-    - Fix: Auto Sell Berhenti Normal saat dimatikan
-    - Fix: Deteksi Backpack Full Akurat
-    - Fix: Shop Seed, Gear, dan 4 Market Fall Aktif Sempurna (Selected & Buy All)
+    ZEDHUB - FINAL STABLE EDITION (GROW A GARDEN)
+    - Fix: Error sintaks yang membuat UI tidak muncul
+    - Fix: Auto Sell bisa dimatikan normal & Backpack Full akurat
+    - Fix: Shop Seed, Gear, & 4 Market Fall Aktif Sempurna
 ]]
 
 local Players = game:GetService("Players")
@@ -483,7 +483,7 @@ local function PreciseSellInventory()
     IsSelling = false
 end
 
--- Auto Sell Loop (bisa berhenti saat dimatikan)
+-- Auto Sell Loop
 task.spawn(function()
     while task.wait(2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -579,14 +579,13 @@ task.spawn(function()
     end
 end)
 
--- FIXED AUTO BUY ENGINE (Shop Seed, Gear, & 4 Market Fall Aktif)
+-- Auto Buy Engine
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
             local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
             if not buyEvt then return end
 
-            -- 1. 4 Kategori Market Fall
             for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
@@ -599,7 +598,6 @@ task.spawn(function()
                 end
             end
 
-            -- 2. Main Shop (Egg, Seed, Gear)
             for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
@@ -716,7 +714,7 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        let delta = input.Position - dragStart
+        local delta = input.Position - dragStart
         MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
@@ -727,4 +725,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("🪐 ZedHub Full Fixed & Optimized Loaded Successfully!")
+print("🪐 ZedHub Full Fixed & Stable Loaded Successfully!")
