@@ -1,33 +1,20 @@
 --[[
-    ZedHub Full Complete Features - Grow A Garden Edition
-    Versi Sempurna & Lengkap dengan Seluruh Item List
+    ZedHub Direct Full Features - Siap Eksekusi Langsung
 ]]
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
-if PlayerGui:FindFirstChild("ZedHubUltimateUI") then
-    PlayerGui.ZedHubUltimateUI:Destroy()
+if PlayerGui:FindFirstChild("ZedHubDirectUI") then
+    PlayerGui.ZedHubDirectUI:Destroy()
 end
 
-getgenv().ZedHubConfig = {
-    AutoCollect = false,
-    AutoSubmitFallBloom = false,
-    GiveASeed = false,
-    AutoShovel = false,
-    ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false,
-    AutoSellFruit = false,
-}
-
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZedHubUltimateUI"
+ScreenGui.Name = "ZedHubDirectUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
@@ -85,7 +72,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 350, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "🪐 ZedHub - Grow A Garden (Full Features)"
+Title.Text = "🪐 ZedHub - Grow A Garden (Full Direct)"
 Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 12
 Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -148,14 +135,19 @@ local function CreateTab(tabName)
     Page.Active = true
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -5, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 1600)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 0)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
     local PageLayout = Instance.new("UIListLayout")
     PageLayout.Parent = Page
     PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    PageLayout.Padding = UDim.new(0, 8)
+    PageLayout.Padding = UDim.new(0, 6)
+
+    -- Otomatis atur ukuran Canvas agar semua isi muncul dan tidak kosong
+    PageLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 15)
+    end)
 
     local TabBtn = Instance.new("TextButton")
     TabBtn.Name = tabName .. "Btn"
@@ -190,60 +182,26 @@ local TabEvent = CreateTab("Event Fall")
 local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 
--- Fungsi Membuat Kotak / Panel Kategori
-local function CreateSection(parent, titleText)
-    local section = Instance.new("Frame")
-    section.Parent = parent
-    section.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
-    section.BackgroundTransparency = 0.4
-    section.Size = UDim2.new(1, -5, 0, 0)
-    section.AutomaticSize = Enum.AutomaticSize.Y
-    Instance.new("UICorner", section).CornerRadius = UDim.new(0, 6)
-    
-    local stroke = Instance.new("UIStroke")
-    stroke.Parent = section
-    stroke.Color = Color3.fromRGB(59, 130, 246)
-    stroke.Transparency = 0.7
-
-    local layout = Instance.new("UIListLayout")
-    layout.Parent = section
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 5)
-
-    local header = Instance.new("TextLabel")
-    header.Parent = section
-    header.BackgroundTransparency = 1
-    header.Size = UDim2.new(1, 0, 0, 25)
-    header.Font = Enum.Font.GothamBold
-    header.Text = "  " .. titleText
-    header.TextColor3 = Color3.fromRGB(96, 165, 250)
-    header.TextSize = 11
-    header.TextXAlignment = Enum.TextXAlignment.Left
-
-    return section
-end
-
--- Fungsi Membuat Toggle Biasa
-local function CreateToggle(parent, labelText, configKey)
+local function CreateToggle(parent, labelText)
     local row = Instance.new("TextButton")
     row.Parent = parent
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, -10, 0, 28)
+    row.BackgroundTransparency = 0.5
+    row.Size = UDim2.new(1, -10, 0, 30)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamMedium
     row.Text = "  " .. labelText
     row.TextColor3 = Color3.fromRGB(200, 210, 225)
-    row.TextSize = 10.5
+    row.TextSize = 11
     row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
 
     local box = Instance.new("Frame")
     box.Parent = row
     box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -26, 0.5, -8)
-    box.Size = UDim2.new(0, 16, 0, 16)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    box.Position = UDim2.new(1, -28, 0.5, -9)
+    box.Size = UDim2.new(0, 18, 0, 18)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
 
     local check = Instance.new("TextLabel")
     check.Parent = box
@@ -252,60 +210,34 @@ local function CreateToggle(parent, labelText, configKey)
     check.Font = Enum.Font.GothamBold
     check.Text = ""
     check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 9
+    check.TextSize = 10
 
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
         box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
         check.Text = state and "✓" or ""
-        if configKey then
-            getgenv().ZedHubConfig[configKey] = state
-        end
     end)
     return row
 end
 
--- === PENGISIAN KONTEN LENGKAP ===
+-- === ISI MENU LENGKAP TIAP TAB ===
+CreateToggle(TabInfo, "Auto Collect Required")
+CreateToggle(TabInfo, "Auto Submit Fall Bloom")
 
--- 1. TAB INFO
-local SecServer = CreateSection(TabInfo, "SERVER SETTINGS")
-CreateToggle(SecServer, "Auto Collect Required", "AutoCollect")
-CreateToggle(SecServer, "Auto Submit Fall Bloom", "AutoSubmitFallBloom")
+CreateToggle(TabEvent, "Give A Seed")
+CreateToggle(TabEvent, "Auto Shovel Acorn")
+CreateToggle(TabEvent, "Market Fall - Auto Buy Gear")
+CreateToggle(TabEvent, "Market Fall - Auto Buy Seeds")
+CreateToggle(TabEvent, "Market Fall - Auto Buy Pets")
+CreateToggle(TabEvent, "Market Fall - Auto Buy Crate")
 
--- 2. TAB EVENT FALL
-local SecFall = CreateSection(TabEvent, "🍁 MARKET FALL CONTROLLER")
-CreateToggle(SecFall, "Give A Seed", "GiveASeed")
-CreateToggle(SecFall, "Auto Shovel Acorn", "AutoShovel")
+CreateToggle(TabSelling, "Auto Sell Backpack If Full")
+CreateToggle(TabSelling, "Auto Sell Fruit")
 
-local SecFallGear = CreateSection(TabEvent, "🛠️ Market Fall - Gear")
-CreateToggle(SecFallGear, "Leaf Rake", nil)
-CreateToggle(SecFallGear, "Scarecrow Stick", nil)
-CreateToggle(SecFallGear, "Acorn Lolipop", nil)
-CreateToggle(SecFallGear, "Golden Acorn", nil)
-
-local SecFallSeed = CreateSection(TabEvent, "🌱 Market Fall - Seed & Egg")
-CreateToggle(SecFallSeed, "Pumpkin Seed", nil)
-CreateToggle(SecFallSeed, "Wheat Seed", nil)
-CreateToggle(SecFallSeed, "Turnip", nil)
-
--- 3. TAB AUTO SELLING
-local SecSell = CreateSection(TabSelling, "💰 AUTO SELLING FRUIT")
-CreateToggle(SecSell, "Auto Sell If Backpack Full", "AutoSellBackpack")
-CreateToggle(SecSell, "Auto Sell Fruit", "AutoSellFruit")
-
--- 4. TAB SHOP
-local SecShopEgg = CreateSection(TabShop, "🥚 SHOP EGG")
-CreateToggle(SecShopEgg, "Common Egg", nil)
-CreateToggle(SecShopEgg, "Uncommon Egg", nil)
-CreateToggle(SecShopEgg, "Rare Egg", nil)
-CreateToggle(SecShopEgg, "Mythichal Egg", nil)
-
-local SecShopSeed = CreateSection(TabShop, "🌱 SHOP SEED")
-CreateToggle(SecShopSeed, "Carrot", nil)
-CreateToggle(SecShopSeed, "Strawberry", nil)
-CreateToggle(SecShopSeed, "Blueberry", nil)
-CreateToggle(SecShopSeed, "Tomato", nil)
+CreateToggle(TabShop, "Shop Egg - Auto Buy Selected")
+CreateToggle(TabShop, "Shop Seed - Auto Buy Selected")
+CreateToggle(TabShop, "Shop Gear - Auto Buy Selected")
 
 -- Kontrol Jendela
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -323,7 +255,7 @@ CloseBtn.MouseButton1Click:Connect(function()
 end)
 
 -- Draggable
-local dragging, dragInput, dragStart, startPos
+local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
@@ -345,4 +277,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Ultimate Full Features Berhasil Dimuat!")
+print("ZedHub Direct Full Loaded!")
