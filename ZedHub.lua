@@ -1,6 +1,6 @@
 --[[
-    ZedHub Streamlined Fall Shop Edition - Grow A Garden
-    Struktur Toko Diringkas & Lebih Teratur
+    ZedHub Separate Fall Shop Tabs Edition - Grow A Garden
+    Setiap Fall Shop Menjadi Tab Halaman Tersendiri dengan Efek Buka-Tutup
 ]]
 
 local Players = game:GetService("Players")
@@ -112,45 +112,30 @@ Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 34)
 Body.Size = UDim2.new(1, 0, 1, -34)
 
--- Sidebar Kiri Utama
+-- Sidebar Kiri Utama (Dibuat bisa di-scroll jika menu bertambah banyak)
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
 Sidebar.BorderSizePixel = 0
-Sidebar.Size = UDim2.new(0, 130, 1, 0)
-Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+Sidebar.Size = UDim2.new(0, 135, 1, 0)
+Sidebar.CanvasSize = UDim2.new(0, 0, 0, 350)
 Sidebar.ScrollBarThickness = 2
 local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
-SBLayout.Padding = UDim.new(0, 4)
-
--- User Profile Box di Bawah Sidebar
-local UserBox = Instance.new("Frame", Sidebar)
-UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-UserBox.Size = UDim2.new(1, -6, 0, 38)
-UserBox.Position = UDim2.new(0, 3, 0, 220)
-Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 6)
-local UserTxt = Instance.new("TextLabel", UserBox)
-UserTxt.BackgroundTransparency = 1
-UserTxt.Size = UDim2.new(1, 0, 1, 0)
-UserTxt.Font = Enum.Font.GothamBold
-UserTxt.Text = "  👤 user_123\n  💎 Premium"
-UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
-UserTxt.TextSize = 9.5
-UserTxt.TextXAlignment = Enum.TextXAlignment.Left
+SBLayout.Padding = UDim.new(0, 3)
 
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
-ContentHolder.Position = UDim2.new(0, 135, 0, 0)
-ContentHolder.Size = UDim2.new(1, -135, 1, 0)
+ContentHolder.Position = UDim2.new(0, 140, 0, 0)
+ContentHolder.Size = UDim2.new(1, -140, 1, 0)
 
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -10, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 1800)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 800)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -161,11 +146,11 @@ local function CreateTab(tabName)
     local TabBtn = Instance.new("TextButton", Sidebar)
     TabBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     TabBtn.BackgroundTransparency = 0.6
-    TabBtn.Size = UDim2.new(1, -6, 0, 32)
+    TabBtn.Size = UDim2.new(1, -6, 0, 30)
     TabBtn.Font = Enum.Font.GothamMedium
     TabBtn.Text = "    " .. tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
-    TabBtn.TextSize = 11.5
+    TabBtn.TextSize = 10.5
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
 
@@ -180,8 +165,13 @@ local function CreateTab(tabName)
     return Page
 end
 
+-- Pembuatan Tab Menu di Sidebar
 local TabInfo = CreateTab("Info")
 local TabEvent = CreateTab("Event")
+local TabShopGear = CreateTab("Shop Fall Gear")
+local TabShopSeed = CreateTab("Shop Fall Seed")
+local TabShopCosmetic = CreateTab("Shop Cosmetic")
+local TabShopPet = CreateTab("Shop Pet & Egg")
 local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
@@ -282,9 +272,9 @@ local function CreateToggle(parentSec, text)
     return row
 end
 
--- === PENGISIAN KONTEN ===
+-- === PENGISIAN KONTEN PER TAB ===
 
--- 1. TAB SHOP: SHOP SEED
+-- 1. TAB SHOP UTAMA
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
 CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
@@ -293,13 +283,21 @@ CreateToggle(SecShopSeed, "Tomato")
 CreateToggle(SecShopSeed, "Auto Buy (Selected)")
 CreateToggle(SecShopSeed, "Auto Buy All")
 
--- 2. TAB EVENT: STRUKTUR RINGKAS DAN JELAS
+-- 2. TAB EVENT (Fall Harvest, Shady Scarecrow, Acorn Shovel)
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFallHarvest, "Required Collection Plant")
 CreateToggle(SecFallHarvest, "Required Submit Plant")
 
--- Shop Fall Gear
-local SecFallGear = CreateAccordionSection(TabEvent, "SHOP FALL GEAR", Color3.fromRGB(59, 130, 246))
+local SecShady = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
+CreateToggle(SecShady, "All Seed")
+CreateToggle(SecShady, "Gold Egg Seed")
+CreateToggle(SecShady, "Give A Seed")
+
+local SecAcornShovel = CreateAccordionSection(TabEvent, "ACORN SHOVEL", Color3.fromRGB(96, 165, 250))
+CreateToggle(SecAcornShovel, "Auto Shovel Acorn")
+
+-- 3. TAB SHOP FALL GEAR (Halaman Sendiri)
+local SecFallGear = CreateAccordionSection(TabShopGear, "SHOP FALL GEAR", Color3.fromRGB(59, 130, 246))
 CreateToggle(SecFallGear, "Firefly Jar")
 CreateToggle(SecFallGear, "Sky Lantern")
 CreateToggle(SecFallGear, "Maple Leaf Kite")
@@ -311,8 +309,11 @@ CreateToggle(SecFallGear, "Harvest Basket")
 CreateToggle(SecFallGear, "Acorn Lollipop")
 CreateToggle(SecFallGear, "Golden Acorn Rake")
 
--- Shop Fall Seed
-local SecFallSeed = CreateAccordionSection(TabEvent, "SHOP FALL SEED", Color3.fromRGB(244, 63, 94))
+local SecAutoBuyGear = CreateAccordionSection(TabShopGear, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
+CreateToggle(SecAutoBuyGear, "Auto Buy On/Off")
+
+-- 4. TAB SHOP FALL SEED (Halaman Sendiri)
+local SecFallSeed = CreateAccordionSection(TabShopSeed, "SHOP FALL SEED", Color3.fromRGB(244, 63, 94))
 CreateToggle(SecFallSeed, "Turnip Seed")
 CreateToggle(SecFallSeed, "Parsley Seed")
 CreateToggle(SecFallSeed, "Autumn Seed Pack")
@@ -322,8 +323,11 @@ CreateToggle(SecFallSeed, "Golden Peach")
 CreateToggle(SecFallSeed, "Kniphopia")
 CreateToggle(SecFallSeed, "Maple Resin")
 
--- Shop Fall Cosmetic dan Crate
-local SecFallCosmetic = CreateAccordionSection(TabEvent, "SHOP FALL COSMETIC DAN CRATE", Color3.fromRGB(20, 184, 166))
+local SecAutoBuySeed = CreateAccordionSection(TabShopSeed, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
+CreateToggle(SecAutoBuySeed, "Auto Buy On/Off")
+
+-- 5. TAB SHOP COSMETIC & CRATE (Halaman Sendiri)
+local SecFallCosmetic = CreateAccordionSection(TabShopCosmetic, "SHOP FALL COSMETIC DAN CRATE", Color3.fromRGB(20, 184, 166))
 CreateToggle(SecFallCosmetic, "Fall Leaf Chair")
 CreateToggle(SecFallCosmetic, "Fall Crate")
 CreateToggle(SecFallCosmetic, "Maple Flag")
@@ -334,8 +338,11 @@ CreateToggle(SecFallCosmetic, "Flying Kit")
 CreateToggle(SecFallCosmetic, "Autumn Crate")
 CreateToggle(SecFallCosmetic, "Fall Mountain")
 
--- Shop Fall Pet dan Egg
-local SecFallPet = CreateAccordionSection(TabEvent, "SHOP FALL PET DAN EGG", Color3.fromRGB(168, 85, 247))
+local SecAutoBuyCosmetic = CreateAccordionSection(TabShopCosmetic, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
+CreateToggle(SecAutoBuyCosmetic, "Auto Buy On/Off")
+
+-- 6. TAB SHOP PET & EGG (Halaman Sendiri)
+local SecFallPet = CreateAccordionSection(TabShopPet, "SHOP FALL PET DAN EGG", Color3.fromRGB(168, 85, 247))
 CreateToggle(SecFallPet, "Fall Egg")
 CreateToggle(SecFallPet, "Salmon")
 CreateToggle(SecFallPet, "Chipmunk")
@@ -347,24 +354,15 @@ CreateToggle(SecFallPet, "Sugar Glider")
 CreateToggle(SecFallPet, "Space Squirrel")
 CreateToggle(SecFallPet, "Red Panda")
 
--- Auto Buy Fall Shop On/Off
-local SecAutoBuy = CreateAccordionSection(TabEvent, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
-CreateToggle(SecAutoBuy, "Auto Buy On/Off")
+local SecAutoBuyPet = CreateAccordionSection(TabShopPet, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
+CreateToggle(SecAutoBuyPet, "Auto Buy On/Off")
 
-local SecShady = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
-CreateToggle(SecShady, "All Seed")
-CreateToggle(SecShady, "Gold Egg Seed")
-CreateToggle(SecShady, "Give A Seed")
-
-local SecAcornShovel = CreateAccordionSection(TabEvent, "ACORN SHOVEL", Color3.fromRGB(96, 165, 250))
-CreateToggle(SecAcornShovel, "Auto Shovel Acorn")
-
--- 3. TAB AUTO SELLING
+-- 7. TAB AUTO SELLING
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 CreateToggle(SecSell, "Auto Sell If Backpack Full")
 CreateToggle(SecSell, "Auto Sell Fruit")
 
--- 4. TAB INFO: WEBHOOK & SERVER
+-- 8. TAB INFO: WEBHOOK & SERVER
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
 local WebhookBox = Instance.new("TextBox", WebhookBody)
 WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -444,4 +442,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Streamlined Fall Shop Loaded Successfully!")
+print("ZedHub Separate Fall Shop Tabs Loaded Successfully!")
