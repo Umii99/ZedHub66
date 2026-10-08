@@ -1,7 +1,8 @@
 --[[
-    ZEDHUB - FINAL MONITOR-ENABLED 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL 180-200 SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Filter Super Ketat (Pet, Harvest Tool, & Alat 100% Aman)
+    - Backend Auto Sell dengan Batas Pengaman 180-200 Slot (Anti-Jual Prematur)
+    - Filter Super Ketat (Pet, Harvest Tool, & Alat Lainnya 100% Aman)
     - Dilengkapi Monitor Print Console untuk melacak jumlah buah asli secara akurat
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
@@ -523,7 +524,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- SUPER STRICT MONITOR 200-SLOT BACKEND ENGINE
+-- 180-200 SLOT THRESHOLD BACKEND ENGINE
 -- =========================================================================
 local IsSelling = false
 
@@ -565,8 +566,8 @@ local function GetBackpackCount()
         end
     end
     
-    -- Print monitor untuk melihat hitungan buah asli secara langsung di console executor
-    print("ZedHub Monitor -> Jumlah Buah Murni di Tas:", currentCount, "/ 200")
+    -- Print monitor untuk melacak hitungan buah murni di console executor
+    print("ZedHub Monitor -> Jumlah Buah Murni di Tas:", currentCount, "/ 200 (Target: 180+)")
     return currentCount
 end
 
@@ -578,134 +579,4 @@ local function SellInventory()
     local ShecklesCount = (Leaderstats and Leaderstats:FindFirstChild("Sheckles")) or 
                           LocalPlayer:FindFirstChild("PlayerSheckles")
                           
-    local PreviousSheckles = ShecklesCount and ShecklesCount.Value or 0
-    local Previous = Character:GetPivot()
-
-    if IsSelling then return end
-    IsSelling = true
-
-    Character:PivotTo(CFrame.new(62, 4, -26))
-    task.wait(0.3)
-    
-    local sellEvt = GameEvents and (
-        GameEvents:FindFirstChild("Sell_Inventory") or 
-        GameEvents:FindFirstChild("SellInventory") or 
-        GameEvents:FindFirstChild("Sell")
-    )
-
-    while task.wait(0.2) do
-        local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
-        local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
-        if not backpackOn and not fruitOn then break end
-
-        if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
-        
-        if sellEvt then
-            pcall(function()
-                sellEvt:FireServer()
-            end)
-        end
-    end
-    
-    Character:PivotTo(Previous)
-    task.wait(0.3)
-    IsSelling = false
-end
-
--- Looping Utama: Dipatok mutlak 200 buah murni
-task.spawn(function()
-    while task.wait(1) do
-        local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
-        local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
-
-        if not IsSelling then
-            if backpackOn and not fruitOn then
-                local currentItems = GetBackpackCount()
-                
-                -- Skrip tidak akan menjual sebelum buah murni menyentuh angka 200!
-                if currentItems >= 200 then
-                    SellInventory()
-                end
-                
-            elseif fruitOn then
-                SellInventory()
-            end
-        end
-    end
-end)
-
--- Auto Buy Engine (Main Shop & 4 Fall Market)
-task.spawn(function()
-    while task.wait(2) do
-        pcall(function()
-            local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
-            if not buyEvt then return end
-
-            for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
-                if data.BuyAll then
-                    buyEvt:FireServer(catName, "BUY_ALL")
-                    task.wait(0.3)
-                elseif data.Active and data.Items and #data.Items > 0 then
-                    for _, itemName in pairs(data.Items) do
-                        if not data.Active then break end
-                        buyEvt:FireServer(catName, itemName)
-                        task.wait(0.25)
-                    end
-                end
-            end
-
-            for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
-                if data.BuyAll then
-                    buyEvt:FireServer(catName, "BUY_ALL")
-                    task.wait(0.3)
-                elseif data.Active and data.Items and #data.Items > 0 then
-                    for _, itemName in pairs(data.Items) do
-                        if not data.Active then break end
-                        buyEvt:FireServer(catName, itemName)
-                        task.wait(0.25)
-                    end
-                end
-            end
-        end)
-    end
-end)
-
-
--- === KONTROL JENDELA (Minimize, Close, Draggable) ===
-MinimizeBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    FloatingBtn.Visible = true
-end)
-
-FloatingBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    FloatingBtn.Visible = false
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
-end)
-
-local dragging, dragStart, startPos
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
-print("ZedHub Monitor-Enabled 200-Slot Pure Fruit Engine Loaded Successfully!")
+    local PreviousSheckles = ShecklesCount and She
