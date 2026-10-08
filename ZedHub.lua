@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
-    - UI Murni milikmu dengan perbaikan callback CreateToggle ON/OFF
-    - Backend Auto Sell dengan Safety Stop (OFF langsung berhenti total)
+    - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
+    - Backend Auto Sell dengan Deteksi Kapasitas Tas Penuh Otomatis
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,25 +522,30 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Dengan Safety Stop)
+-- MASTER BACKEND AUTOMATION ENGINE (Dengan Deteksi Otomatis Tas Penuh)
 -- =========================================================================
 local IsSelling = false
+local LastCropCount = 0
+local StableCountTime = 0
 
 local function GetInvCrops()
     local Character = LocalPlayer.Character
     local Crops = {}
     
-    local function CollectCropsFromParent(Parent)
-        for _, Tool in next, Parent:GetChildren() do
-            local Name = Tool:FindFirstChild("Item_String")
-            if Name then
-                table.insert(Crops, Tool)
+    local function CollectFrom(parent)
+        if not parent then return end
+        for _, item in ipairs(parent:GetChildren()) do
+            if item:IsA("Tool") then
+                local nameLower = string.lower(item.Name)
+                if not string.find(nameLower, "seed") and not string.find(nameLower, "sprinkler") and not string.find(nameLower, "wrench") then
+                    table.insert(Crops, item)
+                end
             end
         end
     end
 
-    if Backpack then CollectCropsFromParent(Backpack) end
-    if Character then CollectCropsFromParent(Character) end
+    if Backpack then CollectFrom(Backpack) end
+    if Character then CollectFrom(Character) end
 
     return Crops
 end
@@ -559,7 +564,6 @@ local function SellInventory()
 
     Character:PivotTo(CFrame.new(62, 4, -26))
     
-    -- Looping dengan pengecekan real-time agar bisa berhenti seketika saat tombol dimatikan (OFF)
     while task.wait(0.1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
@@ -576,24 +580,37 @@ local function SellInventory()
     Character:PivotTo(Previous)
     task.wait(0.2)
     IsSelling = false
+    LastCropCount = 0
+    StableCountTime = 0
 end
 
--- Looping Auto Sell Utama
+-- Looping Auto Sell Utama dengan Deteksi Otomatis Kapasitas Penuh
 task.spawn(function()
     while task.wait(1.5) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if backpackOn or fruitOn then
-            local CropCount = #GetInvCrops()
+            local itemsInBackpack = GetInvCrops()
+            local CropCount = #itemsInBackpack
 
             -- 1. Jika "Auto Sell Fruit" dicentang saja -> Jual terus menerus
             if fruitOn and not backpackOn then
                 SellInventory()
                 
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang (atau keduanya dicentang) -> Jual saat tas penuh (>= 12 item)
-            elseif backpackOn and CropCount >= 12 then
-                SellInventory()
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Deteksi otomatis saat tas penuh (mentok/tidak bertambah meski proses kumpul jalan)
+            elseif backpackOn then
+                if CropCount > 0 and CropCount == LastCropCount then
+                    StableCountTime = StableCountTime + 1.5
+                    -- Jika jumlah item di tas tidak berubah selama 4,5 detik (menandakan tas sudah penuh & mentok)
+                    if StableCountTime >= 4.5 then
+                        SellInventory()
+                        StableCountTime = 0
+                    end
+                else
+                    LastCropCount = CropCount
+                    StableCountTime = 0
+                end
             end
         end
     end
