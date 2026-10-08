@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Deteksi Kapasitas Tas Penuh Presisi
+    - Backend Auto Sell Murni ala SpeedHub (Tidak sell jika belum full, langsung sell saat mentok)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -471,7 +471,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (Terhubung Langsung ke ZedHubConfig) ===
+-- === TAB AUTO SELLING ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 
 CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
@@ -522,11 +522,9 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Smart Stagnation Detection)
+-- MASTER BACKEND AUTOMATION ENGINE (Pure SpeedHub Logic Style)
 -- =========================================================================
 local IsSelling = false
-local LastCropCount = 0
-local StableCountTime = 0
 
 local function GetInvCrops()
     local Character = LocalPlayer.Character
@@ -563,8 +561,15 @@ local function SellInventory()
     IsSelling = true
 
     Character:PivotTo(CFrame.new(62, 4, -26))
+    task.wait(0.3)
     
-    while task.wait(0.1) do
+    local sellEvt = GameEvents and (
+        GameEvents:FindFirstChild("Sell_Inventory") or 
+        GameEvents:FindFirstChild("SellInventory") or 
+        GameEvents:FindFirstChild("Sell")
+    )
+
+    while task.wait(0.2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
         if not backpackOn and not fruitOn then 
@@ -572,58 +577,62 @@ local function SellInventory()
         end
 
         if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
-        if GameEvents and GameEvents:FindFirstChild("Sell_Inventory") then
-            GameEvents.Sell_Inventory:FireServer()
+        
+        if sellEvt then
+            pcall(function()
+                sellEvt:FireServer()
+            end)
         end
     end
     
     Character:PivotTo(Previous)
-    task.wait(0.2)
+    task.wait(0.3)
     IsSelling = false
-    LastCropCount = 0
-    StableCountTime = 0
 end
 
--- Looping Auto Sell Profesional (Akurat mendeteksi tas penuh tanpa salah jual saat tas kosong)
+-- Looping Auto Sell Murni Tanpa Timer Delay Ala SpeedHub
 task.spawn(function()
-    while task.wait(1.5) do
+    local lastCount = -1
+    local stableFrames = 0
+    
+    while task.wait(0.5) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        if backpackOn or fruitOn then
+        if (backpackOn or fruitOn) and not IsSelling then
             local itemsInBackpack = GetInvCrops()
             local CropCount = #itemsInBackpack
 
-            -- 1. Jika "Auto Sell Fruit" dicentang saja -> Jual terus menerus
+            -- 1. Jika "Auto Sell Fruit" dicentang -> Jual terus menerus
             if fruitOn and not backpackOn then
                 SellInventory()
                 
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Mendeteksi saat tas mentok/penuh secara adaptif
-            elseif backpackOn then
-                -- Pastikan tas sudah berisi item yang cukup banyak (di atas 10) dan jumlahnya berhenti bertambah (stagnan) selama 4.5 detik
-                if CropCount > 10 and CropCount == LastCropCount then
-                    StableCountTime = StableCountTime + 1.5
-                    if StableCountTime >= 4.5 then
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Murni diam jika belum full, langsung jual saat mentok
+            elseif backpackOn and not fruitOn then
+                if CropCount > 0 and CropCount == lastCount then
+                    stableFrames = stableFrames + 1
+                    -- Begitu terdeteksi macet mutlak karena tas sudah mentok penuh
+                    if stableFrames >= 4 then 
                         SellInventory()
-                        StableCountTime = 0
+                        stableFrames = 0
+                        lastCount = -1
                     end
                 else
-                    LastCropCount = CropCount
-                    StableCountTime = 0
+                    lastCount = CropCount
+                    stableFrames = 0
                 end
             end
         end
     end
 end)
 
--- Auto Buy Engine (Main Shop & 4 Fall Market: Selected & Buy All)
+-- Auto Buy Engine (Main Shop & 4 Fall Market)
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
             local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
             if not buyEvt then return end
 
-            -- 1. Eksekusi 4 Kategori Fall Market
             for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
@@ -637,7 +646,6 @@ task.spawn(function()
                 end
             end
 
-            -- 2. Eksekusi Main Shop (Egg, Seed, Gear)
             for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
@@ -692,4 +700,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Complete UI & Master Backend Loaded Successfully!")
+print("ZedHub Complete UI & Pure SpeedHub Backend Loaded Successfully!")
