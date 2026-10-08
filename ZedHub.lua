@@ -1,6 +1,6 @@
 --[[
-    ZedHub Ultimate Replica - Grow A Garden Edition
-    Sesuai Persis dengan Gambar Referensi UI Asli
+    ZedHub Perfect Replica - Grow A Garden Edition
+    Tata Letak 2 Kolom Section & Toggle Persis Seperti Referensi UI
 ]]
 
 local Players = game:GetService("Players")
@@ -10,12 +10,12 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
-if PlayerGui:FindFirstChild("ZedHubUltimateUI") then
-    PlayerGui.ZedHubUltimateUI:Destroy()
+if PlayerGui:FindFirstChild("ZedHubPerfectUI") then
+    PlayerGui.ZedHubPerfectUI:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZedHubUltimateUI"
+ScreenGui.Name = "ZedHubPerfectUI"
 ScreenGui.ResetOnSpawn = false
 local success = pcall(function() ScreenGui.Parent = CoreGui end)
 if not success then ScreenGui.Parent = PlayerGui end
@@ -39,11 +39,11 @@ Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 -- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 32)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 640, 0, 380)
+MainFrame.Size = UDim2.new(0, 640, 0, 370)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
@@ -63,7 +63,7 @@ local Title = Instance.new("TextLabel")
 Title.Parent = TopBar
 Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
-Title.Size = UDim2.new(0, 300, 1, 0)
+Title.Size = UDim2.new(0, 250, 1, 0)
 Title.Font = Enum.Font.GothamBold
 Title.Text = "🪐 ZedHub  Grow A Garden"
 Title.TextColor3 = Color3.fromRGB(240, 240, 255)
@@ -117,7 +117,7 @@ local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
 Sidebar.BorderSizePixel = 0
-Sidebar.Size = UDim2.new(0, 135, 1, 0)
+Sidebar.Size = UDim2.new(0, 130, 1, 0)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 Sidebar.ScrollBarThickness = 2
 local SBLayout = Instance.new("UIListLayout", Sidebar)
@@ -128,7 +128,7 @@ SBLayout.Padding = UDim.new(0, 3)
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 UserBox.Size = UDim2.new(1, -6, 0, 36)
-UserBox.Position = UDim2.new(0, 3, 0, 250)
+UserBox.Position = UDim2.new(0, 3, 0, 240)
 Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 6)
 local UserTxt = Instance.new("TextLabel", UserBox)
 UserTxt.BackgroundTransparency = 1
@@ -142,8 +142,8 @@ UserTxt.TextXAlignment = Enum.TextXAlignment.Left
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
-ContentHolder.Position = UDim2.new(0, 140, 0, 0)
-ContentHolder.Size = UDim2.new(1, -140, 1, 0)
+ContentHolder.Position = UDim2.new(0, 135, 0, 0)
+ContentHolder.Size = UDim2.new(1, -135, 1, 0)
 
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
@@ -186,12 +186,43 @@ local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Membuat Section Box (Accordion Style)
-local function CreateSection(parent, titleText)
-    local sec = Instance.new("Frame", parent)
+-- Layout 2 Kolom untuk Halaman (Kiri & Kanan)
+local function CreateTwoColumnLayout(parentTab)
+    local container = Instance.new("Frame", parentTab)
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -6, 0, 330)
+
+    local leftCol = Instance.new("ScrollingFrame", container)
+    leftCol.Name = "LeftCol"
+    leftCol.BackgroundTransparency = 1
+    leftCol.Position = UDim2.new(0, 0, 0, 0)
+    leftCol.Size = UDim2.new(0.48, 0, 1, 0)
+    leftCol.CanvasSize = UDim2.new(0, 0, 0, 500)
+    leftCol.ScrollBarThickness = 2
+    local lLayout = Instance.new("UIListLayout", leftCol)
+    lLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    lLayout.Padding = UDim.new(0, 5)
+
+    local rightCol = Instance.new("ScrollingFrame", container)
+    rightCol.Name = "RightCol"
+    rightCol.BackgroundTransparency = 1
+    rightCol.Position = UDim2.new(0.52, 0, 0, 0)
+    rightCol.Size = UDim2.new(0.48, 0, 1, 0)
+    rightCol.CanvasSize = UDim2.new(0, 0, 0, 500)
+    rightCol.ScrollBarThickness = 2
+    local rLayout = Instance.new("UIListLayout", rightCol)
+    rLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    rLayout.Padding = UDim.new(0, 5)
+
+    return leftCol, rightCol
+end
+
+-- Fungsi Membuat Kotak Section Box
+local function CreateSection(parentCol, titleText)
+    local sec = Instance.new("Frame", parentCol)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
     sec.BackgroundTransparency = 0.4
-    sec.Size = UDim2.new(1, -8, 0, 0)
+    sec.Size = UDim2.new(1, 0, 0, 0)
     sec.AutomaticSize = Enum.AutomaticSize.Y
     Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 6)
     
@@ -205,34 +236,34 @@ local function CreateSection(parent, titleText)
 
     local header = Instance.new("TextLabel", sec)
     header.BackgroundTransparency = 1
-    header.Size = UDim2.new(1, 0, 0, 26)
+    header.Size = UDim2.new(1, 0, 0, 24)
     header.Font = Enum.Font.GothamBold
     header.Text = "  🔸 " .. titleText
     header.TextColor3 = Color3.fromRGB(96, 165, 250)
-    header.TextSize = 10.5
+    header.TextSize = 10
     header.TextXAlignment = Enum.TextXAlignment.Left
 
     return sec
 end
 
 -- Fungsi Toggle Item
-local function CreateToggle(parent, text)
-    local row = Instance.new("TextButton", parent)
+local function CreateToggle(parentSec, text)
+    local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, -8, 0, 26)
+    row.Size = UDim2.new(1, -6, 0, 24)
     row.AutoButtonColor = false
     row.Font = Enum.Font.Gotham
     row.Text = "    " .. text
     row.TextColor3 = Color3.fromRGB(200, 210, 230)
-    row.TextSize = 10
+    row.TextSize = 9.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local box = Instance.new("Frame", row)
     box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -24, 0.5, -7)
-    box.Size = UDim2.new(0, 14, 0, 14)
+    box.Position = UDim2.new(1, -22, 0.5, -6)
+    box.Size = UDim2.new(0, 12, 0, 12)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
 
     local check = Instance.new("TextLabel", box)
@@ -252,42 +283,46 @@ local function CreateToggle(parent, text)
     return row
 end
 
--- === ISI KONTEN LENGKAP MIRIP REFERENSI ===
+-- === MENGISI TAB SHOP (Sesuai Gambar Referensi 2 Kolom) ===
+local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
 
--- Tab Info
-local SecServer = CreateSection(TabInfo, "SERVER SETTINGS")
-CreateToggle(SecServer, "Auto Collect Required")
-CreateToggle(SecServer, "Auto Submit Fall Bloom")
-
--- Tab Event (Termasuk Scarecrow & Gear Lengkap)
-local SecFall = CreateSection(TabEvent, "MARKET FALL CONTROLLER")
-CreateToggle(SecFall, "Give A Seed")
-CreateToggle(SecFall, "Auto Shovel Acorn")
-
-local SecFallGear = CreateSection(TabEvent, "MARKET FALL - GEAR")
-CreateToggle(SecFallGear, "Leaf Rake")
-CreateToggle(SecFallGear, "Scarecrow Stick")
-CreateToggle(SecFallGear, "Acorn Lolipop")
-CreateToggle(SecFallGear, "Golden Acorn")
-
--- Tab Auto Selling
-local SecSell = CreateSection(TabSelling, "AUTO SELLING FRUIT")
-CreateToggle(SecSell, "Auto Sell If Backpack Full")
-CreateToggle(SecSell, "Auto Sell Fruit")
-
--- Tab Shop (Egg, Seed, Gear)
-local SecShopEgg = CreateSection(TabShop, "SHOP EGG")
-CreateToggle(SecShopEgg, "Common Egg")
-CreateToggle(SecShopEgg, "Rare Egg")
-CreateToggle(SecShopEgg, "Mythical Egg")
-CreateToggle(SecShopEgg, "Auto Buy (Selected)")
-CreateToggle(SecShopEgg, "Auto Buy All")
-
-local SecShopSeed = CreateSection(TabShop, "SHOP SEED")
+local SecShopSeed = CreateSection(ShopLeft, "SHOP SEED")
 CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
 CreateToggle(SecShopSeed, "Blueberry")
+CreateToggle(SecShopSeed, "Tomato")
 CreateToggle(SecShopSeed, "Auto Buy (Selected)")
+CreateToggle(SecShopSeed, "Auto Buy All")
+
+local SecAllSeed = CreateSection(ShopRight, "ALL SEED")
+CreateToggle(SecAllSeed, "Carrot")
+CreateToggle(SecAllSeed, "Strawberry")
+CreateToggle(SecAllSeed, "Advanced Sprinkler")
+CreateToggle(SecAllSeed, "Grandmaster")
+CreateToggle(SecAllSeed, "Godly Sprinkler")
+CreateToggle(SecAllSeed, "Auto Buy (Selected)")
+CreateToggle(SecAllSeed, "Auto Buy All")
+
+-- Tab Info
+local InfoLeft, InfoRight = CreateTwoColumnLayout(TabInfo)
+local SecServer = CreateSection(InfoLeft, "SERVER SETTINGS")
+CreateToggle(SecServer, "Auto Collect Required")
+CreateToggle(SecServer, "Auto Submit Fall Bloom")
+
+-- Tab Event
+local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
+local SecFall = CreateSection(EventLeft, "MARKET FALL CONTROLLER")
+CreateToggle(SecFall, "Give A Seed")
+CreateToggle(SecFall, "Auto Shovel Acorn")
+local SecFallGear = CreateSection(EventRight, "MARKET FALL - GEAR")
+CreateToggle(SecFallGear, "Leaf Rake")
+CreateToggle(SecFallGear, "Scarecrow Stick")
+
+-- Tab Selling
+local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
+local SecSell = CreateSection(SellLeft, "AUTO SELLING FRUIT")
+CreateToggle(SecSell, "Auto Sell If Backpack Full")
+CreateToggle(SecSell, "Auto Sell Fruit")
 
 -- === FITUR KONTROL JENDELA (Draggable, Minimize, Close) ===
 
@@ -328,4 +363,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Ultimate Replica Loaded Successfully!")
+print("ZedHub Perfect Layout Loaded Successfully!")
