@@ -1,6 +1,6 @@
 --[[
-    ZedHub Auto Acorn & Gear Update - Grow A Garden
-    Penambahan Halaman Auto Acorn & Perubahan Nama Golden Acorn
+    ZedHub Complete Shop & Selected Edition - Grow A Garden
+    Tab Shop Lengkap dengan System Selected (Dropdown) & Auto Buy
 ]]
 
 local Players = game:GetService("Players")
@@ -150,7 +150,7 @@ local function CreateTab(tabName)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -10, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 2200)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 2500)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -411,33 +411,45 @@ CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {
 })
 CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off")
 
--- Halaman Baru: AUTO ACORN (Di bawah Shady Scarecrown)
+-- Auto Acorn
 local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN", Color3.fromRGB(56, 189, 248))
 CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off")
 
 
--- === PENGISIAN KONTEN TAB LAINNYA ===
-local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
-CreateToggle(SecShopSeed, "Carrot")
-CreateToggle(SecShopSeed, "Strawberry")
-CreateToggle(SecShopSeed, "Blueberry")
-CreateToggle(SecShopSeed, "Tomato")
-CreateActionToggle(SecShopSeed, "Auto Buy On/Off")
+-- === PENGISIAN KONTEN TAB SHOP (DENGAN LIST LENGKAP HTML) ===
 
-local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
-CreateToggle(SecShopGear, "Watering Can")
-CreateToggle(SecShopGear, "Basic Shovel")
-CreateToggle(SecShopGear, "Advanced Sprinkler")
-CreateToggle(SecShopGear, "Godly Sprinkler")
-CreateActionToggle(SecShopGear, "Auto Buy On/Off")
-
+-- 1. SHOP EGG
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
-CreateToggle(SecShopEgg, "Common Egg")
-CreateToggle(SecShopEgg, "Rare Egg")
-CreateToggle(SecShopEgg, "Epic Egg")
-CreateToggle(SecShopEgg, "Gold Egg")
-CreateActionToggle(SecShopEgg, "Auto Buy On/Off")
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {
+    "Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"
+})
+CreateActionToggle(SecShopEgg, "Auto Buy (Selected)")
+CreateActionToggle(SecShopEgg, "Auto Buy All")
 
+-- 2. SHOP SEED
+local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {
+    "Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", 
+    "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", 
+    "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", 
+    "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", 
+    "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"
+})
+CreateActionToggle(SecShopSeed, "Auto Buy (Selected)")
+CreateActionToggle(SecShopSeed, "Auto Buy All")
+
+-- 3. SHOP GEAR
+local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {
+    "Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", 
+    "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", 
+    "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"
+})
+CreateActionToggle(SecShopGear, "Auto Buy (Selected)")
+CreateActionToggle(SecShopGear, "Auto Buy All")
+
+
+-- === TAB LAINNYA ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 CreateToggle(SecSell, "Auto Sell If Backpack Full")
 CreateToggle(SecSell, "Auto Sell Fruit")
@@ -521,4 +533,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Auto Acorn & Gear Updated Successfully!")
+print("ZedHub Complete Shop & Selected Loaded Successfully!")
