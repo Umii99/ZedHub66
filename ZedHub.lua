@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell Mutlak (Membaca Max Capacity & Item Count langsung dari game seperti Zetsu)
+    - Backend Auto Sell Mutlak (Responsif, akurat membaca kapasitas asli game tanpa bug tombol)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,7 +522,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Precise Max Capacity & Count Sync)
+-- MASTER BACKEND AUTOMATION ENGINE (Responsive & Accurate Capacity Reader)
 -- =========================================================================
 local IsSelling = false
 
@@ -557,7 +557,6 @@ local function GetBackpackCapacityInfo()
     elseif LocalPlayer:GetAttribute("MaxCapacity") then
         maxCapacity = LocalPlayer:GetAttribute("MaxCapacity")
     else
-        -- Memeriksa folder data internal pemain
         for _, child in ipairs(LocalPlayer:GetChildren()) do
             if child:IsA("Folder") or child:IsA("Configuration") then
                 local foundMax = child:FindFirstChild("MaxInventory") or 
@@ -581,8 +580,7 @@ local function SellInventory()
     
     local Leaderstats = LocalPlayer:FindFirstChild("leaderstats")
     local ShecklesCount = (Leaderstats and Leaderstats:FindFirstChild("Sheckles")) or 
-                          LocalPlayer:FindFirstChild("PlayerSheckles") or
-                          (Leaderstats and Leaderstats:FindFirstChild("PlayerSheckles"))
+                          LocalPlayer:FindFirstChild("PlayerSheckles")
                           
     local PreviousSheckles = ShecklesCount and ShecklesCount.Value or 0
     local Previous = Character:GetPivot()
@@ -620,21 +618,20 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Bandingkan Total Buah dengan Kapasitas Maksimum Asli Game
+-- Looping Utama Auto Sell yang Super Responsif
 task.spawn(function()
-    while task.wait(1) do
+    while task.wait(0.8) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        if (backpackOn or fruitOn) and not IsSelling then
-            local currentItems, maxLimit = GetBackpackCapacityInfo()
-
-            -- 1. Jika "Auto Sell Fruit" dicentang -> Jual terus menerus
-            if fruitOn and not backpackOn then
+        if not IsSelling then
+            -- 1. Jika "Auto Sell Fruit" dicentang -> Langsung jual terus-menerus tanpa peduli kapasitas
+            if fruitOn then
                 SellInventory()
                 
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Diam total jika belum full, langsung sell pas menyentuh limit max
-            elseif backpackOn and not fruitOn then
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Diam total jika belum penuh, langsung jual pas menyentuh limit max
+            elseif backpackOn then
+                local currentItems, maxLimit = GetBackpackCapacityInfo()
                 if currentItems >= maxLimit then
                     SellInventory()
                 end
@@ -717,4 +714,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub UI & Perfect Capacity-Sync Backend Loaded Successfully!")
+print("ZedHub UI & Responsive Auto Sell Backend Loaded Successfully!")
