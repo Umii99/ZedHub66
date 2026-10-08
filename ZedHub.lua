@@ -1,6 +1,5 @@
 --[[
-    ZedHub Final Accurate Replica - Grow A Garden Edition
-    Struktur Persis Sesuai Video Referensi Asli
+    ZedHub Tab Info - Webhook & Server (Buka-Tutup dengan Trigger Click)
 ]]
 
 local Players = game:GetService("Players")
@@ -163,7 +162,7 @@ local function CreateTab(tabName)
     TabBtn.BackgroundTransparency = 0.6
     TabBtn.Size = UDim2.new(1, -6, 0, 30)
     TabBtn.Font = Enum.Font.GothamMedium
-    TabBtn.Text = "    " .. tabName
+    TabBtn.Text = "    " + tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
     TabBtn.TextSize = 10.5
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
@@ -180,152 +179,123 @@ local function CreateTab(tabName)
     return Page
 end
 
+-- Tab Pembuatan
 local TabInfo = CreateTab("Info")
 local TabEvent = CreateTab("Event")
 local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
 
--- Layout 2 Kolom (Kiri & Kanan Sesuai Video)
-local function CreateTwoColumnLayout(parentTab)
-    local container = Instance.new("Frame", parentTab)
-    container.BackgroundTransparency = 1
-    container.Size = UDim2.new(1, -6, 0, 330)
-
-    local leftCol = Instance.new("ScrollingFrame", container)
-    leftCol.Name = "LeftCol"
-    leftCol.BackgroundTransparency = 1
-    leftCol.Position = UDim2.new(0, 0, 0, 0)
-    leftCol.Size = UDim2.new(0.48, 0, 1, 0)
-    leftCol.CanvasSize = UDim2.new(0, 0, 0, 500)
-    leftCol.ScrollBarThickness = 2
-    local lLayout = Instance.new("UIListLayout", leftCol)
-    lLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    lLayout.Padding = UDim.new(0, 5)
-
-    local rightCol = Instance.new("ScrollingFrame", container)
-    rightCol.Name = "RightCol"
-    rightCol.BackgroundTransparency = 1
-    rightCol.Position = UDim2.new(0.52, 0, 0, 0)
-    rightCol.Size = UDim2.new(0.48, 0, 1, 0)
-    rightCol.CanvasSize = UDim2.new(0, 0, 0, 500)
-    rightCol.ScrollBarThickness = 2
-    local rLayout = Instance.new("UIListLayout", rightCol)
-    rLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    rLayout.Padding = UDim.new(0, 5)
-
-    return leftCol, rightCol
-end
-
--- Fungsi Membuat Kotak Section Box
-local function CreateSection(parentCol, titleText)
-    local sec = Instance.new("Frame", parentCol)
+-- Fungsi Membuat Accordion Section (Buka-Tutup)
+local function CreateAccordionSection(parent, titleText, accentColor)
+    local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
     sec.BackgroundTransparency = 0.4
-    sec.Size = UDim2.new(1, 0, 0, 0)
+    sec.Size = UDim2.new(1, -10, 0, 0)
     sec.AutomaticSize = Enum.AutomaticSize.Y
     Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 6)
     
     local stroke = Instance.new("UIStroke", sec)
-    stroke.Color = Color3.fromRGB(59, 130, 246)
+    stroke.Color = accentColor or Color3.fromRGB(59, 130, 246)
     stroke.Transparency = 0.6
 
-    local layout = Instance.new("UIListLayout", sec)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 4)
+    local mainLayout = Instance.new("UIListLayout", sec)
+    mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    mainLayout.Padding = UDim.new(0, 4)
 
-    local header = Instance.new("TextLabel", sec)
-    header.BackgroundTransparency = 1
-    header.Size = UDim2.new(1, 0, 0, 24)
-    header.Font = Enum.Font.GothamBold
-    header.Text = "  🔸 " .. titleText
-    header.TextColor3 = Color3.fromRGB(96, 165, 250)
-    header.TextSize = 10
-    header.TextXAlignment = Enum.TextXAlignment.Left
+    local headerBtn = Instance.new("TextButton", sec)
+    headerBtn.BackgroundTransparency = 1
+    headerBtn.Size = UDim2.new(1, 0, 0, 28)
+    headerBtn.Font = Enum.Font.GothamBold
+    headerBtn.Text = "  🔹 " .. titleText
+    headerBtn.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
+    headerBtn.TextSize = 10.5
+    headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
-    return sec
-end
+    local chevron = Instance.new("TextLabel", headerBtn)
+    chevron.BackgroundTransparency = 1
+    chevron.Position = UDim2.new(1, -25, 0, 0)
+    chevron.Size = UDim2.new(0, 20, 1, 0)
+    chevron.Font = Enum.Font.GothamBold
+    chevron.Text = "▲"
+    chevron.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
+    chevron.TextSize = 9
 
--- Fungsi Toggle Item
-local function CreateToggle(parentSec, text)
-    local row = Instance.new("TextButton", parentSec)
-    row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, -6, 0, 24)
-    row.AutoButtonColor = false
-    row.Font = Enum.Font.Gotham
-    row.Text = "    " .. text
-    row.TextColor3 = Color3.fromRGB(200, 210, 230)
-    row.TextSize = 9.5
-    row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
+    local container = Instance.new("Frame", sec)
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, 0, 0, 0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.ClipsDescendants = true
 
-    local box = Instance.new("Frame", row)
-    box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -22, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    local containerLayout = Instance.new("UIListLayout", container)
+    containerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    containerLayout.Padding = UDim.new(0, 6)
 
-    local check = Instance.new("TextLabel", box)
-    check.BackgroundTransparency = 1
-    check.Size = UDim2.new(1, 0, 1, 0)
-    check.Font = Enum.Font.GothamBold
-    check.Text = ""
-    check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 8
+    local padding = Instance.new("UIPadding", container)
+    padding.PaddingBottom = UDim.new(0, 6)
+    padding.PaddingLeft = UDim.new(0, 6)
+    padding.PaddingRight = UDim.new(0, 6)
 
-    local state = false
-    row.MouseButton1Click:Connect(function()
-        state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
-        check.Text = state and "✓" or ""
+    local isOpen = true
+    headerBtn.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        container.Visible = isOpen
+        chevron.Text = isOpen and "▲" or "▼"
     end)
-    return row
+
+    return container
 end
 
--- === PENGISIAN KONTEN TAB SESUAI VIDEO REFERENSI ===
+-- === TAB INFO: WEBHOOK & SERVER ===
 
--- 1. Tab Shop
-local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
-local SecShopSeed = CreateSection(ShopLeft, "SHOP SEED")
-CreateToggle(SecShopSeed, "Carrot")
-CreateToggle(SecShopSeed, "Strawberry")
-CreateToggle(SecShopSeed, "Blueberry")
-CreateToggle(SecShopSeed, "Tomato")
-CreateToggle(SecShopSeed, "Auto Buy (Selected)")
-CreateToggle(SecShopSeed, "Auto Buy All")
+-- 1. Halaman 1: WEBHOOK
+local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
 
-local SecAllSeed = CreateSection(ShopRight, "ALL SEED")
-CreateToggle(SecAllSeed, "Carrot")
-CreateToggle(SecAllSeed, "Strawberry")
-CreateToggle(SecAllSeed, "Advanced Sprinkler")
-CreateToggle(SecAllSeed, "Grandmaster")
-CreateToggle(SecAllSeed, "Godly Sprinkler")
-CreateToggle(SecAllSeed, "Auto Buy (Selected)")
-CreateToggle(SecAllSeed, "Auto Buy All")
+local WebhookBox = Instance.new("TextBox", WebhookBody)
+WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+WebhookBox.Size = UDim2.new(1, 0, 0, 28)
+WebhookBox.Font = Enum.Font.Gotham
+WebhookBox.PlaceholderText = "URL Webhook Discord..."
+WebhookBox.Text = ""
+WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
+WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
+WebhookBox.TextSize = 10
+Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
 
--- 2. Tab Event (Market Fall & Scarecrow)
-local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
-local SecFall = CreateSection(EventLeft, "MARKET FALL CONTROLLER")
-CreateToggle(SecFall, "Give A Seed")
-CreateToggle(SecFall, "Auto Shovel Acorn")
+-- 2. Halaman 2: SERVER (Buka-tutup dengan input & tombol Click)
+local ServerBody = CreateAccordionSection(TabInfo, "SERVER", Color3.fromRGB(96, 165, 250))
 
-local SecFallGear = CreateSection(EventRight, "MARKET FALL - GEAR")
-CreateToggle(SecFallGear, "Leaf Rake")
-CreateToggle(SecFallGear, "Scarecrow Stick")
-CreateToggle(SecFallGear, "Acorn Lolipop")
+local ServerRow = Instance.new("Frame", ServerBody)
+ServerRow.BackgroundTransparency = 1
+ServerRow.Size = UDim2.new(1, 0, 0, 28)
 
--- 3. Tab Info
-local InfoLeft, InfoRight = CreateTwoColumnLayout(TabInfo)
-local SecServer = CreateSection(InfoLeft, "SERVER SETTINGS")
-CreateToggle(SecServer, "Auto Collect Required")
-CreateToggle(SecServer, "Auto Submit Fall Bloom")
+local ServerInput = Instance.new("TextBox", ServerRow)
+ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
+ServerInput.Font = Enum.Font.Gotham
+ServerInput.PlaceholderText = "2007"
+ServerInput.Text = ""
+ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
+ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
+ServerInput.TextSize = 10
+Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
 
--- 4. Tab Auto Selling
-local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
-local SecSell = CreateSection(SellLeft, "AUTO SELLING FRUIT")
-CreateToggle(SecSell, "Auto Sell If Backpack Full")
-CreateToggle(SecSell, "Auto Sell Fruit")
+local ClickBtn = Instance.new("TextButton", ServerRow)
+ClickBtn.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
+ClickBtn.Position = UDim2.new(0.71, 0, 0, 0)
+ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
+ClickBtn.Font = Enum.Font.GothamBold
+ClickBtn.Text = "Click"
+ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ClickBtn.TextSize = 10
+Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
+
+ClickBtn.MouseButton1Click:Connect(function()
+    local serverCode = ServerInput.Text
+    print("Tombol Click ditekan untuk Server:", serverCode)
+    -- Masukkan fungsi join/script server Anda di sini
+end)
+
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 
@@ -343,7 +313,6 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Sistem Draggable Halus di TopBar
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -366,4 +335,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Final Replica Loaded Successfully!")
+print("ZedHub Info Webhook & Server Loaded Successfully!")
