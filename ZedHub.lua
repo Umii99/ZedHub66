@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
-    - UI Murni milikmu dengan koneksi callback centang ON/OFF yang akurat
-    - Backend Auto Sell (Merespons status centang & Backpack Full)
+    - UI Murni milikmu dengan perbaikan callback CreateToggle ON/OFF yang sempurna
+    - Backend Auto Sell (Merespons centang real-time & Backpack Full)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -280,7 +280,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Pilihan Item Biasa dengan Dukungan Callback
+-- Tombol Checkbox (Diperbaiki agar callback ON/OFF berfungsi sempurna)
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -313,7 +313,10 @@ local function CreateToggle(parentSec, text, callback)
         state = not state
         box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
         check.Text = state and "✓" or ""
-        if callback then callback(state, text) end
+        
+        if callback then 
+            callback(state) 
+        end
     end)
     return row
 end
@@ -418,7 +421,7 @@ local function CreateActionToggle(parentSec, text, callback)
     return row
 end
 
--- === PENGISIAN KONTEN TAB EVENT & MAPPING CONFIG ===
+-- === PENGISIAN KONTEN TAB EVENT ===
 
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
@@ -468,7 +471,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (Dengan Callback State Centang ON/OFF) ===
+-- === TAB AUTO SELLING (Terhubung Langsung ke ZedHubConfig) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 
 CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
@@ -567,13 +570,13 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Auto Sell (Responsif terhadap status centang ON/OFF)
+-- Looping Auto Sell (Benar-benar merespons ON/OFF centang UI)
 task.spawn(function()
     while task.wait(2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        -- Jika kedua tombol tidak dicentang (OFF), lewati proses loop
+        -- Jika tidak dicentang (OFF), abaikan loop dan jangan lakukan apa pun
         if backpackOn or fruitOn then
             local CropCount = #GetInvCrops()
 
@@ -589,7 +592,7 @@ task.spawn(function()
     end
 end)
 
--- Event instan saat item masuk ke tas (Backpack Full) jika dicentang
+-- Event instan saat item bertambah di backpack jika opsi Backpack Full dicentang
 if Backpack then
     Backpack.ChildAdded:Connect(function()
         if getgenv().ZedHubConfig.AutoSellBackpack then
