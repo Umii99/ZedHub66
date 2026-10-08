@@ -1,6 +1,6 @@
 --[[
-    ZedHub Final Perfect Edition - Grow A Garden
-    All Seed & Shop Seed Dirapikan dengan Efek Buka-Tutup Proporsional
+    ZedHub Pure Single Column Edition - Grow A Garden
+    Tanpa Kolom Kanan & Tanpa Pemisah Vertikal
 ]]
 
 local Players = game:GetService("Players")
@@ -36,7 +36,7 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 11
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Ukuran Proporsional & Pas di HP)
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -139,7 +139,7 @@ UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
 UserTxt.TextSize = 8.5
 UserTxt.TextXAlignment = Enum.TextXAlignment.Left
 
--- Content Holder Kanan
+-- Content Holder Kanan (Satu Kolom Penuh Tanpa Sekat Kanan)
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
 ContentHolder.Position = UDim2.new(0, 125, 0, 0)
@@ -149,7 +149,7 @@ local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
-    Page.Size = UDim2.new(1, -5, 1, 0)
+    Page.Size = UDim2.new(1, -10, 1, 0)
     Page.CanvasSize = UDim2.new(0, 0, 0, 800)
     Page.ScrollBarThickness = 3
     Page.Visible = false
@@ -186,38 +186,7 @@ local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
 
--- Layout 2 Kolom
-local function CreateTwoColumnLayout(parentTab)
-    local container = Instance.new("Frame", parentTab)
-    container.BackgroundTransparency = 1
-    container.Size = UDim2.new(1, -6, 0, 290)
-
-    local leftCol = Instance.new("ScrollingFrame", container)
-    leftCol.Name = "LeftCol"
-    leftCol.BackgroundTransparency = 1
-    leftCol.Position = UDim2.new(0, 0, 0, 0)
-    leftCol.Size = UDim2.new(0.48, 0, 1, 0)
-    leftCol.CanvasSize = UDim2.new(0, 0, 0, 500)
-    leftCol.ScrollBarThickness = 2
-    local lLayout = Instance.new("UIListLayout", leftCol)
-    lLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    lLayout.Padding = UDim.new(0, 5)
-
-    local rightCol = Instance.new("ScrollingFrame", container)
-    rightCol.Name = "RightCol"
-    rightCol.BackgroundTransparency = 1
-    rightCol.Position = UDim2.new(0.52, 0, 0, 0)
-    rightCol.Size = UDim2.new(0.48, 0, 1, 0)
-    rightCol.CanvasSize = UDim2.new(0, 0, 0, 500)
-    rightCol.ScrollBarThickness = 2
-    local rLayout = Instance.new("UIListLayout", rightCol)
-    rLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    rLayout.Padding = UDim.new(0, 5)
-
-    return leftCol, rightCol
-end
-
--- Fungsi Accordion Buka-Tutup
+-- Fungsi Accordion Buka-Tutup (Satu Kolom Lebar Penuh)
 local function CreateAccordionSection(parent, titleText, accentColor)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -313,11 +282,10 @@ local function CreateToggle(parentSec, text)
     return row
 end
 
--- === PENGISIAN KONTEN ===
+-- === PENGISIAN KONTEN SATU KOLOM PENUH ===
 
--- 1. TAB SHOP: SHOP SEED & ALL SEED (Dirapikan berdampingan)
-local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
-local SecShopSeed = CreateAccordionSection(ShopLeft, "SHOP SEED", Color3.fromRGB(52, 211, 153))
+-- 1. TAB SHOP: SHOP SEED (All Seed sudah dihapus permanen beserta pemisahnya)
+local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
 CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
 CreateToggle(SecShopSeed, "Blueberry")
@@ -325,29 +293,13 @@ CreateToggle(SecShopSeed, "Tomato")
 CreateToggle(SecShopSeed, "Auto Buy (Selected)")
 CreateToggle(SecShopSeed, "Auto Buy All")
 
-local SecAllSeed = CreateAccordionSection(ShopRight, "ALL SEED", Color3.fromRGB(96, 165, 250))
-CreateToggle(SecAllSeed, "Carrot")
-CreateToggle(SecAllSeed, "Strawberry")
-CreateToggle(SecAllSeed, "Advanced Sprinkler")
-CreateToggle(SecAllSeed, "Grandmaster")
-CreateToggle(SecAllSeed, "Godly Sprinkler")
-CreateToggle(SecAllSeed, "Auto Buy (Selected)")
-CreateToggle(SecAllSeed, "Auto Buy All")
-
--- 2. TAB EVENT: MARKET FALL CONTROLLER & GEAR
-local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
-local SecFall = CreateAccordionSection(EventLeft, "MARKET FALL CONTROLLER", Color3.fromRGB(251, 146, 60))
+-- 2. TAB EVENT: MARKET FALL CONTROLLER
+local SecFall = CreateAccordionSection(TabEvent, "MARKET FALL CONTROLLER", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFall, "Give A Seed")
 CreateToggle(SecFall, "Auto Shovel Acorn")
 
-local SecFallGear = CreateAccordionSection(EventLeft, "MARKET FALL GEAR", Color3.fromRGB(244, 63, 94))
-CreateToggle(SecFallGear, "Leaf Rake")
-CreateToggle(SecFallGear, "Scarecrow Stick")
-CreateToggle(SecFallGear, "Acorn Lolipop")
-
 -- 3. TAB AUTO SELLING
-local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
-local SecSell = CreateAccordionSection(SellLeft, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
+local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 CreateToggle(SecSell, "Auto Sell If Backpack Full")
 CreateToggle(SecSell, "Auto Sell Fruit")
 
@@ -431,4 +383,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Perfect Layout Loaded!")
+print("ZedHub Pure Single Column Loaded Successfully!")
