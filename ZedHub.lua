@@ -1,8 +1,8 @@
 --[[
-    ZEDHUB - FINAL STABLE COOLDOWN SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL GAG PURE FRUIT 200 LIMIT & SPEED HUB TELEPORT SCRIPT
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Batas Stabil & Cooldown Anti-Continuous Sell (15 Detik Jeda)
-    - Dilengkapi Monitor Print Console untuk melacak jumlah item secara akurat
+    - Backend Auto Sell: Filter Buah Murni (Bebas Pet/Gear/Seed) dengan Target 200
+    - Sistem Teleport Kasir Instan (TP -> Jual -> TP Balik) + Cooldown Anti-Spam
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -523,88 +523,77 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- STABLE BACKEND ENGINE DENGAN ANTI-CONTINUOUS SELL (COOLDOWN 15 DETIK)
+-- BACKEND FINAL: PURE FRUIT 200 LIMIT & SPEED HUB TELEPORT SYSTEM
 -- =========================================================================
 local IsSelling = false
 
-local function GetBackpackCount()
-    local currentCount = 0
+local function GetPureFruitCount()
+    local fruitCount = 0
     if Backpack then
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
                 
-                -- Filter pengecualian standar yang aman
+                -- Filter ketat: Memblokir pet, seed, gear, dan alat agar hitungan murni buah
                 local isNotFruit = string.find(nameLower, "seed") or 
                                    string.find(nameLower, "sprinkler") or 
                                    string.find(nameLower, "wrench") or 
                                    string.find(nameLower, "shovel") or 
                                    string.find(nameLower, "basket") or
-                                   string.find(nameLower, "can") or 
-                                   string.find(nameLower, "watering") or
                                    string.find(nameLower, "tool") or
-                                   string.find(nameLower, "harvest") or
                                    string.find(nameLower, "scythe") or
                                    string.find(nameLower, "hoe") or
-                                   string.find(nameLower, "favorite") or
-                                   string.find(nameLower, "spray") or
                                    string.find(nameLower, "pet") or
-                                   string.find(nameLower, "egg")
+                                   string.find(nameLower, "egg") or
+                                   string.find(nameLower, "crate") or
+                                   string.find(nameLower, "gear")
 
                 if not isNotFruit then
-                    currentCount = currentCount + 1
+                    fruitCount = fruitCount + 1
                 end
             end
         end
     end
     
-    print("ZedHub Monitor -> Jumlah Item Terdeteksi:", currentCount, "/ 130")
-    return currentCount
+    print("ZedHub Monitor -> Buah Murni (Bebas Pet/Gear):", fruitCount, "/ 200")
+    return fruitCount
 end
 
 local function SellInventory()
     local Character = LocalPlayer.Character
     if not Character then return end
-    
-    local Leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-    local ShecklesCount = (Leaderstats and Leaderstats:FindFirstChild("Sheckles")) or 
-                          LocalPlayer:FindFirstChild("PlayerSheckles")
-                          
-    local PreviousSheckles = ShecklesCount and ShecklesCount.Value or 0
-    local Previous = Character:GetPivot()
+    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+    if not HumanoidRootPart then return end
 
     if IsSelling then return end
     IsSelling = true
 
-    Character:PivotTo(CFrame.new(62, 4, -26))
+    -- Simpan posisi awal karakter di kebun
+    local originalCFrame = HumanoidRootPart.CFrame
+
+    -- 1. Teleport instan ke kasir penjualan
+    HumanoidRootPart.CFrame = CFrame.new(62, 4, -26)
     task.wait(0.3)
-    
-    local sellEvt = GameEvents and (
-        GameEvents:FindFirstChild("Sell_Inventory") or 
-        GameEvents:FindFirstChild("SellInventory") or 
-        GameEvents:FindFirstChild("Sell")
-    )
 
-    while task.wait(0.2) do
-        local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
-        local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
-        if not backpackOn and not fruitOn then break end
-
-        if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
-        
-        if sellEvt then
-            pcall(function()
-                sellEvt:FireServer()
-            end)
-        end
+    -- 2. Tembak event jual resmi Grow A Garden
+    local sellEvt = GameEvents and GameEvents:FindFirstChild("Sell_Inventory")
+    if sellEvt then
+        pcall(function()
+            sellEvt:FireServer()
+        end)
     end
-    
-    Character:PivotTo(Previous)
-    task.wait(0.3)
+    task.wait(0.4)
+
+    -- 3. Teleport balik instan ke posisi semula
+    HumanoidRootPart.CFrame = originalCFrame
+    task.wait(0.4)
+
+    -- Cooldown pengaman 10 detik agar tidak spam bolak-balik
+    task.wait(10)
     IsSelling = false
 end
 
--- Looping Utama dengan Cooldown Pengaman 15 Detik (Anti-Continuous Sell)
+-- Looping Utama: Memicu Auto Sell persis saat buah murni menyentuh angka 200
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -612,18 +601,15 @@ task.spawn(function()
 
         if not IsSelling then
             if backpackOn and not fruitOn then
-                local currentItems = GetBackpackCount()
+                local currentFruits = GetPureFruitCount()
                 
-                if currentItems >= 130 then
+                if currentFruits >= 200 then
                     SellInventory()
-                    
-                    -- PENGAMAN MUTLAK: Jeda waktu 15 detik agar skrip tidak ngebug jual terus-menerus!
-                    print("ZedHub Monitor -> Penjualan berhasil. Cooldown 15 detik dimulai...")
-                    task.wait(15) 
                 end
                 
             elseif fruitOn then
                 SellInventory()
+                task.wait(2)
             end
         end
     end
@@ -703,4 +689,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Stable Cooldown Engine Loaded Successfully!")
+print("ZedHub Pure Fruit Speed Hub Engine Loaded Successfully!")
