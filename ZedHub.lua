@@ -1,6 +1,6 @@
 --[[
-    ZedHub Larger Font Edition - Grow A Garden
-    Ukuran Huruf Lebih Besar & Nyaman di HP
+    ZedHub Event Update - Grow A Garden
+    Auto Buy Fall Shop Diperjelas
 ]]
 
 local Players = game:GetService("Players")
@@ -150,7 +150,7 @@ local function CreateTab(tabName)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -10, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 800)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 1400)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -186,7 +186,7 @@ local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Buka-Tutup (Huruf Diperbesar)
+-- Fungsi Accordion Buka-Tutup
 local function CreateAccordionSection(parent, titleText, accentColor)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -293,10 +293,66 @@ CreateToggle(SecShopSeed, "Tomato")
 CreateToggle(SecShopSeed, "Auto Buy (Selected)")
 CreateToggle(SecShopSeed, "Auto Buy All")
 
--- 2. TAB EVENT: MARKET FALL CONTROLLER
-local SecFall = CreateAccordionSection(TabEvent, "MARKET FALL CONTROLLER", Color3.fromRGB(251, 146, 60))
-CreateToggle(SecFall, "Give A Seed")
-CreateToggle(SecFall, "Auto Shovel Acorn")
+-- 2. TAB EVENT: STRUKTUR LENGKAP TERATUR
+local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
+CreateToggle(SecFallHarvest, "Required Collection Plant")
+CreateToggle(SecFallHarvest, "Required Submit Plant")
+
+local SecFallMarket = CreateAccordionSection(TabEvent, "FALL MARKET", Color3.fromRGB(244, 63, 94))
+CreateToggle(SecFallMarket, "Fall Shop Seed")
+CreateToggle(SecFallMarket, "Turnip Seed")
+CreateToggle(SecFallMarket, "Parsley Seed")
+CreateToggle(SecFallMarket, "Autumn Seed Pack")
+CreateToggle(SecFallMarket, "Meyers Lemon")
+CreateToggle(SecFallMarket, "Carnival Pumpkin")
+CreateToggle(SecFallMarket, "Golden Peach")
+CreateToggle(SecFallMarket, "Kniphopia")
+CreateToggle(SecFallMarket, "Maple Resin")
+
+CreateToggle(SecFallMarket, "Fall Shop Pets")
+CreateToggle(SecFallMarket, "Fall Egg")
+CreateToggle(SecFallMarket, "Salmon")
+CreateToggle(SecFallMarket, "Chipmunk")
+CreateToggle(SecFallMarket, "Woodpecker")
+CreateToggle(SecFallMarket, "Red Squirrel")
+CreateToggle(SecFallMarket, "Marmot")
+CreateToggle(SecFallMarket, "Mallard")
+CreateToggle(SecFallMarket, "Sugar Glider")
+CreateToggle(SecFallMarket, "Space Squirrel")
+CreateToggle(SecFallMarket, "Red Panda")
+
+CreateToggle(SecFallMarket, "Fall Shop Gears")
+CreateToggle(SecFallMarket, "Firefly Jar")
+CreateToggle(SecFallMarket, "Sky Lantern")
+CreateToggle(SecFallMarket, "Maple Leaf Kite")
+CreateToggle(SecFallMarket, "Maple Blower")
+CreateToggle(SecFallMarket, "Maple Syrup")
+CreateToggle(SecFallMarket, "Maple Sprinkler")
+CreateToggle(SecFallMarket, "Bonfire")
+CreateToggle(SecFallMarket, "Harvest Basket")
+CreateToggle(SecFallMarket, "Acorn Lollipop")
+CreateToggle(SecFallMarket, "Golden Acorn Rake")
+
+CreateToggle(SecFallMarket, "Fall Shop Cosmetic")
+CreateToggle(SecFallMarket, "Fall Leaf Chair")
+CreateToggle(SecFallMarket, "Fall Crate")
+CreateToggle(SecFallMarket, "Maple Flag")
+CreateToggle(SecFallMarket, "Maple Wreath")
+CreateToggle(SecFallMarket, "Fall Haybale")
+CreateToggle(SecFallMarket, "Pile Of Leaves")
+CreateToggle(SecFallMarket, "Flying Kit")
+CreateToggle(SecFallMarket, "Autumn Crate")
+CreateToggle(SecFallMarket, "Fall Mountain")
+
+CreateToggle(SecFallMarket, "Auto Buy Fall Shop")
+
+local SecShady = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
+CreateToggle(SecShady, "All Seed")
+CreateToggle(SecShady, "Gold Egg Seed")
+CreateToggle(SecShady, "Give A Seed")
+
+local SecAcornShovel = CreateAccordionSection(TabEvent, "ACORN SHOVEL", Color3.fromRGB(96, 165, 250))
+CreateToggle(SecAcornShovel, "Auto Shovel Acorn")
 
 -- 3. TAB AUTO SELLING
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
@@ -383,4 +439,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Larger Font Loaded Successfully!")
+print("ZedHub Fall Shop Auto Buy Updated Successfully!")
