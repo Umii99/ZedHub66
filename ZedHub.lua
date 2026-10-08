@@ -1,6 +1,6 @@
 --[[
-    ZedHub Consolidated Shop Edition - Grow A Garden
-    Tab Shop dengan Kategori ShopSeed, ShopGear, & ShopEgg Lengkap Tombol Auto Buy
+    ZedHub Individual Auto Buy Edition - Grow A Garden
+    Setiap Shop Dilengkapi Tombol Auto Buy On/Off Tersendiri
 ]]
 
 local Players = game:GetService("Players")
@@ -150,7 +150,7 @@ local function CreateTab(tabName)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -10, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 1500)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 1600)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -284,7 +284,7 @@ local function CreateToggle(parentSec, text)
     return row
 end
 
--- Tombol Khusus Auto Buy (Dibedakan Tampilan & Warnanya agar Menonjol)
+-- Tombol Khusus Auto Buy On/Off (Pemicu Utama dengan Warna Berbeda)
 local function CreateAutoBuyToggle(parentSec, text)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -323,29 +323,29 @@ end
 
 -- === PENGISIAN KONTEN TAB SHOP ===
 
--- 1. SHOP SEED (Di dalam Tab Shop)
+-- 1. SHOP SEED
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
 CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
 CreateToggle(SecShopSeed, "Blueberry")
 CreateToggle(SecShopSeed, "Tomato")
-CreateAutoBuyToggle(SecShopSeed, "Auto Buy All (Seed)")
+CreateAutoBuyToggle(SecShopSeed, "Auto Buy On/Off")
 
--- 2. SHOP GEAR (Halaman Buka-Tutup di Tab Shop)
+-- 2. SHOP GEAR
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
 CreateToggle(SecShopGear, "Watering Can")
 CreateToggle(SecShopGear, "Basic Shovel")
 CreateToggle(SecShopGear, "Advanced Sprinkler")
 CreateToggle(SecShopGear, "Godly Sprinkler")
-CreateAutoBuyToggle(SecShopGear, "Auto Buy All (Gear)")
+CreateAutoBuyToggle(SecShopGear, "Auto Buy On/Off")
 
--- 3. SHOP EGG (Halaman Buka-Tutup di Tab Shop)
+-- 3. SHOP EGG
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
 CreateToggle(SecShopEgg, "Common Egg")
 CreateToggle(SecShopEgg, "Rare Egg")
 CreateToggle(SecShopEgg, "Epic Egg")
 CreateToggle(SecShopEgg, "Gold Egg")
-CreateAutoBuyToggle(SecShopEgg, "Auto Buy All (Egg)")
+CreateAutoBuyToggle(SecShopEgg, "Auto Buy On/Off")
 
 -- === PENGISIAN KONTEN TAB LAINNYA ===
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
@@ -443,4 +443,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Consolidated Shop Loaded Successfully!")
+print("ZedHub Individual Auto Buy Loaded Successfully!")
