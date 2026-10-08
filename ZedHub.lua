@@ -1,6 +1,6 @@
 --[[
-    ZedHub Perfect Replica - Grow A Garden Edition
-    Tata Letak 2 Kolom Section & Toggle Persis Seperti Referensi UI
+    ZedHub Final Accurate Replica - Grow A Garden Edition
+    Struktur Persis Sesuai Video Referensi Asli
 ]]
 
 local Players = game:GetService("Players")
@@ -10,12 +10,12 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
-if PlayerGui:FindFirstChild("ZedHubPerfectUI") then
-    PlayerGui.ZedHubPerfectUI:Destroy()
+if PlayerGui:FindFirstChild("ZedHubFinalUI") then
+    PlayerGui.ZedHubFinalUI:Destroy()
 end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZedHubPerfectUI"
+ScreenGui.Name = "ZedHubFinalUI"
 ScreenGui.ResetOnSpawn = false
 local success = pcall(function() ScreenGui.Parent = CoreGui end)
 if not success then ScreenGui.Parent = PlayerGui end
@@ -39,7 +39,7 @@ Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 -- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(12, 18, 32)
+MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -112,7 +112,7 @@ Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 32)
 Body.Size = UDim2.new(1, 0, 1, -32)
 
--- Sidebar Kiri
+-- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
@@ -186,7 +186,7 @@ local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 local TabSettings = CreateTab("Settings")
 
--- Layout 2 Kolom untuk Halaman (Kiri & Kanan)
+-- Layout 2 Kolom (Kiri & Kanan Sesuai Video)
 local function CreateTwoColumnLayout(parentTab)
     local container = Instance.new("Frame", parentTab)
     container.BackgroundTransparency = 1
@@ -283,9 +283,10 @@ local function CreateToggle(parentSec, text)
     return row
 end
 
--- === MENGISI TAB SHOP (Sesuai Gambar Referensi 2 Kolom) ===
-local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
+-- === PENGISIAN KONTEN TAB SESUAI VIDEO REFERENSI ===
 
+-- 1. Tab Shop
+local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
 local SecShopSeed = CreateSection(ShopLeft, "SHOP SEED")
 CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
@@ -303,28 +304,30 @@ CreateToggle(SecAllSeed, "Godly Sprinkler")
 CreateToggle(SecAllSeed, "Auto Buy (Selected)")
 CreateToggle(SecAllSeed, "Auto Buy All")
 
--- Tab Info
+-- 2. Tab Event (Market Fall & Scarecrow)
+local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
+local SecFall = CreateSection(EventLeft, "MARKET FALL CONTROLLER")
+CreateToggle(SecFall, "Give A Seed")
+CreateToggle(SecFall, "Auto Shovel Acorn")
+
+local SecFallGear = CreateSection(EventRight, "MARKET FALL - GEAR")
+CreateToggle(SecFallGear, "Leaf Rake")
+CreateToggle(SecFallGear, "Scarecrow Stick")
+CreateToggle(SecFallGear, "Acorn Lolipop")
+
+-- 3. Tab Info
 local InfoLeft, InfoRight = CreateTwoColumnLayout(TabInfo)
 local SecServer = CreateSection(InfoLeft, "SERVER SETTINGS")
 CreateToggle(SecServer, "Auto Collect Required")
 CreateToggle(SecServer, "Auto Submit Fall Bloom")
 
--- Tab Event
-local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
-local SecFall = CreateSection(EventLeft, "MARKET FALL CONTROLLER")
-CreateToggle(SecFall, "Give A Seed")
-CreateToggle(SecFall, "Auto Shovel Acorn")
-local SecFallGear = CreateSection(EventRight, "MARKET FALL - GEAR")
-CreateToggle(SecFallGear, "Leaf Rake")
-CreateToggle(SecFallGear, "Scarecrow Stick")
-
--- Tab Selling
+-- 4. Tab Auto Selling
 local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
 local SecSell = CreateSection(SellLeft, "AUTO SELLING FRUIT")
 CreateToggle(SecSell, "Auto Sell If Backpack Full")
 CreateToggle(SecSell, "Auto Sell Fruit")
 
--- === FITUR KONTROL JENDELA (Draggable, Minimize, Close) ===
+-- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
@@ -340,7 +343,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Sistem Draggable yang Halus di TopBar
+-- Sistem Draggable Halus di TopBar
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -363,4 +366,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Perfect Layout Loaded Successfully!")
+print("ZedHub Final Replica Loaded Successfully!")
