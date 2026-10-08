@@ -1,7 +1,7 @@
 --[[
-    ZEDHUB - FINAL 200-CAPACITY INTEGRATED SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL ABSOLUTE STRICT AFK SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan kapasitas default 200 slot (Aman untuk AFK)
+    - Backend Auto Sell dengan Pengaman Mutlak (Anti-Jual sebelum mencapai 200 slot)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,13 +522,12 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- FIXED 200-CAPACITY AUTOMATION ENGINE (Aman untuk AFK Semalaman)
+-- ABSOLUTE STRICT AFK BACKEND ENGINE (Anti Salah Jual)
 -- =========================================================================
 local IsSelling = false
 
-local function GetBackpackStatus()
+local function GetBackpackCount()
     local currentCount = 0
-    
     if Backpack then
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
@@ -539,13 +538,7 @@ local function GetBackpackStatus()
             end
         end
     end
-    
-    -- Dipatok mutlak 200 slot sesuai kapasitas tas akunmu
-    local maxLimit = LocalPlayer:GetAttribute("MaxInventory") or 
-                     LocalPlayer:GetAttribute("Capacity") or 
-                     LocalPlayer:GetAttribute("BackpackCapacity") or 200
-    
-    return currentCount, maxLimit
+    return currentCount
 end
 
 local function SellInventory()
@@ -590,21 +583,25 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Tidak akan menjual sebelum isi tas menyentuh angka 200!
+-- Looping Utama: Pengaman Mutlak untuk AFK (Hanya jalan pas tembus 200)
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if not IsSelling then
-            if fruitOn then
-                SellInventory()
-            elseif backpackOn then
-                local currentItems, maxLimit = GetBackpackStatus()
+            -- JIKA HANYA "Auto Sell If Backpack Full" YANG NYALA
+            if backpackOn and not fruitOn then
+                local currentItems = GetBackpackCount()
                 
-                if currentItems >= maxLimit then
+                -- SYARAT MUTLAK: Selama tas belum 200 buah, loop ini DIAM TOTAL!
+                if currentItems >= 200 then
                     SellInventory()
                 end
+                
+            -- JIKA "Auto Sell Fruit" NYALA (Jual terus-menerus)
+            elseif fruitOn then
+                SellInventory()
             end
         end
     end
@@ -630,7 +627,7 @@ task.spawn(function()
                 end
             end
 
-            for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
+for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
                     task.wait(0.3)
@@ -684,4 +681,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub 200-Capacity AFK Engine Loaded Successfully!")
+print("ZedHub Absolute Strict AFK Engine Loaded Successfully!")
