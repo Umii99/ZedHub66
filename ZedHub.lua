@@ -1,5 +1,8 @@
 --[[
-    ZEDHUB - COMPLETE UI & AUTOMATION ENGINE (GROW A GARDEN)
+    ZEDHUB - FINAL FULL FIXED EDITION (GROW A GARDEN)
+    - Fix: Auto Sell Berhenti Normal saat dimatikan
+    - Fix: Deteksi Backpack Full Akurat
+    - Fix: Shop Seed, Gear, dan 4 Market Fall Aktif Sempurna (Selected & Buy All)
 ]]
 
 local Players = game:GetService("Players")
@@ -18,7 +21,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (Pusat Kendali Engine)
+-- CONFIGURATION STATE
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -49,7 +52,7 @@ ScreenGui.ResetOnSpawn = false
 local success = pcall(function() ScreenGui.Parent = CoreGui end)
 if not success then ScreenGui.Parent = PlayerGui end
 
--- Floating Button (Minimize State)
+-- Floating Button
 local FloatingBtn = Instance.new("TextButton")
 FloatingBtn.Name = "FloatingBtn"
 FloatingBtn.Parent = ScreenGui
@@ -99,7 +102,6 @@ Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 12
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- FPS Label di Top Bar
 local FPSLabel = Instance.new("TextLabel")
 FPSLabel.Parent = TopBar
 FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -111,7 +113,6 @@ FPSLabel.TextColor3 = Color3.fromRGB(148, 163, 184)
 FPSLabel.TextSize = 10
 Instance.new("UICorner", FPSLabel).CornerRadius = UDim.new(0, 4)
 
--- Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -123,7 +124,6 @@ MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
 MinimizeBtn.TextSize = 14
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 4)
 
--- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = TopBar
 CloseBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
@@ -135,13 +135,11 @@ CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseBtn.TextSize = 10
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
--- Body Layout
 local Body = Instance.new("Frame", MainFrame)
 Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 34)
 Body.Size = UDim2.new(1, 0, 1, -34)
 
--- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
@@ -153,7 +151,6 @@ local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SBLayout.Padding = UDim.new(0, 4)
 
--- User Profile Box di Bawah Sidebar
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 UserBox.Size = UDim2.new(1, -6, 0, 38)
@@ -168,7 +165,6 @@ UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
 UserTxt.TextSize = 9.5
 UserTxt.TextXAlignment = Enum.TextXAlignment.Left
 
--- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
 ContentHolder.Position = UDim2.new(0, 135, 0, 0)
@@ -209,14 +205,12 @@ local function CreateTab(tabName)
     return Page
 end
 
--- Tab Menu Utama di Sidebar
 local TabInfo = CreateTab("Info")
 local TabEvent = CreateTab("Event")
 local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Buka-Tutup
 local function CreateAccordionSection(parent, titleText, accentColor)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -276,7 +270,6 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Pilihan Item Biasa (Tersambung ke Callback)
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -314,7 +307,6 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Tombol Selected (Dropdown List Buka-Tutup dengan Rekap Item Terpilih)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -376,7 +368,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Tombol Khusus Action On/Off
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -415,125 +406,57 @@ local function CreateActionToggle(parentSec, text, callback)
 end
 
 -- =========================================================================
--- PENGISIAN KONTEN UI & KONEKSI KE CONFIG BACKEND
+-- MAPPING KONTROL KE CONFIG
 -- =========================================================================
 
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
-CreateToggle(SecFallHarvest, "Required Collection Plant", function(state)
-    getgenv().ZedHubConfig.AutoCollect = state
-end)
-CreateToggle(SecFallHarvest, "Required Submit Plant", function(state)
-    getgenv().ZedHubConfig.AutoSubmit = state
-end)
+CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
+CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
--- Fall Shop
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP", Color3.fromRGB(236, 72, 153))
+CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
+CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {
-    "Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", 
-    "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"
-}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state)
-    getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state
-end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
+CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {
-    "Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", 
-    "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"
-}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off", function(state)
-    getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Active = state
-end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {
-    "Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", 
-    "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"
-}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(state)
-    getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Active = state
-end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
+CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {
-    "Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", 
-    "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"
-}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state)
-    getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state
+local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW", Color3.fromRGB(251, 191, 36))
+CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
+    if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
+CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
--- Shady Scarecrown
-local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
-CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {
-    "All Seed", "Gold Egg Seed"
-}, function(items)
-    if #items > 0 then
-        getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED"
-    end
-end)
-CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state)
-    getgenv().ZedHubConfig.GiveASeed = state
-end)
-
--- Auto Acorn
 local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN", Color3.fromRGB(56, 189, 248))
-CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state)
-    getgenv().ZedHubConfig.AutoShovel = state
-end)
+CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
 
--- SHOP EGG
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
-CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {
-    "Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"
-}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
-CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state
-end)
-CreateActionToggle(SecShopEgg, "Auto Buy All", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state
-end)
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
+CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
+CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
 
--- SHOP SEED
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
-CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {
-    "Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", 
-    "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", 
-    "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", 
-    "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", 
-    "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"
-}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
-CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state
-end)
-CreateActionToggle(SecShopSeed, "Auto Buy All", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state
-end)
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
+CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
+CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
--- SHOP GEAR
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
-CreateSelectedDropdown(SecShopGear, "Shop Gear List", {
-    "Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", 
-    "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", 
-    "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"
-}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
-CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state
-end)
-CreateActionToggle(SecShopGear, "Auto Buy All", function(state)
-    getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state
-end)
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
+CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
+CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
--- AUTO SELLING
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
-CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
-    getgenv().ZedHubConfig.AutoSellBackpack = state
-end)
-CreateToggle(SecSell, "Auto Sell Fruit", function(state)
-    getgenv().ZedHubConfig.AutoSellFruit = state
-end)
+CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state) getgenv().ZedHubConfig.AutoSellBackpack = state end)
+CreateToggle(SecSell, "Auto Sell Fruit", function(state) getgenv().ZedHubConfig.AutoSellFruit = state end)
 
 
 -- =========================================================================
--- MASTER AUTOMATION BACKEND ENGINE (Logika Eksekusi Game)
+-- FULL FIXED MASTER BACKEND ENGINE
 -- =========================================================================
 local isProcessingScarecrow = false
 local IsSelling = false
@@ -545,42 +468,45 @@ local function PreciseSellInventory()
         local character = LocalPlayer.Character
         if not character then IsSelling = false return end
         local hrp = character:FindFirstChild("HumanoidRootPart")
-        local sheckles = LocalPlayer:FindFirstChild("leaderstats") and LocalPlayer.leaderstats:FindFirstChild("Sheckles")
-        if not hrp or not sheckles then IsSelling = false return end
+        if not hrp then IsSelling = false return end
 
         local previousCFrame = hrp.CFrame
-        local previousSheckles = sheckles.Value
-
         hrp.CFrame = CFrame.new(62, 4, -26)
-        task.wait(0.3)
+        task.wait(0.4)
 
-        while task.wait(0.2) do
-            if sheckles.Value ~= previousSheckles then break end
-            if GameEvents and GameEvents:FindFirstChild("Sell_Inventory") then
-                GameEvents.Sell_Inventory:FireServer()
-            end
+        if GameEvents and GameEvents:FindFirstChild("Sell_Inventory") then
+            GameEvents.Sell_Inventory:FireServer()
         end
-        task.wait(0.2)
+        task.wait(0.5)
         hrp.CFrame = previousCFrame
     end)
     IsSelling = false
 end
 
--- Auto Sell Loop
+-- Auto Sell Loop (bisa berhenti saat dimatikan)
 task.spawn(function()
-    while task.wait(3) do
+    while task.wait(2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
-        local count = 0
-        pcall(function()
-            for _, t in pairs(LocalPlayer.Backpack:GetChildren()) do
-                if t:FindFirstChild("Item_String") then count += 1 end
-            end
-        end)
 
-        if (backpackOn and count >= 15) or (fruitOn) then
-            PreciseSellInventory()
-            task.wait(4)
+        if backpackOn or fruitOn then
+            local count = 0
+            pcall(function()
+                for _, t in pairs(LocalPlayer.Backpack:GetChildren()) do
+                    if t:IsA("Tool") then count += 1 end
+                end
+                local char = LocalPlayer.Character
+                if char then
+                    for _, t in pairs(char:GetChildren()) do
+                        if t:IsA("Tool") then count += 1 end
+                    end
+                end
+            end)
+
+            if fruitOn or (backpackOn and count >= 12) then
+                PreciseSellInventory()
+                task.wait(3)
+            end
         end
     end
 end)
@@ -601,7 +527,7 @@ end
 
 -- Auto Collect Required
 task.spawn(function()
-    while task.wait(2) do
+    while task.wait(1.5) do
         if getgenv().ZedHubConfig.AutoCollect then
             pcall(function()
                 local requiredKeyword = GetEventRequiredItemName()
@@ -621,7 +547,7 @@ task.spawn(function()
                                 local prompt = plant:FindFirstChildWhichIsA("ProximityPrompt", true)
                                 if prompt and prompt.Enabled then
                                     fireproximityprompt(prompt)
-                                    task.wait(0.2)
+                                    task.wait(0.15)
                                 end
                             end
                         end
@@ -634,7 +560,7 @@ end)
 
 -- Auto Submit Plant
 task.spawn(function()
-    while task.wait(3) do
+    while task.wait(2.5) do
         if getgenv().ZedHubConfig.AutoSubmit then
             pcall(function()
                 local needed = GetEventRequiredItemName()
@@ -644,7 +570,7 @@ task.spawn(function()
                         local submitEvt = GameEvents and (GameEvents:FindFirstChild("SubmitFallPlant") or GameEvents:FindFirstChild("SubmitEvent"))
                         if submitEvt then
                             submitEvt:FireServer(tool)
-                            task.wait(0.5)
+                            task.wait(0.4)
                         end
                     end
                 end
@@ -653,31 +579,35 @@ task.spawn(function()
     end
 end)
 
--- Auto Buy Engine (Selected & Buy All)
+-- FIXED AUTO BUY ENGINE (Shop Seed, Gear, & 4 Market Fall Aktif)
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
-            local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock"))
+            local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
             if not buyEvt then return end
 
-            for cat, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
+            -- 1. 4 Kategori Market Fall
+            for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
                 if data.BuyAll then
-                    buyEvt:FireServer(cat, "BUY_ALL")
-                elseif data.Active then
+                    buyEvt:FireServer(catName, "BUY_ALL")
+                    task.wait(0.3)
+                elseif data.Active and data.Items and #data.Items > 0 then
                     for _, itemName in pairs(data.Items) do
-                        buyEvt:FireServer(cat, itemName)
-                        task.wait(0.2)
+                        buyEvt:FireServer(catName, itemName)
+                        task.wait(0.25)
                     end
                 end
             end
 
-            for cat, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
+            -- 2. Main Shop (Egg, Seed, Gear)
+            for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
-                    buyEvt:FireServer(cat, "BUY_ALL")
-                elseif data.Active then
+                    buyEvt:FireServer(catName, "BUY_ALL")
+                    task.wait(0.3)
+                elseif data.Active and data.Items and #data.Items > 0 then
                     for _, itemName in pairs(data.Items) do
-                        buyEvt:FireServer(cat, itemName)
-                        task.wait(0.2)
+                        buyEvt:FireServer(catName, itemName)
+                        task.wait(0.25)
                     end
                 end
             end
@@ -715,7 +645,7 @@ local function EquipSpecificSeed(mode)
 end
 
 task.spawn(function()
-    while task.wait(5) do
+    while task.wait(4) do
         if getgenv().ZedHubConfig.GiveASeed and not isProcessingScarecrow then
             pcall(function()
                 isProcessingScarecrow = true
@@ -738,7 +668,7 @@ task.spawn(function()
                             local tween = TweenService:Create(hrp, TweenInfo.new(dist / 25, Enum.EasingStyle.Linear), {CFrame = npcPart.CFrame + Vector3.new(0, 3, 0)})
                             tween:Play()
                             tween.Completed:Wait()
-                            task.wait(0.4)
+                            task.wait(0.3)
 
                             local giveEvt = GameEvents and GameEvents:FindFirstChild("ScarecrowGiveSeed")
                             if giveEvt then giveEvt:FireServer(mode)
@@ -746,7 +676,7 @@ task.spawn(function()
                                 local p = scarecrow:FindFirstChildWhichIsA("ProximityPrompt", true)
                                 if p then fireproximityprompt(p) end
                             end
-                            task.wait(0.8)
+                            task.wait(0.6)
 
                             local rTween = TweenService:Create(hrp, TweenInfo.new((hrp.Position - origin.Position).Magnitude / 25, Enum.EasingStyle.Linear), {CFrame = origin})
                             rTween:Play()
@@ -760,7 +690,7 @@ task.spawn(function()
     end
 end)
 
--- Kontrol Jendela (Minimize, Close, Draggable)
+-- UI Window Controls
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -786,7 +716,7 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
+        let delta = input.Position - dragStart
         MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
@@ -797,4 +727,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("🪐 ZedHub Complete UI & Engine Successfully Loaded!")
+print("🪐 ZedHub Full Fixed & Optimized Loaded Successfully!")
