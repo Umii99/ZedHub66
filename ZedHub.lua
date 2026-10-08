@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Deteksi Kapasitas Tas Penuh Otomatis
+    - Backend Auto Sell dengan Deteksi Kapasitas Tas Penuh Presisi
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -280,7 +280,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Checkbox (Diperbaiki agar callback ON/OFF berfungsi sempurna)
+-- Tombol Checkbox
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -522,7 +522,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Dengan Deteksi Otomatis Tas Penuh)
+-- MASTER BACKEND AUTOMATION ENGINE (Smart Stagnation Detection)
 -- =========================================================================
 local IsSelling = false
 local LastCropCount = 0
@@ -584,7 +584,7 @@ local function SellInventory()
     StableCountTime = 0
 end
 
--- Looping Auto Sell Utama dengan Deteksi Otomatis Kapasitas Penuh
+-- Looping Auto Sell Profesional (Akurat mendeteksi tas penuh tanpa salah jual saat tas kosong)
 task.spawn(function()
     while task.wait(1.5) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -598,11 +598,11 @@ task.spawn(function()
             if fruitOn and not backpackOn then
                 SellInventory()
                 
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Deteksi otomatis saat tas penuh (mentok/tidak bertambah meski proses kumpul jalan)
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Mendeteksi saat tas mentok/penuh secara adaptif
             elseif backpackOn then
-                if CropCount > 0 and CropCount == LastCropCount then
+                -- Pastikan tas sudah berisi item yang cukup banyak (di atas 10) dan jumlahnya berhenti bertambah (stagnan) selama 4.5 detik
+                if CropCount > 10 and CropCount == LastCropCount then
                     StableCountTime = StableCountTime + 1.5
-                    -- Jika jumlah item di tas tidak berubah selama 4,5 detik (menandakan tas sudah penuh & mentok)
                     if StableCountTime >= 4.5 then
                         SellInventory()
                         StableCountTime = 0
