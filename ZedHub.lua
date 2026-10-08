@@ -1,9 +1,6 @@
 --[[
-    ZEDHUB - FINAL GAG PURE FRUIT 200 LIMIT & SPEED HUB TELEPORT SCRIPT
-    - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell: Filter Buah Murni (Bebas Pet/Gear/Seed) dengan Target 200
-    - Sistem Teleport Kasir Instan (TP -> Jual -> TP Balik) + Cooldown Anti-Spam
-    - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
+    ZEDHUB - DUAL AUTO SELL MODES (BACKPACK FULL & CONTINUOUS SELL)
+    - UI lengkap dengan dua tombol Auto Sell terpisah untuk persiapan fitur threshold.
 ]]
 
 local Players = game:GetService("Players")
@@ -11,7 +8,6 @@ local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 local GameEvents = ReplicatedStorage:FindFirstChild("GameEvents")
 
 local LocalPlayer = Players.LocalPlayer
@@ -23,7 +19,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (Pusat Kendali Engine & UI State)
+-- CONFIGURATION STATE (Pusat Kendali UI & Dual Auto Sell)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -31,8 +27,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false,
-    AutoSellFruit = false,
+    AutoSellBackpack = false, -- Tombol untuk Jual saat Penuh (260)
+    AutoSellFruit = false,    -- Tombol untuk Jual Terus-menerus (Persiapan Threshold)
     
     FallMarketBuy = {
         FallGear = { Active = false, BuyAll = false, Items = {} },
@@ -472,7 +468,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING ===
+-- === TAB AUTO SELLING (KEDUA TOMBOL DIKEMBALIKAN UTUH) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 
 CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
@@ -523,43 +519,11 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND FINAL: PURE FRUIT 200 LIMIT & SPEED HUB TELEPORT SYSTEM
+-- BACKEND: DUA MODE (BACKPACK FULL 260 & AUTO SELL / PERSIAPAN THRESHOLD)
 -- =========================================================================
 local IsSelling = false
 
-local function GetPureFruitCount()
-    local fruitCount = 0
-    if Backpack then
-        for _, item in ipairs(Backpack:GetChildren()) do
-            if item:IsA("Tool") then
-                local nameLower = string.lower(item.Name)
-                
-                -- Filter ketat: Memblokir pet, seed, gear, dan alat agar hitungan murni buah
-                local isNotFruit = string.find(nameLower, "seed") or 
-                                   string.find(nameLower, "sprinkler") or 
-                                   string.find(nameLower, "wrench") or 
-                                   string.find(nameLower, "shovel") or 
-                                   string.find(nameLower, "basket") or
-                                   string.find(nameLower, "tool") or
-                                   string.find(nameLower, "scythe") or
-                                   string.find(nameLower, "hoe") or
-                                   string.find(nameLower, "pet") or
-                                   string.find(nameLower, "egg") or
-                                   string.find(nameLower, "crate") or
-                                   string.find(nameLower, "gear")
-
-                if not isNotFruit then
-                    fruitCount = fruitCount + 1
-                end
-            end
-        end
-    end
-    
-    print("ZedHub Monitor -> Buah Murni (Bebas Pet/Gear):", fruitCount, "/ 200")
-    return fruitCount
-end
-
-local function SellInventory()
+local function SellInventoryOnce()
     local Character = LocalPlayer.Character
     if not Character then return end
     local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
@@ -568,14 +532,13 @@ local function SellInventory()
     if IsSelling then return end
     IsSelling = true
 
-    -- Simpan posisi awal karakter di kebun
     local originalCFrame = HumanoidRootPart.CFrame
 
-    -- 1. Teleport instan ke kasir penjualan
+    -- 1. Teleport ke kasir
     HumanoidRootPart.CFrame = CFrame.new(62, 4, -26)
     task.wait(0.3)
 
-    -- 2. Tembak event jual resmi Grow A Garden
+    -- 2. Tembak event jual
     local sellEvt = GameEvents and GameEvents:FindFirstChild("Sell_Inventory")
     if sellEvt then
         pcall(function()
@@ -584,32 +547,49 @@ local function SellInventory()
     end
     task.wait(0.4)
 
-    -- 3. Teleport balik instan ke posisi semula
+    -- 3. Teleport balik ke kebun
     HumanoidRootPart.CFrame = originalCFrame
     task.wait(0.4)
 
-    -- Cooldown pengaman 10 detik agar tidak spam bolak-balik
-    task.wait(10)
     IsSelling = false
 end
 
--- Looping Utama: Memicu Auto Sell persis saat buah murni menyentuh angka 200
+-- Looping Utama: Menangani kedua tombol secara terpisah
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if not IsSelling then
+            -- Mode 1: Auto Sell Jika Backpack Full (Mentok 260)
             if backpackOn and not fruitOn then
-                local currentFruits = GetPureFruitCount()
-                
-                if currentFruits >= 200 then
-                    SellInventory()
+                local currentTotal = 0
+                pcall(function()
+                    if Backpack then
+                        for _, item in ipairs(Backpack:GetChildren()) do
+                            if item:IsA("Tool") then
+                                currentTotal = currentTotal + 1
+                            end
+                        end
+                    end
+                end)
+
+                if currentTotal >= 260 then
+                    SellInventoryOnce()
+                    -- Jeda agar tidak langsung menjual lagi
+                    repeat
+                        task.wait(3)
+                        local checkEmpty = 0
+                        for _, item in ipairs(Backpack:GetChildren()) do
+                            if item:IsA("Tool") then checkEmpty = checkEmpty + 1 end
+                        end
+                    until checkEmpty < 50 or not getgenv().ZedHubConfig.AutoSellBackpack
                 end
                 
+            -- Mode 2: Auto Sell Fruit (Terus-menerus - siap kamu kembangkan untuk fitur threshold)
             elseif fruitOn then
-                SellInventory()
-                task.wait(2)
+                SellInventoryOnce()
+                task.wait(5) -- Jeda berkala aman
             end
         end
     end
@@ -689,4 +669,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Pure Fruit Speed Hub Engine Loaded Successfully!")
+print("ZedHub Dual Sell Mode Loaded Successfully!")
