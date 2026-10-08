@@ -1,6 +1,6 @@
 --[[
-    ZedHub Final Strict List Edition - Grow A Garden
-    Hanya Memuat: ALL SEED, SHOP SEED, MARKET FALL CONTROLLER, MARKET FALL GEAR
+    ZedHub Final Clean Edition - Grow A Garden
+    Market Fall Gear Digabung ke Controller dengan Efek Accordion Premium
 ]]
 
 local Players = game:GetService("Players")
@@ -217,114 +217,12 @@ local function CreateTwoColumnLayout(parentTab)
     return leftCol, rightCol
 end
 
-local function CreateSection(parentCol, titleText)
-    local sec = Instance.new("Frame", parentCol)
-    sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
-    sec.BackgroundTransparency = 0.4
-    sec.Size = UDim2.new(1, 0, 0, 0)
-    sec.AutomaticSize = Enum.AutomaticSize.Y
-    Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 6)
-    
-    local stroke = Instance.new("UIStroke", sec)
-    stroke.Color = Color3.fromRGB(59, 130, 246)
-    stroke.Transparency = 0.6
-
-    local layout = Instance.new("UIListLayout", sec)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 4)
-
-    local header = Instance.new("TextLabel", sec)
-    header.BackgroundTransparency = 1
-    header.Size = UDim2.new(1, 0, 0, 24)
-    header.Font = Enum.Font.GothamBold
-    header.Text = "  🔸 " .. titleText
-    header.TextColor3 = Color3.fromRGB(96, 165, 250)
-    header.TextSize = 10
-    header.TextXAlignment = Enum.TextXAlignment.Left
-
-    return sec
-end
-
-local function CreateToggle(parentSec, text)
-    local row = Instance.new("TextButton", parentSec)
-    row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, -6, 0, 24)
-    row.AutoButtonColor = false
-    row.Font = Enum.Font.Gotham
-    row.Text = "    " .. text
-    row.TextColor3 = Color3.fromRGB(200, 210, 230)
-    row.TextSize = 9.5
-    row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
-
-    local box = Instance.new("Frame", row)
-    box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -22, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
-
-    local check = Instance.new("TextLabel", box)
-    check.BackgroundTransparency = 1
-    check.Size = UDim2.new(1, 0, 1, 0)
-    check.Font = Enum.Font.GothamBold
-    check.Text = ""
-    check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 8
-
-    local state = false
-    row.MouseButton1Click:Connect(function()
-        state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
-        check.Text = state and "✓" or ""
-    end)
-    return row
-end
-
--- === HANYA MENAMPILKAN DAFTAR YANG DIMINTA ===
-
--- 1. TAB SHOP: Mengisi SHOP SEED dan ALL SEED[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
-local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
-local SecShopSeed = CreateSection(ShopLeft, "SHOP SEED")
-CreateToggle(SecShopSeed, "Carrot")
-CreateToggle(SecShopSeed, "Strawberry")
-CreateToggle(SecShopSeed, "Blueberry")
-CreateToggle(SecShopSeed, "Tomato")
-CreateToggle(SecShopSeed, "Auto Buy (Selected)")
-CreateToggle(SecShopSeed, "Auto Buy All")
-
-local SecAllSeed = CreateSection(ShopRight, "ALL SEED")
-CreateToggle(SecAllSeed, "Carrot")
-CreateToggle(SecAllSeed, "Strawberry")
-CreateToggle(SecAllSeed, "Advanced Sprinkler")
-CreateToggle(SecAllSeed, "Grandmaster")
-CreateToggle(SecAllSeed, "Godly Sprinkler")
-CreateToggle(SecAllSeed, "Auto Buy (Selected)")
-CreateToggle(SecAllSeed, "Auto Buy All")
-
--- 2. TAB EVENT: Mengisi MARKET FALL CONTROLLER dan MARKET FALL GEAR[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span)
-local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
-local SecFall = CreateSection(EventLeft, "MARKET FALL CONTROLLER")
-CreateToggle(SecFall, "Give A Seed")
-CreateToggle(SecFall, "Auto Shovel Acorn")
-
-local SecFallGear = CreateSection(EventRight, "MARKET FALL GEAR")
-CreateToggle(SecFallGear, "Leaf Rake")
-CreateToggle(SecFallGear, "Scarecrow Stick")
-CreateToggle(SecFallGear, "Acorn Lolipop")
-
--- 3. TAB AUTO SELLING
-local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
-local SecSell = CreateSection(SellLeft, "AUTO SELLING FRUIT")
-CreateToggle(SecSell, "Auto Sell If Backpack Full")
-CreateToggle(SecSell, "Auto Sell Fruit")
-
--- 4. TAB INFO: WEBHOOK & SERVER (Buka-tutup dengan tombol Click)
+-- Fungsi Accordion Premium (Buka-Tutup Halus)
 local function CreateAccordionSection(parent, titleText, accentColor)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
     sec.BackgroundTransparency = 0.4
-    sec.Size = UDim2.new(1, -10, 0, 0)
+    sec.Size = UDim2.new(1, 0, 0, 0)
     sec.AutomaticSize = Enum.AutomaticSize.Y
     Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 6)
     
@@ -379,6 +277,83 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
+-- Fungsi Toggle Biasa untuk di dalam Section
+local function CreateToggle(parentSec, text)
+    local row = Instance.new("TextButton", parentSec)
+    row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+    row.BackgroundTransparency = 0.6
+    row.Size = UDim2.new(1, 0, 0, 24)
+    row.AutoButtonColor = false
+    row.Font = Enum.Font.Gotham
+    row.Text = "    " .. text
+    row.TextColor3 = Color3.fromRGB(200, 210, 230)
+    row.TextSize = 9.5
+    row.TextXAlignment = Enum.TextXAlignment.Left
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
+
+    local box = Instance.new("Frame", row)
+    box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    box.Position = UDim2.new(1, -20, 0.5, -6)
+    box.Size = UDim2.new(0, 12, 0, 12)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+
+    local check = Instance.new("TextLabel", box)
+    check.BackgroundTransparency = 1
+    check.Size = UDim2.new(1, 0, 1, 0)
+    check.Font = Enum.Font.GothamBold
+    check.Text = ""
+    check.TextColor3 = Color3.fromRGB(255, 255, 255)
+    check.TextSize = 8
+
+    local state = false
+    row.MouseButton1Click:Connect(function()
+        state = not state
+        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
+        check.Text = state and "✓" or ""
+    end)
+    return row
+end
+
+-- === PENGISIAN KONTEN ===
+
+-- 1. TAB SHOP: SHOP SEED & ALL SEED[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+local ShopLeft, ShopRight = CreateTwoColumnLayout(TabShop)
+local SecShopSeed = CreateAccordionSection(ShopLeft, "SHOP SEED", Color3.fromRGB(52, 211, 153))
+CreateToggle(SecShopSeed, "Carrot")
+CreateToggle(SecShopSeed, "Strawberry")
+CreateToggle(SecShopSeed, "Blueberry")
+CreateToggle(SecShopSeed, "Tomato")
+CreateToggle(SecShopSeed, "Auto Buy (Selected)")
+CreateToggle(SecShopSeed, "Auto Buy All")
+
+local SecAllSeed = CreateAccordionSection(ShopRight, "ALL SEED", Color3.fromRGB(96, 165, 250))
+CreateToggle(SecAllSeed, "Carrot")
+CreateToggle(SecAllSeed, "Strawberry")
+CreateToggle(SecAllSeed, "Advanced Sprinkler")
+CreateToggle(SecAllSeed, "Grandmaster")
+CreateToggle(SecAllSeed, "Godly Sprinkler")
+CreateToggle(SecAllSeed, "Auto Buy (Selected)")
+CreateToggle(SecAllSeed, "Auto Buy All")
+
+-- 2. TAB EVENT: MARKET FALL CONTROLLER (Market Fall Gear digabung di sini dengan buka-tutup)
+local EventLeft, EventRight = CreateTwoColumnLayout(TabEvent)
+local SecFall = CreateAccordionSection(EventLeft, "MARKET FALL CONTROLLER", Color3.fromRGB(251, 146, 60))
+CreateToggle(SecFall, "Give A Seed")
+CreateToggle(SecFall, "Auto Shovel Acorn")
+
+-- Market Fall Gear digabungkan di sebelah kanan dengan fitur buka-tutup yang sangat indah
+local SecFallGear = CreateAccordionSection(EventRight, "MARKET FALL GEAR", Color3.fromRGB(244, 63, 94))
+CreateToggle(SecFallGear, "Leaf Rake")
+CreateToggle(SecFallGear, "Scarecrow Stick")
+CreateToggle(SecFallGear, "Acorn Lolipop")
+
+-- 3. TAB AUTO SELLING
+local SellLeft, SellRight = CreateTwoColumnLayout(TabSelling)
+local SecSell = CreateAccordionSection(SellLeft, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
+CreateToggle(SecSell, "Auto Sell If Backpack Full")
+CreateToggle(SecSell, "Auto Sell Fruit")
+
+-- 4. TAB INFO: WEBHOOK & SERVER (Dengan Buka-Tutup & Tombol Click)
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
 local WebhookBox = Instance.new("TextBox", WebhookBody)
 WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -458,4 +433,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Strict List Loaded Successfully!")
+print("ZedHub Final Perfect Edition Loaded Successfully!")
