@@ -1,6 +1,6 @@
 --[[
-    ZedHub Fall Market Separated Edition - Grow A Garden
-    Kategori Fall Market Dipisah Menjadi Accordion Tersendiri
+    ZedHub Streamlined Fall Shop Edition - Grow A Garden
+    Struktur Toko Diringkas & Lebih Teratur
 ]]
 
 local Players = game:GetService("Players")
@@ -293,63 +293,63 @@ CreateToggle(SecShopSeed, "Tomato")
 CreateToggle(SecShopSeed, "Auto Buy (Selected)")
 CreateToggle(SecShopSeed, "Auto Buy All")
 
--- 2. TAB EVENT: STRUKTUR LENGKAP & DIPISAH SESUAI KATEGORI SHOP
+-- 2. TAB EVENT: STRUKTUR RINGKAS DAN JELAS
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFallHarvest, "Required Collection Plant")
 CreateToggle(SecFallHarvest, "Required Submit Plant")
 
--- Fall Shop Seed & Seed Pack
-local SecFallShopSeed = CreateAccordionSection(TabEvent, "FALL SHOP SEED", Color3.fromRGB(244, 63, 94))
-CreateToggle(SecFallShopSeed, "Turnip Seed")
-CreateToggle(SecFallShopSeed, "Parsley Seed")
-CreateToggle(SecFallShopSeed, "Autumn Seed Pack")
-CreateToggle(SecFallShopSeed, "Meyers Lemon")
-CreateToggle(SecFallShopSeed, "Carnival Pumpkin")
-CreateToggle(SecFallShopSeed, "Golden Peach")
-CreateToggle(SecFallShopSeed, "Kniphopia")
-CreateToggle(SecFallShopSeed, "Maple Resin")
+-- Shop Fall Gear
+local SecFallGear = CreateAccordionSection(TabEvent, "SHOP FALL GEAR", Color3.fromRGB(59, 130, 246))
+CreateToggle(SecFallGear, "Firefly Jar")
+CreateToggle(SecFallGear, "Sky Lantern")
+CreateToggle(SecFallGear, "Maple Leaf Kite")
+CreateToggle(SecFallGear, "Maple Blower")
+CreateToggle(SecFallGear, "Maple Syrup")
+CreateToggle(SecFallGear, "Maple Sprinkler")
+CreateToggle(SecFallGear, "Bonfire")
+CreateToggle(SecFallGear, "Harvest Basket")
+CreateToggle(SecFallGear, "Acorn Lollipop")
+CreateToggle(SecFallGear, "Golden Acorn Rake")
 
--- Fall Shop Pets
-local SecFallShopPets = CreateAccordionSection(TabEvent, "FALL SHOP PETS", Color3.fromRGB(168, 85, 247))
-CreateToggle(SecFallShopPets, "Fall Egg")
-CreateToggle(SecFallShopPets, "Salmon")
-CreateToggle(SecFallShopPets, "Chipmunk")
-CreateToggle(SecFallShopPets, "Woodpecker")
-CreateToggle(SecFallShopPets, "Red Squirrel")
-CreateToggle(SecFallShopPets, "Marmot")
-CreateToggle(SecFallShopPets, "Mallard")
-CreateToggle(SecFallShopPets, "Sugar Glider")
-CreateToggle(SecFallShopPets, "Space Squirrel")
-CreateToggle(SecFallShopPets, "Red Panda")
+-- Shop Fall Seed
+local SecFallSeed = CreateAccordionSection(TabEvent, "SHOP FALL SEED", Color3.fromRGB(244, 63, 94))
+CreateToggle(SecFallSeed, "Turnip Seed")
+CreateToggle(SecFallSeed, "Parsley Seed")
+CreateToggle(SecFallSeed, "Autumn Seed Pack")
+CreateToggle(SecFallSeed, "Meyers Lemon")
+CreateToggle(SecFallSeed, "Carnival Pumpkin")
+CreateToggle(SecFallSeed, "Golden Peach")
+CreateToggle(SecFallSeed, "Kniphopia")
+CreateToggle(SecFallSeed, "Maple Resin")
 
--- Fall Shop Gears
-local SecFallShopGears = CreateAccordionSection(TabEvent, "FALL SHOP GEARS", Color3.fromRGB(59, 130, 246))
-CreateToggle(SecFallShopGears, "Firefly Jar")
-CreateToggle(SecFallShopGears, "Sky Lantern")
-CreateToggle(SecFallShopGears, "Maple Leaf Kite")
-CreateToggle(SecFallShopGears, "Maple Blower")
-CreateToggle(SecFallShopGears, "Maple Syrup")
-CreateToggle(SecFallShopGears, "Maple Sprinkler")
-CreateToggle(SecFallShopGears, "Bonfire")
-CreateToggle(SecFallShopGears, "Harvest Basket")
-CreateToggle(SecFallShopGears, "Acorn Lollipop")
-CreateToggle(SecFallShopGears, "Golden Acorn Rake")
+-- Shop Fall Cosmetic dan Crate
+local SecFallCosmetic = CreateAccordionSection(TabEvent, "SHOP FALL COSMETIC DAN CRATE", Color3.fromRGB(20, 184, 166))
+CreateToggle(SecFallCosmetic, "Fall Leaf Chair")
+CreateToggle(SecFallCosmetic, "Fall Crate")
+CreateToggle(SecFallCosmetic, "Maple Flag")
+CreateToggle(SecFallCosmetic, "Maple Wreath")
+CreateToggle(SecFallCosmetic, "Fall Haybale")
+CreateToggle(SecFallCosmetic, "Pile Of Leaves")
+CreateToggle(SecFallCosmetic, "Flying Kit")
+CreateToggle(SecFallCosmetic, "Autumn Crate")
+CreateToggle(SecFallCosmetic, "Fall Mountain")
 
--- Fall Shop Cosmetic & Crate
-local SecFallShopCosmetic = CreateAccordionSection(TabEvent, "FALL SHOP COSMETIC", Color3.fromRGB(20, 184, 166))
-CreateToggle(SecFallShopCosmetic, "Fall Leaf Chair")
-CreateToggle(SecFallShopCosmetic, "Fall Crate")
-CreateToggle(SecFallShopCosmetic, "Maple Flag")
-CreateToggle(SecFallShopCosmetic, "Maple Wreath")
-CreateToggle(SecFallShopCosmetic, "Fall Haybale")
-CreateToggle(SecFallShopCosmetic, "Pile Of Leaves")
-CreateToggle(SecFallShopCosmetic, "Flying Kit")
-CreateToggle(SecFallShopCosmetic, "Autumn Crate")
-CreateToggle(SecFallShopCosmetic, "Fall Mountain")
+-- Shop Fall Pet dan Egg
+local SecFallPet = CreateAccordionSection(TabEvent, "SHOP FALL PET DAN EGG", Color3.fromRGB(168, 85, 247))
+CreateToggle(SecFallPet, "Fall Egg")
+CreateToggle(SecFallPet, "Salmon")
+CreateToggle(SecFallPet, "Chipmunk")
+CreateToggle(SecFallPet, "Woodpecker")
+CreateToggle(SecFallPet, "Red Squirrel")
+CreateToggle(SecFallPet, "Marmot")
+CreateToggle(SecFallPet, "Mallard")
+CreateToggle(SecFallPet, "Sugar Glider")
+CreateToggle(SecFallPet, "Space Squirrel")
+CreateToggle(SecFallPet, "Red Panda")
 
--- Auto Buy Fall Shop Global Toggle
-local SecAutoBuyFall = CreateAccordionSection(TabEvent, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
-CreateToggle(SecAutoBuyFall, "Auto Buy Fall Shop")
+-- Auto Buy Fall Shop On/Off
+local SecAutoBuy = CreateAccordionSection(TabEvent, "AUTO BUY FALL SHOP", Color3.fromRGB(234, 179, 8))
+CreateToggle(SecAutoBuy, "Auto Buy On/Off")
 
 local SecShady = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
 CreateToggle(SecShady, "All Seed")
@@ -444,4 +444,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Market Categories Separated Successfully!")
+print("ZedHub Streamlined Fall Shop Loaded Successfully!")
