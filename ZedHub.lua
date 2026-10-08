@@ -1,6 +1,8 @@
 --[[
-    ZEDHUB - FINAL INTEGRATED EDITION (GROW A GARDEN)
-    UI Murni + Automation Engine yang Berfungsi Penuh
+    ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
+    - UI Murni milikmu
+    - Mekanisme Auto Sell (ON/OFF & Backpack Full)
+    - Mekanisme Auto Buy Shop & 4 Fall Market (Selected & Buy All)
 ]]
 
 local Players = game:GetService("Players")
@@ -12,6 +14,7 @@ local TweenService = game:GetService("TweenService")
 local GameEvents = ReplicatedStorage:FindFirstChild("GameEvents")
 
 local LocalPlayer = Players.LocalPlayer
+local Backpack = LocalPlayer:WaitForChild("Backpack")
 local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
@@ -19,7 +22,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (Pusat Kendali Engine)
+-- CONFIGURATION STATE
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -277,7 +280,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Pilihan Item Biasa (Tersambung Callback)
+-- Tombol Pilihan Item Biasa
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -436,11 +439,11 @@ CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lante
 CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
 -- Shady Scarecrown
-local SecShadyScarecrow = CreateAccordionSection(TabEvent, "SHADY SCARECROW", Color3.fromRGB(251, 191, 36))
-CreateSelectedDropdown(SecShadyScarecrow, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
+local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW", Color3.fromRGB(251, 191, 36))
+CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
     if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
-CreateActionToggle(SecShadyScarecrow, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
+CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
 -- Auto Acorn
 local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN", Color3.fromRGB(56, 189, 248))
@@ -470,156 +473,146 @@ local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.
 CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state) getgenv().ZedHubConfig.AutoSellBackpack = state end)
 CreateToggle(SecSell, "Auto Sell Fruit", function(state) getgenv().ZedHubConfig.AutoSellFruit = state end)
 
+local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
+local WebhookBox = Instance.new("TextBox", WebhookBody)
+WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+WebhookBox.Size = UDim2.new(1, 0, 0, 30)
+WebhookBox.Font = Enum.Font.Gotham
+WebhookBox.PlaceholderText = "URL Webhook Discord..."
+WebhookBox.Text = ""
+WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
+WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
+WebhookBox.TextSize = 11
+Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
+
+local ServerBody = CreateAccordionSection(TabInfo, "SERVER", Color3.fromRGB(96, 165, 250))
+local ServerRow = Instance.new("Frame", ServerBody)
+ServerRow.BackgroundTransparency = 1
+ServerRow.Size = UDim2.new(1, 0, 0, 30)
+
+local ServerInput = Instance.new("TextBox", ServerRow)
+ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
+ServerInput.Font = Enum.Font.Gotham
+ServerInput.PlaceholderText = "2007"
+ServerInput.Text = ""
+ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
+ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
+ServerInput.TextSize = 11
+Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
+
+local ClickBtn = Instance.new("TextButton", ServerRow)
+ClickBtn.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
+ClickBtn.Position = UDim2.new(0.71, 0, 0, 0)
+ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
+ClickBtn.Font = Enum.Font.GothamBold
+ClickBtn.Text = "Click"
+ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ClickBtn.TextSize = 11
+Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
+
 
 -- =========================================================================
--- MASTER AUTOMATION BACKEND ENGINE
+-- MASTER BACKEND AUTOMATION ENGINE
 -- =========================================================================
-local isProcessingScarecrow = false
 local IsSelling = false
 
-local function PreciseSellInventory()
+local function GetInvCrops()
+    local Character = LocalPlayer.Character
+    local Crops = {}
+    
+    local function CollectCropsFromParent(Parent)
+        for _, Tool in next, Parent:GetChildren() do
+            local Name = Tool:FindFirstChild("Item_String")
+            if Name then
+                table.insert(Crops, Tool)
+            end
+        end
+    end
+
+    if Backpack then CollectCropsFromParent(Backpack) end
+    if Character then CollectCropsFromParent(Character) end
+
+    return Crops
+end
+
+local function SellInventory()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+    
+    local Leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+    local ShecklesCount = Leaderstats and Leaderstats:FindFirstChild("Sheckles")
+    local PreviousSheckles = ShecklesCount and ShecklesCount.Value or 0
+    local Previous = Character:GetPivot()
+
     if IsSelling then return end
     IsSelling = true
-    pcall(function()
-        local character = LocalPlayer.Character
-        if not character then IsSelling = false return end
-        local hrp = character:FindFirstChild("HumanoidRootPart")
-        if not hrp then IsSelling = false return end
 
-        local previousCFrame = hrp.CFrame
-        hrp.CFrame = CFrame.new(62, 4, -26)
-        task.wait(0.4)
-
+    Character:PivotTo(CFrame.new(62, 4, -26))
+    while task.wait() do
+        if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
         if GameEvents and GameEvents:FindFirstChild("Sell_Inventory") then
             GameEvents.Sell_Inventory:FireServer()
         end
-        task.wait(0.5)
-        hrp.CFrame = previousCFrame
-    end)
+    end
+    Character:PivotTo(Previous)
+
+    task.wait(0.2)
     IsSelling = false
 end
 
--- Auto Sell Loop (bisa berhenti saat dimatikan)
+-- Auto Sell Looping (Mengikuti aturan ON/OFF tombolmu)
 task.spawn(function()
     while task.wait(2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        if backpackOn or fruitOn then
-            local count = 0
-            pcall(function()
-                for _, t in pairs(LocalPlayer.Backpack:GetChildren()) do
-                    if t:IsA("Tool") then count += 1 end
-                end
-                local char = LocalPlayer.Character
-                if char then
-                    for _, t in pairs(char:GetChildren()) do
-                        if t:IsA("Tool") then count += 1 end
-                    end
-                end
-            end)
+        if not backpackOn and not fruitOn then
+            continue
+        end
 
-            if fruitOn or (backpackOn and count >= 12) then
-                PreciseSellInventory()
-                task.wait(3)
-            end
+        local CropCount = #GetInvCrops()
+
+        -- Jika "Auto Sell Fruit" ON saja (jual terus menerus)
+        if fruitOn and not backpackOn then
+            SellInventory()
+            
+        -- Jika "Auto Sell If Backpack Full" ON (atau keduanya ON) -> Jual saat tas penuh (>= 12 item)
+        elseif backpackOn and CropCount >= 12 then
+            SellInventory()
         end
     end
 end)
 
-local function GetEventRequiredItemName()
-    if not PlayerGui then return nil end
-    for _, gui in pairs(PlayerGui:GetChildren()) do
-        if gui.Name:lower():find("event") or gui.Name:lower():find("fall") or gui.Name:lower():find("bloom") then
-            for _, desc in pairs(gui:GetDescendants()) do
-                if desc:IsA("TextLabel") and (desc.Text:lower():find("need") or desc.Text:lower():find("require") or desc.Text:lower():find("/")) then
-                    return desc.Text
-                end
-            end
-        end
-    end
-    return nil
-end
-
--- Auto Collect Required
-task.spawn(function()
-    while task.wait(1.5) do
-        if getgenv().ZedHubConfig.AutoCollect then
-            pcall(function()
-                local requiredKeyword = GetEventRequiredItemName()
-                local myFarm = Workspace:FindFirstChild("Farm")
-                if myFarm then
-                    for _, plant in pairs(myFarm:GetDescendants()) do
-                        if plant:IsA("Model") or plant:IsA("Part") then
-                            local pName = plant.Name:lower()
-                            local match = false
-                            if requiredKeyword and pName:find(requiredKeyword:lower()) then
-                                match = true
-                            elseif not requiredKeyword and (pName:find("fall") or pName:find("bloom") or pName:find("event")) then
-                                match = true
-                            end
-
-                            if match then
-                                local prompt = plant:FindFirstChildWhichIsA("ProximityPrompt", true)
-                                if prompt and prompt.Enabled then
-                                    fireproximityprompt(prompt)
-                                    task.wait(0.15)
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- Auto Submit Plant
-task.spawn(function()
-    while task.wait(2.5) do
-        if getgenv().ZedHubConfig.AutoSubmit then
-            pcall(function()
-                local needed = GetEventRequiredItemName()
-                local backpack = LocalPlayer.Backpack
-                for _, tool in pairs(backpack:GetChildren()) do
-                    if tool:IsA("Tool") and (not needed or tool.Name:lower():find(needed:lower()) or tool.Name:lower():find("fall")) then
-                        local submitEvt = GameEvents and (GameEvents:FindFirstChild("SubmitFallPlant") or GameEvents:FindFirstChild("SubmitEvent"))
-                        if submitEvt then
-                            submitEvt:FireServer(tool)
-                            task.wait(0.4)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- Auto Buy Engine (Shop & 4 Market Fall)
+-- Auto Buy Engine (Main Shop & 4 Fall Market: Selected & Buy All)
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
             local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
             if not buyEvt then return end
 
+            -- 1. Eksekusi 4 Kategori Fall Market
             for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
                     task.wait(0.3)
                 elseif data.Active and data.Items and #data.Items > 0 then
                     for _, itemName in pairs(data.Items) do
+                        if not data.Active then break end
                         buyEvt:FireServer(catName, itemName)
                         task.wait(0.25)
                     end
                 end
             end
 
+            -- 2. Eksekusi Main Shop (Egg, Seed, Gear)
             for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
                     task.wait(0.3)
                 elseif data.Active and data.Items and #data.Items > 0 then
                     for _, itemName in pairs(data.Items) do
+                        if not data.Active then break end
                         buyEvt:FireServer(catName, itemName)
                         task.wait(0.25)
                     end
@@ -629,80 +622,6 @@ task.spawn(function()
     end
 end)
 
--- Shady Scarecrow Automation
-local function EquipSpecificSeed(mode)
-    local character = LocalPlayer.Character
-    local backpack = LocalPlayer.Backpack
-    if not character then return false end
-    local keywords = (mode == "GOLD_EGG_SEED") and {"gold", "egg", "golden"} or {"seed"}
-
-    local currentTool = character:FindFirstChildOfClass("Tool")
-    if currentTool then
-        local tName = currentTool.Name:lower()
-        for _, kw in pairs(keywords) do if tName:find(kw) then return true end end
-    end
-
-    for _, item in pairs(backpack:GetChildren()) do
-        if item:IsA("Tool") then
-            local iName = item.Name:lower()
-            for _, kw in pairs(keywords) do
-                if iName:find(kw) then
-                    if currentTool then currentTool.Parent = backpack end
-                    item.Parent = character
-                    task.wait(0.4)
-                    return true
-                end
-            end
-        end
-    end
-    return false
-end
-
-task.spawn(function()
-    while task.wait(4) do
-        if getgenv().ZedHubConfig.GiveASeed and not isProcessingScarecrow then
-            pcall(function()
-                isProcessingScarecrow = true
-                local mode = getgenv().ZedHubConfig.ShadyScarecrowMode
-                if EquipSpecificSeed(mode) then
-                    local scarecrow = nil
-                    for _, obj in pairs(Workspace:GetChildren()) do
-                        if obj.Name:lower():find("scarecrow") or obj.Name:lower():find("shady") then
-                            scarecrow = obj
-                            break
-                        end
-                    end
-
-                    if scarecrow then
-                        local npcPart = scarecrow:FindFirstChild("HumanoidRootPart") or scarecrow.PrimaryPart or scarecrow:FindFirstChildWhichIsA("BasePart")
-                        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                        if npcPart and hrp then
-                            local origin = hrp.CFrame
-                            local dist = (hrp.Position - npcPart.Position).Magnitude
-                            local tween = TweenService:Create(hrp, TweenInfo.new(dist / 25, Enum.EasingStyle.Linear), {CFrame = npcPart.CFrame + Vector3.new(0, 3, 0)})
-                            tween:Play()
-                            tween.Completed:Wait()
-                            task.wait(0.3)
-
-                            local giveEvs = GameEvents and GameEvents:FindFirstChild("ScarecrowGiveSeed")
-                            if giveEvs then giveEvs:FireServer(mode)
-                            else
-                                local p = scarecrow:FindFirstChildWhichIsA("ProximityPrompt", true)
-                                if p then fireproximityprompt(p) end
-                            end
-                            task.wait(0.6)
-
-                            local rTween = TweenService:Create(hrp, TweenInfo.new((hrp.Position - origin.Position).Magnitude / 25, Enum.EasingStyle.Linear), {CFrame = origin})
-                            rTween:Play()
-                            rTween.Completed:Wait()
-                        end
-                    end
-                end
-                isProcessingScarecrow = false
-            end)
-        end
-    end
-end)
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -741,4 +660,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Complete UI & Master Automation Engine Successfully Loaded!")
+print("ZedHub Complete UI & Optimized Engine Loaded Successfully!")
