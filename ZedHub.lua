@@ -1,7 +1,7 @@
 --[[
-    ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL GITHUB-STYLE CLEAN SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell Mutlak (Responsif, akurat membaca kapasitas asli game tanpa bug tombol)
+    - Backend Auto Sell murni ala GitHub (Sangat ringan & aman untuk AFK)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,19 +522,16 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Responsive & Accurate Capacity Reader)
+-- GITHUB-STYLE CLEAN BACKEND AUTOMATION ENGINE
 -- =========================================================================
 local IsSelling = false
 
-local function GetBackpackCapacityInfo()
-    local character = LocalPlayer.Character
+local function GetBackpackStatus()
     local currentCount = 0
-    local maxCapacity = 50 -- Angka default cadangan
-
-    -- 1. Menghitung jumlah item buah aktif di tas & karakter
-    local function ScanFolder(folder)
-        if not folder then return end
-        for _, item in ipairs(folder:GetChildren()) do
+    
+    -- Hitung item tool di backpack
+    if Backpack then
+        for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
                 if not string.find(nameLower, "seed") and not string.find(nameLower, "sprinkler") and not string.find(nameLower, "wrench") then
@@ -543,35 +540,13 @@ local function GetBackpackCapacityInfo()
             end
         end
     end
-
-    if Backpack then ScanFolder(Backpack) end
-    if character then ScanFolder(character) end
-
-    -- 2. Membaca batas kapasitas maksimum langsung dari atribut game
-    if LocalPlayer:GetAttribute("MaxInventory") then
-        maxCapacity = LocalPlayer:GetAttribute("MaxInventory")
-    elseif LocalPlayer:GetAttribute("BackpackCapacity") then
-        maxCapacity = LocalPlayer:GetAttribute("BackpackCapacity")
-    elseif LocalPlayer:GetAttribute("PlantCapacity") then
-        maxCapacity = LocalPlayer:GetAttribute("PlantCapacity")
-    elseif LocalPlayer:GetAttribute("MaxCapacity") then
-        maxCapacity = LocalPlayer:GetAttribute("MaxCapacity")
-    else
-        for _, child in ipairs(LocalPlayer:GetChildren()) do
-            if child:IsA("Folder") or child:IsA("Configuration") then
-                local foundMax = child:FindFirstChild("MaxInventory") or 
-                                 child:FindFirstChild("BackpackCapacity") or 
-                                 child:FindFirstChild("Capacity") or 
-                                 child:FindFirstChild("MaxCapacity")
-                if foundMax and foundMax:IsA("ValueBase") then
-                    maxCapacity = foundMax.Value
-                    break
-                end
-            end
-        end
-    end
-
-    return currentCount, maxCapacity
+    
+    -- Ambil kapasitas langsung dari atribut game (Fallback aman ke 50 jika belum termuat)
+    local maxLimit = LocalPlayer:GetAttribute("MaxInventory") or 
+                     LocalPlayer:GetAttribute("Capacity") or 
+                     LocalPlayer:GetAttribute("BackpackCapacity") or 50
+    
+    return currentCount, maxLimit
 end
 
 local function SellInventory()
@@ -600,9 +575,7 @@ local function SellInventory()
     while task.wait(0.2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
-        if not backpackOn and not fruitOn then 
-            break 
-        end
+        if not backpackOn and not fruitOn then break end
 
         if ShecklesCount and ShecklesCount.Value ~= PreviousSheckles then break end
         
@@ -618,20 +591,19 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama Auto Sell yang Super Responsif
+-- Looping Utama ala GitHub Open-Source
 task.spawn(function()
-    while task.wait(0.8) do
+    while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if not IsSelling then
-            -- 1. Jika "Auto Sell Fruit" dicentang -> Langsung jual terus-menerus tanpa peduli kapasitas
             if fruitOn then
                 SellInventory()
-                
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Diam total jika belum penuh, langsung jual pas menyentuh limit max
             elseif backpackOn then
-                local currentItems, maxLimit = GetBackpackCapacityInfo()
+                local currentItems, maxLimit = GetBackpackStatus()
+                
+                -- Hanya jual jika jumlah item sudah >= kapasitas maksimal tas
                 if currentItems >= maxLimit then
                     SellInventory()
                 end
@@ -714,4 +686,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub UI & Responsive Auto Sell Backend Loaded Successfully!")
+print("ZedHub GitHub-Style Clean Engine Loaded Successfully!")
