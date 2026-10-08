@@ -1,7 +1,8 @@
 --[[
-    ZEDHUB - FINAL ABSOLUTE 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL MONITOR-ENABLED 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Filter Super Ketat (Harvest Tool & Alat Lainnya 100% Aman)
+    - Backend Auto Sell dengan Filter Super Ketat (Pet, Harvest Tool, & Alat 100% Aman)
+    - Dilengkapi Monitor Print Console untuk melacak jumlah buah asli secara akurat
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,7 +523,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- ABSOLUTE 200-SLOT PURE FRUIT BACKEND ENGINE
+-- SUPER STRICT MONITOR 200-SLOT BACKEND ENGINE
 -- =========================================================================
 local IsSelling = false
 
@@ -533,7 +534,7 @@ local function GetBackpackCount()
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
                 
-                -- Pengecualian Super Ketat: Memblokir Harvest Tool, Seed, Sprinkler, dll.
+                -- Pengecualian Super Ketat: Memblokir Pet, Harvest Tool, Seed, Sprinkler, dll.
                 local isNotFruit = string.find(nameLower, "seed") or 
                                    string.find(nameLower, "sprinkler") or 
                                    string.find(nameLower, "wrench") or 
@@ -546,7 +547,16 @@ local function GetBackpackCount()
                                    string.find(nameLower, "scythe") or
                                    string.find(nameLower, "hoe") or
                                    string.find(nameLower, "favorite") or
-                                   string.find(nameLower, "spray")
+                                   string.find(nameLower, "spray") or
+                                   string.find(nameLower, "pet") or
+                                   string.find(nameLower, "egg") or
+                                   string.find(nameLower, "salmon") or
+                                   string.find(nameLower, "chipmunk") or
+                                   string.find(nameLower, "woodpecker") or
+                                   string.find(nameLower, "squirrel") or
+                                   string.find(nameLower, "marmot") or
+                                   string.find(nameLower, "mallard") or
+                                   string.find(nameLower, "glider")
 
                 if not isNotFruit then
                     currentCount = currentCount + 1
@@ -554,6 +564,9 @@ local function GetBackpackCount()
             end
         end
     end
+    
+    -- Print monitor untuk melihat hitungan buah asli secara langsung di console executor
+    print("ZedHub Monitor -> Jumlah Buah Murni di Tas:", currentCount, "/ 200")
     return currentCount
 end
 
@@ -695,4 +708,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Absolute 200-Slot Pure Fruit Engine Loaded Successfully!")
+print("ZedHub Monitor-Enabled 200-Slot Pure Fruit Engine Loaded Successfully!")
