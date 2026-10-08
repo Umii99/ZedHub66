@@ -1,8 +1,8 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
-    - UI Murni milikmu
-    - Mekanisme Auto Sell (ON/OFF & Backpack Full)
-    - Mekanisme Auto Buy Shop & 4 Fall Market (Selected & Buy All)
+    - UI Murni milikmu dengan koneksi callback centang ON/OFF yang akurat
+    - Backend Auto Sell (Merespons status centang & Backpack Full)
+    - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
 local Players = game:GetService("Players")
@@ -22,7 +22,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE
+-- CONFIGURATION STATE (Pusat Kendali Engine & UI State)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -280,7 +280,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Pilihan Item Biasa
+-- Tombol Pilihan Item Biasa dengan Dukungan Callback
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -468,10 +468,16 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB LAINNYA ===
+-- === TAB AUTO SELLING (Dengan Callback State Centang ON/OFF) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
-CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state) getgenv().ZedHubConfig.AutoSellBackpack = state end)
-CreateToggle(SecSell, "Auto Sell Fruit", function(state) getgenv().ZedHubConfig.AutoSellFruit = state end)
+
+CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
+    getgenv().ZedHubConfig.AutoSellBackpack = state
+end)
+
+CreateToggle(SecSell, "Auto Sell Fruit", function(state)
+    getgenv().ZedHubConfig.AutoSellFruit = state
+end)
 
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
 local WebhookBox = Instance.new("TextBox", WebhookBody)
@@ -561,28 +567,39 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Auto Sell Looping (Mengikuti aturan ON/OFF tombolmu)
+-- Looping Auto Sell (Responsif terhadap status centang ON/OFF)
 task.spawn(function()
     while task.wait(2) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        if not backpackOn and not fruitOn then
-            continue
-        end
+        -- Jika kedua tombol tidak dicentang (OFF), lewati proses loop
+        if backpackOn or fruitOn then
+            local CropCount = #GetInvCrops()
 
-        local CropCount = #GetInvCrops()
-
-        -- Jika "Auto Sell Fruit" ON saja (jual terus menerus)
-        if fruitOn and not backpackOn then
-            SellInventory()
-            
-        -- Jika "Auto Sell If Backpack Full" ON (atau keduanya ON) -> Jual saat tas penuh (>= 12 item)
-        elseif backpackOn and CropCount >= 12 then
-            SellInventory()
+            -- 1. Jika "Auto Sell Fruit" dicentang saja -> Jual terus menerus
+            if fruitOn and not backpackOn then
+                SellInventory()
+                
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang (atau keduanya dicentang) -> Jual saat tas penuh (>= 12 item)
+            elseif backpackOn and CropCount >= 12 then
+                SellInventory()
+            end
         end
     end
 end)
+
+-- Event instan saat item masuk ke tas (Backpack Full) jika dicentang
+if Backpack then
+    Backpack.ChildAdded:Connect(function()
+        if getgenv().ZedHubConfig.AutoSellBackpack then
+            local CropCount = #GetInvCrops()
+            if CropCount >= 12 then
+                SellInventory()
+            end
+        end
+    end)
+end
 
 -- Auto Buy Engine (Main Shop & 4 Fall Market: Selected & Buy All)
 task.spawn(function()
@@ -660,4 +677,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Complete UI & Optimized Engine Loaded Successfully!")
+print("ZedHub Complete UI & Master Backend Loaded Successfully!")
