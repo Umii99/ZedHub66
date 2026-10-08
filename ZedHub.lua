@@ -1,235 +1,109 @@
 --[[
-    ZedHub UI Premium - Grow A Garden Edition
-    Dikonversi dari struktur UI Web ke Roblox Luau
+    ZedHub UI - Safe & Direct Version
+    Langsung muncul tanpa pengecekan rumit
 ]]
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
 
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or CoreGui
+local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
--- Hapus UI lama jika ada
-if PlayerGui:FindFirstChild("ZedHubUI") then
-    PlayerGui.ZedHubUI:Destroy()
+-- Hapus UI lama jika ada agar bersih
+if PlayerGui:FindFirstChild("ZedHubSimpleUI") then
+    PlayerGui.ZedHubSimpleUI:Destroy()
 end
 
--- Konfigurasi Global
-getgenv().ZedHubConfig = {
-    AutoCollect = false,
-    AutoSubmitFallBloom = false,
-    GiveASeed = false,
-    AutoShovel = false,
-    ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false,
-    AutoSellFruit = false,
-    FallMarketBuy = {
-        FallGear = { Active = false, BuyAll = false, Items = {} },
-        FallSeed = { Active = false, BuyAll = false, Items = {} },
-        FallPets = { Active = false, BuyAll = false, Items = {} },
-        FallCrate = { Active = false, BuyAll = false, Items = {} }
-    },
-    MainShopBuy = {
-        MainEgg = { Active = false, BuyAll = false, Items = {} },
-        MainSeed = { Active = false, BuyAll = false, Items = {} },
-        MainGear = { Active = false, BuyAll = false, Items = {} }
-    }
-}
-
--- Buat ScreenGui Utama
+-- 1. ScreenGui Utama
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZedHubUI"
-ScreenGui.Parent = PlayerGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Name = "ZedHubSimpleUI"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Tombol Floating / Minimize (Muncul saat Hub diminimize)
-local FloatingBtn = Instance.new("TextButton")
-FloatingBtn.Name = "FloatingBtn"
-FloatingBtn.Parent = ScreenGui
-FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-FloatingBtn.BorderColor3 = Color3.fromRGB(59, 130, 246)
-FloatingBtn.BorderSizePixel = 1
-FloatingBtn.Position = UDim2.new(0, 15, 0, 15)
-FloatingBtn.Size = UDim2.new(0, 95, 0, 32)
-FloatingBtn.Visible = false
-FloatingBtn.Font = Enum.Font.GothamBold
-FloatingBtn.Text = "🪐 ZedHub [Buka]"
-FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
-FloatingBtn.TextSize = 11
+-- Coba pasang ke CoreGui, jika gagal lempar ke PlayerGui
+local success, err = pcall(function()
+    ScreenGui.Parent = CoreGui
+end)
+if not success then
+    ScreenGui.Parent = PlayerGui
+end
 
-local FloatCorner = Instance.new("UICorner")
-FloatCorner.CornerRadius = UDim.new(0, 10)
-FloatCorner.Parent = FloatingBtn
-
--- Main Frame (Ukuran Proporsional Landscape)
+-- 2. Main Frame (Jendela Utama)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-MainFrame.BackgroundTransparency = 0.05
-MainFrame.BorderColor3 = Color3.fromRGB(51, 65, 85)
-MainFrame.BorderSizePixel = 1
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42) -- Warna Gelap Elegan
+MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 680, 0, 400)
+MainFrame.Size = UDim2.new(0, 500, 0, 300)
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = MainFrame
+-- Sudut Melengkung (Rounded)
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
 
--- Top Title Bar
+-- Garis Tepi (Border Stroke)
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Parent = MainFrame
+UIStroke.Color = Color3.fromRGB(59, 130, 246)
+UIStroke.Thickness = 1.5
+
+-- 3. Top Bar (Judul & Tombol Tutup)
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(1, 0, 0, 36)
+TopBar.Size = UDim2.new(1, 0, 0, 35)
 
 local TopCorner = Instance.new("UICorner")
-TopCorner.CornerRadius = UDim.new(0, 12)
+TopCorner.CornerRadius = UDim.new(0, 10)
 TopCorner.Parent = TopBar
 
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Parent = TopBar
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-TitleLabel.Size = UDim2.new(0, 250, 1, 0)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.Text = "🪐 ZedHub  (Grow A Garden)"
-TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 255)
-TitleLabel.TextSize = 12
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+local Title = Instance.new("TextLabel")
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(0, 300, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "🪐 ZedHub - Grow A Garden"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Tombol Minimize & Close di TopBar
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Parent = TopBar
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-MinimizeBtn.BorderSizePixel = 0
-MinimizeBtn.Position = UDim2.new(1, -55, 0.5, -10)
-MinimizeBtn.Size = UDim2.new(0, 22, 0, 22)
-MinimizeBtn.Font = Enum.Font.GothamBold
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-MinimizeBtn.TextSize = 14
-Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 4)
-
+-- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = TopBar
 CloseBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
-CloseBtn.BackgroundTransparency = 0.2
 CloseBtn.BorderSizePixel = 0
-CloseBtn.Position = UDim2.new(1, -28, 0.5, -10)
-CloseBtn.Size = UDim2.new(0, 22, 0, 22)
+CloseBtn.Position = UDim2.new(1, -30, 0.5, -10)
+CloseBtn.Size = UDim2.new(0, 20, 0, 20)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 11
+CloseBtn.TextSize = 10
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
-
--- Body Layout (Sidebar + Content)
-local BodyLayout = Instance.new("Frame")
-BodyLayout.Parent = MainFrame
-BodyLayout.BackgroundTransparency = 1
-BodyLayout.Position = UDim2.new(0, 0, 0, 36)
-BodyLayout.Size = UDim2.new(1, 0, 1, -36)
-
--- Left Sidebar Navigation
-local Sidebar = Instance.new("ScrollingFrame")
-Sidebar.Parent = BodyLayout
-Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
-Sidebar.BackgroundTransparency = 0.5
-Sidebar.BorderSizePixel = 0
-Sidebar.Size = UDim2.new(0, 130, 1, 0)
-Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
-Sidebar.ScrollBarThickness = 2
-
-local SidebarLayout = Instance.new("UIListLayout")
-SidebarLayout.Parent = Sidebar
-SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
-SidebarLayout.Padding = UDim.new(0, 4)
-
--- Content Area Holder
-local ContentArea = Instance.new("Frame")
-ContentArea.Parent = BodyLayout
-ContentArea.BackgroundTransparency = 1
-ContentArea.Position = UDim2.new(0, 135, 0, 0)
-ContentArea.Size = UDim2.new(1, -135, 1, 0)
-
--- Fungsi Membuat Tab Konten
-local tabs = {}
-local function CreateTab(name)
-    local page = Instance.new("ScrollingFrame")
-    page.Name = name .. "Page"
-    page.Parent = ContentArea
-    page.Active = true
-    page.BackgroundTransparency = 1
-    page.Size = UDim2.new(1, 0, 1, 0)
-    page.CanvasSize = UDim2.new(0, 0, 0, 800)
-    page.ScrollBarThickness = 3
-    page.Visible = false
-
-    local pageLayout = Instance.new("UIListLayout")
-    pageLayout.Parent = page
-    pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    pageLayout.Padding = UDim.new(0, 8)
-
-    local btn = Instance.new("TextButton")
-    btn.Name = name .. "Btn"
-    btn.Parent = Sidebar
-    btn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    btn.BackgroundTransparency = 0.8
-    btn.Size = UDim2.new(1, -8, 0, 28)
-    btn.Font = Enum.Font.GothamMedium
-    btn.Text = "  " .. name
-    btn.TextColor3 = Color3.fromRGB(148, 163, 184)
-    btn.TextSize = 11
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
-    btn.MouseButton1Click:Connect(function()
-        for _, p in pairs(ContentArea:GetChildren()) do
-            if p:IsA("ScrollingFrame") then p.Visible = false end
-        end
-        page.Visible = true
-    end)
-
-    if #ContentArea:GetChildren() == 1 then
-        page.Visible = true
-    end
-
-    return page
-end
-
--- Tab 1: Info
-local TabInfo = CreateTab("Info")
--- Tab 2: Event Fall
-local TabEvent = CreateTab("Event Fall")
--- Tab 3: Auto Selling
-local TabSelling = CreateTab("Auto Selling")
--- Tab 4: Shop
-local TabShop = CreateTab("Shop")
-
--- Logika Tombol Minimize & Restore
-MinimizeBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    FloatingBtn.Visible = true
-end)
-
-FloatingBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    FloatingBtn.Visible = false
-end)
 
 CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Fitur Draggable Sederhana untuk Roblox Mobile/PC
+-- 4. Konten Teks di Dalamnya
+local ContentText = Instance.new("TextLabel")
+ContentText.Parent = MainFrame
+ContentText.BackgroundTransparency = 1
+ContentText.Position = UDim2.new(0, 20, 0, 50)
+ContentText.Size = UDim2.new(1, -40, 0, 100)
+ContentText.Font = Enum.Font.GothamMedium
+ContentText.Text = "Berhasil Memuat!\nUI ZedHub Anda sekarang sudah muncul di layar.\n\n(Silakan salin skrip fitur lengkap Anda ke sini)"
+ContentText.TextColor3 = Color3.fromRGB(148, 163, 184)
+ContentText.TextSize = 12
+ContentText.TextXAlignment = Enum.TextXAlignment.Left
+ContentText.TextYAlignment = Enum.TextYAlignment.Top
+
+-- 5. Fitur Geser (Draggable) untuk HP/PC
 local dragging, dragInput, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -252,4 +126,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub UI Berhasil Dimuat Terlebih Dahulu!")
+print("ZedHub Berhasil Dieksekusi!")
