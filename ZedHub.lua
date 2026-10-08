@@ -1,7 +1,8 @@
 --[[
-    ZEDHUB - STABLE 150-SLOT SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL MONITOR-ENABLED 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Batas Stabil 150 Slot
+    - Backend Auto Sell dengan Filter Super Ketat (Pet, Harvest Tool, & Alat 100% Aman)
+    - Dilengkapi Monitor Print Console untuk melacak jumlah buah asli secara akurat
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,7 +523,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- STABLE 150-SLOT BACKEND ENGINE
+-- SUPER STRICT MONITOR 200-SLOT BACKEND ENGINE
 -- =========================================================================
 local IsSelling = false
 
@@ -532,6 +533,8 @@ local function GetBackpackCount()
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
+                
+                -- Pengecualian Super Ketat: Memblokir Pet, Harvest Tool, Seed, Sprinkler, dll.
                 local isNotFruit = string.find(nameLower, "seed") or 
                                    string.find(nameLower, "sprinkler") or 
                                    string.find(nameLower, "wrench") or 
@@ -546,7 +549,14 @@ local function GetBackpackCount()
                                    string.find(nameLower, "favorite") or
                                    string.find(nameLower, "spray") or
                                    string.find(nameLower, "pet") or
-                                   string.find(nameLower, "egg")
+                                   string.find(nameLower, "egg") or
+                                   string.find(nameLower, "salmon") or
+                                   string.find(nameLower, "chipmunk") or
+                                   string.find(nameLower, "woodpecker") or
+                                   string.find(nameLower, "squirrel") or
+                                   string.find(nameLower, "marmot") or
+                                   string.find(nameLower, "mallard") or
+                                   string.find(nameLower, "glider")
 
                 if not isNotFruit then
                     currentCount = currentCount + 1
@@ -554,6 +564,9 @@ local function GetBackpackCount()
             end
         end
     end
+    
+    -- Print monitor untuk melihat hitungan buah asli secara langsung di console executor
+    print("ZedHub Monitor -> Jumlah Buah Murni di Tas:", currentCount, "/ 200")
     return currentCount
 end
 
@@ -599,7 +612,7 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Dipatok stabil di angka 150
+-- Looping Utama: Dipatok mutlak 200 buah murni
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -609,7 +622,8 @@ task.spawn(function()
             if backpackOn and not fruitOn then
                 local currentItems = GetBackpackCount()
                 
-                if currentItems >= 150 then
+                -- Skrip tidak akan menjual sebelum buah murni menyentuh angka 200!
+                if currentItems >= 200 then
                     SellInventory()
                 end
                 
@@ -694,4 +708,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Stable 150-Slot Engine Loaded Successfully!")
+print("ZedHub Monitor-Enabled 200-Slot Pure Fruit Engine Loaded Successfully!")
