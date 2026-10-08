@@ -1,7 +1,8 @@
 --[[
-    ZEDHUB - FINAL MONITOR-ENABLED 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL 200-SLOT PURE FRUIT & SLOT QUOTA FILTER SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Filter Super Ketat (Pet, Harvest Tool, & Alat 100% Aman)
+    - Backend Auto Sell dengan Filter Deteksi Kuota Slot Pet (Pola /60)
+    - Target Pemicu Mutlak: 200 Buah Murni
     - Dilengkapi Monitor Print Console untuk melacak jumlah buah asli secara akurat
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
@@ -523,7 +524,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- SUPER STRICT MONITOR 200-SLOT BACKEND ENGINE
+-- BACKEND ENGINE DENGAN FILTER KUOTA SLOT PET (X/60) & TARGET 200 BUAH
 -- =========================================================================
 local IsSelling = false
 
@@ -532,41 +533,31 @@ local function GetBackpackCount()
     if Backpack then
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
-                local nameLower = string.lower(item.Name)
+                local itemName = item.Name
+                local nameLower = string.lower(itemName)
                 
-                -- Pengecualian Super Ketat: Memblokir Pet, Harvest Tool, Seed, Sprinkler, dll.
-                local isNotFruit = string.find(nameLower, "seed") or 
-                                   string.find(nameLower, "sprinkler") or 
-                                   string.find(nameLower, "wrench") or 
-                                   string.find(nameLower, "shovel") or 
-                                   string.find(nameLower, "basket") or
-                                   string.find(nameLower, "can") or 
-                                   string.find(nameLower, "watering") or
-                                   string.find(nameLower, "tool") or
-                                   string.find(nameLower, "harvest") or
-                                   string.find(nameLower, "scythe") or
-                                   string.find(nameLower, "hoe") or
-                                   string.find(nameLower, "favorite") or
-                                   string.find(nameLower, "spray") or
-                                   string.find(nameLower, "pet") or
-                                   string.find(nameLower, "egg") or
-                                   string.find(nameLower, "salmon") or
-                                   string.find(nameLower, "chipmunk") or
-                                   string.find(nameLower, "woodpecker") or
-                                   string.find(nameLower, "squirrel") or
-                                   string.find(nameLower, "marmot") or
-                                   string.find(nameLower, "mallard") or
-                                   string.find(nameLower, "glider")
+                -- Memblokir item yang memiliki format kuota slot (Contoh: "/60")
+                local hasSlotQuota = string.find(itemName, "/%d+")
+                local isOtherItem = string.find(nameLower, "seed") or 
+                                    string.find(nameLower, "sprinkler") or 
+                                    string.find(nameLower, "wrench") or 
+                                    string.find(nameLower, "shovel") or 
+                                    string.find(nameLower, "basket") or
+                                    string.find(nameLower, "tool") or
+                                    string.find(nameLower, "harvest") or
+                                    string.find(nameLower, "scythe") or
+                                    string.find(nameLower, "hoe") or
+                                    string.find(nameLower, "spray")
 
-                if not isNotFruit then
+                -- Jika item bukan pet (tidak punya format /60) dan bukan alat, hitung sebagai buah murni
+                if not hasSlotQuota and not isOtherItem then
                     currentCount = currentCount + 1
                 end
             end
         end
     end
     
-    -- Print monitor untuk melihat hitungan buah asli secara langsung di console executor
-    print("ZedHub Monitor -> Jumlah Buah Murni di Tas:", currentCount, "/ 200")
+    print("ZedHub Monitor -> Buah Murni (Bebas Pet/Alat):", currentCount, "/ 200")
     return currentCount
 end
 
@@ -612,7 +603,7 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Dipatok mutlak 200 buah murni
+-- Looping Utama: Dipatok tepat di angka 200 buah murni
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -622,9 +613,9 @@ task.spawn(function()
             if backpackOn and not fruitOn then
                 local currentItems = GetBackpackCount()
                 
-                -- Skrip tidak akan menjual sebelum buah murni menyentuh angka 200!
                 if currentItems >= 200 then
                     SellInventory()
+                    task.wait(5) -- Jeda aman agar tas kosong sempurna
                 end
                 
             elseif fruitOn then
@@ -708,4 +699,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Monitor-Enabled 200-Slot Pure Fruit Engine Loaded Successfully!")
+print("ZedHub Slot Quota Filter Engine Loaded Successfully!")
