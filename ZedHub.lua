@@ -1,7 +1,7 @@
 --[[
     ZEDHUB - FINAL FULL INTEGRATED SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell Murni ala SpeedHub (Tidak sell jika belum full, langsung sell saat mentok)
+    - Backend Auto Sell Mutlak (Membaca Max Capacity & Item Count langsung dari game seperti Zetsu)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,30 +522,57 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- MASTER BACKEND AUTOMATION ENGINE (Pure SpeedHub Logic Style)
+-- MASTER BACKEND AUTOMATION ENGINE (Precise Max Capacity & Count Sync)
 -- =========================================================================
 local IsSelling = false
 
-local function GetInvCrops()
-    local Character = LocalPlayer.Character
-    local Crops = {}
-    
-    local function CollectFrom(parent)
-        if not parent then return end
-        for _, item in ipairs(parent:GetChildren()) do
+local function GetBackpackCapacityInfo()
+    local character = LocalPlayer.Character
+    local currentCount = 0
+    local maxCapacity = 50 -- Angka default cadangan
+
+    -- 1. Menghitung jumlah item buah aktif di tas & karakter
+    local function ScanFolder(folder)
+        if not folder then return end
+        for _, item in ipairs(folder:GetChildren()) do
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
                 if not string.find(nameLower, "seed") and not string.find(nameLower, "sprinkler") and not string.find(nameLower, "wrench") then
-                    table.insert(Crops, item)
+                    currentCount = currentCount + 1
                 end
             end
         end
     end
 
-    if Backpack then CollectFrom(Backpack) end
-    if Character then CollectFrom(Character) end
+    if Backpack then ScanFolder(Backpack) end
+    if character then ScanFolder(character) end
 
-    return Crops
+    -- 2. Membaca batas kapasitas maksimum langsung dari atribut game
+    if LocalPlayer:GetAttribute("MaxInventory") then
+        maxCapacity = LocalPlayer:GetAttribute("MaxInventory")
+    elseif LocalPlayer:GetAttribute("BackpackCapacity") then
+        maxCapacity = LocalPlayer:GetAttribute("BackpackCapacity")
+    elseif LocalPlayer:GetAttribute("PlantCapacity") then
+        maxCapacity = LocalPlayer:GetAttribute("PlantCapacity")
+    elseif LocalPlayer:GetAttribute("MaxCapacity") then
+        maxCapacity = LocalPlayer:GetAttribute("MaxCapacity")
+    else
+        -- Memeriksa folder data internal pemain
+        for _, child in ipairs(LocalPlayer:GetChildren()) do
+            if child:IsA("Folder") or child:IsA("Configuration") then
+                local foundMax = child:FindFirstChild("MaxInventory") or 
+                                 child:FindFirstChild("BackpackCapacity") or 
+                                 child:FindFirstChild("Capacity") or 
+                                 child:FindFirstChild("MaxCapacity")
+                if foundMax and foundMax:IsA("ValueBase") then
+                    maxCapacity = foundMax.Value
+                    break
+                end
+            end
+        end
+    end
+
+    return currentCount, maxCapacity
 end
 
 local function SellInventory()
@@ -553,7 +580,10 @@ local function SellInventory()
     if not Character then return end
     
     local Leaderstats = LocalPlayer:FindFirstChild("leaderstats")
-    local ShecklesCount = Leaderstats and Leaderstats:FindFirstChild("Sheckles")
+    local ShecklesCount = (Leaderstats and Leaderstats:FindFirstChild("Sheckles")) or 
+                          LocalPlayer:FindFirstChild("PlayerSheckles") or
+                          (Leaderstats and Leaderstats:FindFirstChild("PlayerSheckles"))
+                          
     local PreviousSheckles = ShecklesCount and ShecklesCount.Value or 0
     local Previous = Character:GetPivot()
 
@@ -590,36 +620,23 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Auto Sell Murni Tanpa Timer Delay Ala SpeedHub
+-- Looping Utama: Bandingkan Total Buah dengan Kapasitas Maksimum Asli Game
 task.spawn(function()
-    local lastCount = -1
-    local stableFrames = 0
-    
-    while task.wait(0.5) do
+    while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if (backpackOn or fruitOn) and not IsSelling then
-            local itemsInBackpack = GetInvCrops()
-            local CropCount = #itemsInBackpack
+            local currentItems, maxLimit = GetBackpackCapacityInfo()
 
             -- 1. Jika "Auto Sell Fruit" dicentang -> Jual terus menerus
             if fruitOn and not backpackOn then
                 SellInventory()
                 
-            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Murni diam jika belum full, langsung jual saat mentok
+            -- 2. Jika "Auto Sell If Backpack Full" dicentang -> Diam total jika belum full, langsung sell pas menyentuh limit max
             elseif backpackOn and not fruitOn then
-                if CropCount > 0 and CropCount == lastCount then
-                    stableFrames = stableFrames + 1
-                    -- Begitu terdeteksi macet mutlak karena tas sudah mentok penuh
-                    if stableFrames >= 4 then 
-                        SellInventory()
-                        stableFrames = 0
-                        lastCount = -1
-                    end
-                else
-                    lastCount = CropCount
-                    stableFrames = 0
+                if currentItems >= maxLimit then
+                    SellInventory()
                 end
             end
         end
@@ -700,4 +717,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Complete UI & Pure SpeedHub Backend Loaded Successfully!")
+print("ZedHub UI & Perfect Capacity-Sync Backend Loaded Successfully!")
