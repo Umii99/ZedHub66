@@ -1,9 +1,8 @@
 --[[
-    ZEDHUB - FINAL 200-SLOT PURE FRUIT & SLOT QUOTA FILTER SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL STABLE COOLDOWN SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Filter Deteksi Kuota Slot Pet (Pola /60)
-    - Target Pemicu Mutlak: 200 Buah Murni
-    - Dilengkapi Monitor Print Console untuk melacak jumlah buah asli secara akurat
+    - Backend Auto Sell dengan Batas Stabil & Cooldown Anti-Continuous Sell (15 Detik Jeda)
+    - Dilengkapi Monitor Print Console untuk melacak jumlah item secara akurat
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -524,7 +523,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND ENGINE DENGAN FILTER KUOTA SLOT PET (X/60) & TARGET 200 BUAH
+-- STABLE BACKEND ENGINE DENGAN ANTI-CONTINUOUS SELL (COOLDOWN 15 DETIK)
 -- =========================================================================
 local IsSelling = false
 
@@ -533,31 +532,33 @@ local function GetBackpackCount()
     if Backpack then
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
-                local itemName = item.Name
-                local nameLower = string.lower(itemName)
+                local nameLower = string.lower(item.Name)
                 
-                -- Memblokir item yang memiliki format kuota slot (Contoh: "/60")
-                local hasSlotQuota = string.find(itemName, "/%d+")
-                local isOtherItem = string.find(nameLower, "seed") or 
-                                    string.find(nameLower, "sprinkler") or 
-                                    string.find(nameLower, "wrench") or 
-                                    string.find(nameLower, "shovel") or 
-                                    string.find(nameLower, "basket") or
-                                    string.find(nameLower, "tool") or
-                                    string.find(nameLower, "harvest") or
-                                    string.find(nameLower, "scythe") or
-                                    string.find(nameLower, "hoe") or
-                                    string.find(nameLower, "spray")
+                -- Filter pengecualian standar yang aman
+                local isNotFruit = string.find(nameLower, "seed") or 
+                                   string.find(nameLower, "sprinkler") or 
+                                   string.find(nameLower, "wrench") or 
+                                   string.find(nameLower, "shovel") or 
+                                   string.find(nameLower, "basket") or
+                                   string.find(nameLower, "can") or 
+                                   string.find(nameLower, "watering") or
+                                   string.find(nameLower, "tool") or
+                                   string.find(nameLower, "harvest") or
+                                   string.find(nameLower, "scythe") or
+                                   string.find(nameLower, "hoe") or
+                                   string.find(nameLower, "favorite") or
+                                   string.find(nameLower, "spray") or
+                                   string.find(nameLower, "pet") or
+                                   string.find(nameLower, "egg")
 
-                -- Jika item bukan pet (tidak punya format /60) dan bukan alat, hitung sebagai buah murni
-                if not hasSlotQuota and not isOtherItem then
+                if not isNotFruit then
                     currentCount = currentCount + 1
                 end
             end
         end
     end
     
-    print("ZedHub Monitor -> Buah Murni (Bebas Pet/Alat):", currentCount, "/ 200")
+    print("ZedHub Monitor -> Jumlah Item Terdeteksi:", currentCount, "/ 130")
     return currentCount
 end
 
@@ -603,7 +604,7 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Dipatok tepat di angka 200 buah murni
+-- Looping Utama dengan Cooldown Pengaman 15 Detik (Anti-Continuous Sell)
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -613,9 +614,12 @@ task.spawn(function()
             if backpackOn and not fruitOn then
                 local currentItems = GetBackpackCount()
                 
-                if currentItems >= 200 then
+                if currentItems >= 130 then
                     SellInventory()
-                    task.wait(5) -- Jeda aman agar tas kosong sempurna
+                    
+                    -- PENGAMAN MUTLAK: Jeda waktu 15 detik agar skrip tidak ngebug jual terus-menerus!
+                    print("ZedHub Monitor -> Penjualan berhasil. Cooldown 15 detik dimulai...")
+                    task.wait(15) 
                 end
                 
             elseif fruitOn then
@@ -699,4 +703,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Slot Quota Filter Engine Loaded Successfully!")
+print("ZedHub Stable Cooldown Engine Loaded Successfully!")
