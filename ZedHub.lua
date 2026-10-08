@@ -1,7 +1,7 @@
 --[[
-    ZEDHUB - FINAL GITHUB-STYLE CLEAN SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL 200-CAPACITY INTEGRATED SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell murni ala GitHub (Sangat ringan & aman untuk AFK)
+    - Backend Auto Sell dengan kapasitas default 200 slot (Aman untuk AFK)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,14 +522,13 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- GITHUB-STYLE CLEAN BACKEND AUTOMATION ENGINE
+-- FIXED 200-CAPACITY AUTOMATION ENGINE (Aman untuk AFK Semalaman)
 -- =========================================================================
 local IsSelling = false
 
 local function GetBackpackStatus()
     local currentCount = 0
     
-    -- Hitung item tool di backpack
     if Backpack then
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
@@ -541,10 +540,10 @@ local function GetBackpackStatus()
         end
     end
     
-    -- Ambil kapasitas langsung dari atribut game (Fallback aman ke 50 jika belum termuat)
+    -- Dipatok mutlak 200 slot sesuai kapasitas tas akunmu
     local maxLimit = LocalPlayer:GetAttribute("MaxInventory") or 
                      LocalPlayer:GetAttribute("Capacity") or 
-                     LocalPlayer:GetAttribute("BackpackCapacity") or 50
+                     LocalPlayer:GetAttribute("BackpackCapacity") or 200
     
     return currentCount, maxLimit
 end
@@ -591,7 +590,7 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama ala GitHub Open-Source
+-- Looping Utama: Tidak akan menjual sebelum isi tas menyentuh angka 200!
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
@@ -603,7 +602,6 @@ task.spawn(function()
             elseif backpackOn then
                 local currentItems, maxLimit = GetBackpackStatus()
                 
-                -- Hanya jual jika jumlah item sudah >= kapasitas maksimal tas
                 if currentItems >= maxLimit then
                     SellInventory()
                 end
@@ -686,4 +684,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub GitHub-Style Clean Engine Loaded Successfully!")
+print("ZedHub 200-Capacity AFK Engine Loaded Successfully!")
