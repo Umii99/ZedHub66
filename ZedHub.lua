@@ -1,6 +1,6 @@
 --[[
-    ZedHub Full Features - Grow A Garden Edition
-    Struktur Lengkap & Stabil untuk Eksekutor Mobile
+    ZedHub Full Complete Features - Grow A Garden Edition
+    Versi Sempurna & Lengkap dengan Seluruh Item List
 ]]
 
 local Players = game:GetService("Players")
@@ -12,12 +12,10 @@ local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
--- Hapus UI lama agar bersih
-if PlayerGui:FindFirstChild("ZedHubFullCompleteUI") then
-    PlayerGui.ZedHubFullCompleteUI:Destroy()
+if PlayerGui:FindFirstChild("ZedHubUltimateUI") then
+    PlayerGui.ZedHubUltimateUI:Destroy()
 end
 
--- Global Config
 getgenv().ZedHubConfig = {
     AutoCollect = false,
     AutoSubmitFallBloom = false,
@@ -26,22 +24,10 @@ getgenv().ZedHubConfig = {
     ShadyScarecrowMode = "GOLD_EGG_SEED",
     AutoSellBackpack = false,
     AutoSellFruit = false,
-    FallMarketBuy = {
-        FallGear = { Active = false, BuyAll = false, Items = {} },
-        FallSeed = { Active = false, BuyAll = false, Items = {} },
-        FallPets = { Active = false, BuyAll = false, Items = {} },
-        FallCrate = { Active = false, BuyAll = false, Items = {} }
-    },
-    MainShopBuy = {
-        MainEgg = { Active = false, BuyAll = false, Items = {} },
-        MainSeed = { Active = false, BuyAll = false, Items = {} },
-        MainGear = { Active = false, BuyAll = false, Items = {} }
-    }
 }
 
--- 1. ScreenGui Utama
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ZedHubFullCompleteUI"
+ScreenGui.Name = "ZedHubUltimateUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
@@ -52,7 +38,7 @@ if not success then
     ScreenGui.Parent = PlayerGui
 end
 
--- 2. Floating Button (Minimize)
+-- Floating Button (Minimize)
 local FloatingBtn = Instance.new("TextButton")
 FloatingBtn.Name = "FloatingBtn"
 FloatingBtn.Parent = ScreenGui
@@ -68,7 +54,7 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 11
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- 3. Main Frame
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
@@ -84,7 +70,7 @@ MainStroke.Parent = MainFrame
 MainStroke.Color = Color3.fromRGB(51, 65, 85)
 MainStroke.Thickness = 1.5
 
--- 4. Top Bar
+-- Top Bar
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
 TopBar.Parent = MainFrame
@@ -99,12 +85,11 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 15, 0, 0)
 Title.Size = UDim2.new(0, 350, 1, 0)
 Title.Font = Enum.Font.GothamBold
-Title.Text = "🪐 ZedHub - Grow A Garden (Premium)"
+Title.Text = "🪐 ZedHub - Grow A Garden (Full Features)"
 Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 12
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Tombol Minimize & Close
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -129,7 +114,7 @@ CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseBtn.TextSize = 10
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
--- 5. Body Layout
+-- Body Layout
 local BodyLayout = Instance.new("Frame")
 BodyLayout.Parent = MainFrame
 BodyLayout.BackgroundTransparency = 1
@@ -156,7 +141,6 @@ ContentHolder.BackgroundTransparency = 1
 ContentHolder.Position = UDim2.new(0, 135, 0, 0)
 ContentHolder.Size = UDim2.new(1, -135, 1, 0)
 
--- Fungsi Pembuat Tab
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame")
     Page.Name = tabName .. "Page"
@@ -164,7 +148,7 @@ local function CreateTab(tabName)
     Page.Active = true
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -5, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 1200)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 1600)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -206,51 +190,75 @@ local TabEvent = CreateTab("Event Fall")
 local TabSelling = CreateTab("Auto Selling")
 local TabShop = CreateTab("Shop")
 
--- Fungsi Pembantu Membuat Toggle / Tombol Centang Interaktif yang Bisa Diklik
-local function CreateToggleItem(parent, labelText, configKey)
+-- Fungsi Membuat Kotak / Panel Kategori
+local function CreateSection(parent, titleText)
+    local section = Instance.new("Frame")
+    section.Parent = parent
+    section.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
+    section.BackgroundTransparency = 0.4
+    section.Size = UDim2.new(1, -5, 0, 0)
+    section.AutomaticSize = Enum.AutomaticSize.Y
+    Instance.new("UICorner", section).CornerRadius = UDim.new(0, 6)
+    
+    local stroke = Instance.new("UIStroke")
+    stroke.Parent = section
+    stroke.Color = Color3.fromRGB(59, 130, 246)
+    stroke.Transparency = 0.7
+
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = section
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 5)
+
+    local header = Instance.new("TextLabel")
+    header.Parent = section
+    header.BackgroundTransparency = 1
+    header.Size = UDim2.new(1, 0, 0, 25)
+    header.Font = Enum.Font.GothamBold
+    header.Text = "  " .. titleText
+    header.TextColor3 = Color3.fromRGB(96, 165, 250)
+    header.TextSize = 11
+    header.TextXAlignment = Enum.TextXAlignment.Left
+
+    return section
+end
+
+-- Fungsi Membuat Toggle Biasa
+local function CreateToggle(parent, labelText, configKey)
     local row = Instance.new("TextButton")
-    row.Name = "ToggleRow"
     row.Parent = parent
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    row.BackgroundTransparency = 0.5
-    row.BorderSizePixel = 0
-    row.Size = UDim2.new(1, -5, 0, 32)
+    row.BackgroundTransparency = 0.6
+    row.Size = UDim2.new(1, -10, 0, 28)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamMedium
     row.Text = "  " .. labelText
     row.TextColor3 = Color3.fromRGB(200, 210, 225)
-    row.TextSize = 11
+    row.TextSize = 10.5
     row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
-    local statusBox = Instance.new("Frame")
-    statusBox.Parent = row
-    statusBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    statusBox.Position = UDim2.new(1, -30, 0.5, -9)
-    statusBox.Size = UDim2.new(0, 18, 0, 18)
-    Instance.new("UICorner", statusBox).CornerRadius = UDim.new(0, 4)
+    local box = Instance.new("Frame")
+    box.Parent = row
+    box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    box.Position = UDim2.new(1, -26, 0.5, -8)
+    box.Size = UDim2.new(0, 16, 0, 16)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
 
-    local checkMark = Instance.new("TextLabel")
-    checkMark.Parent = statusBox
-    checkMark.BackgroundTransparency = 1
-    checkMark.Size = UDim2.new(1, 0, 1, 0)
-    checkMark.Font = Enum.Font.GothamBold
-    checkMark.Text = ""
-    checkMark.TextColor3 = Color3.fromRGB(255, 255, 255)
-    checkMark.TextSize = 10
+    local check = Instance.new("TextLabel")
+    check.Parent = box
+    check.BackgroundTransparency = 1
+    check.Size = UDim2.new(1, 0, 1, 0)
+    check.Font = Enum.Font.GothamBold
+    check.Text = ""
+    check.TextColor3 = Color3.fromRGB(255, 255, 255)
+    check.TextSize = 9
 
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
-        if state then
-            statusBox.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-            checkMark.Text = "✓"
-        else
-            statusBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-            checkMark.Text = ""
-        end
-
-        -- Update ke config global
+        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
+        check.Text = state and "✓" or ""
         if configKey then
             getgenv().ZedHubConfig[configKey] = state
         end
@@ -258,30 +266,48 @@ local function CreateToggleItem(parent, labelText, configKey)
     return row
 end
 
--- === ISI KONTEN TAB INFO ===
-CreateToggleItem(TabInfo, "Auto Collect Required", "AutoCollect")
-CreateToggleItem(TabInfo, "Auto Submit Fall Bloom", "AutoSubmitFallBloom")
+-- === PENGISIAN KONTEN LENGKAP ===
 
--- === ISI KONTEN TAB EVENT FALL ===
-CreateToggleItem(TabEvent, "Give A Seed", "GiveASeed")
-CreateToggleItem(TabEvent, "Auto Shovel Acorn", "AutoShovel")
+-- 1. TAB INFO
+local SecServer = CreateSection(TabInfo, "SERVER SETTINGS")
+CreateToggle(SecServer, "Auto Collect Required", "AutoCollect")
+CreateToggle(SecServer, "Auto Submit Fall Bloom", "AutoSubmitFallBloom")
 
--- === ISI KONTEN TAB AUTO SELLING ===
-CreateToggleItem(TabSelling, "Auto Sell Backpack", "AutoSellBackpack")
-CreateToggleItem(TabSelling, "Auto Sell Fruit", "AutoSellFruit")
+-- 2. TAB EVENT FALL
+local SecFall = CreateSection(TabEvent, "🍁 MARKET FALL CONTROLLER")
+CreateToggle(SecFall, "Give A Seed", "GiveASeed")
+CreateToggle(SecFall, "Auto Shovel Acorn", "AutoShovel")
 
--- === ISI KONTEN TAB SHOP (Contoh Item Pilihan) ===
-local ShopInfoLabel = Instance.new("TextLabel")
-ShopInfoLabel.Parent = TabShop
-ShopInfoLabel.BackgroundTransparency = 1
-ShopInfoLabel.Size = UDim2.new(1, -5, 0, 30)
-ShopInfoLabel.Font = Enum.Font.GothamBold
-ShopInfoLabel.Text = "  Sistem Toko & Pembelian Otomatis Aktif"
-ShopInfoLabel.TextColor3 = Color3.fromRGB(168, 85, 247)
-ShopInfoLabel.TextSize = 11
-ShopInfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+local SecFallGear = CreateSection(TabEvent, "🛠️ Market Fall - Gear")
+CreateToggle(SecFallGear, "Leaf Rake", nil)
+CreateToggle(SecFallGear, "Scarecrow Stick", nil)
+CreateToggle(SecFallGear, "Acorn Lolipop", nil)
+CreateToggle(SecFallGear, "Golden Acorn", nil)
 
--- 6. Logika Minimize, Restore, & Close
+local SecFallSeed = CreateSection(TabEvent, "🌱 Market Fall - Seed & Egg")
+CreateToggle(SecFallSeed, "Pumpkin Seed", nil)
+CreateToggle(SecFallSeed, "Wheat Seed", nil)
+CreateToggle(SecFallSeed, "Turnip", nil)
+
+-- 3. TAB AUTO SELLING
+local SecSell = CreateSection(TabSelling, "💰 AUTO SELLING FRUIT")
+CreateToggle(SecSell, "Auto Sell If Backpack Full", "AutoSellBackpack")
+CreateToggle(SecSell, "Auto Sell Fruit", "AutoSellFruit")
+
+-- 4. TAB SHOP
+local SecShopEgg = CreateSection(TabShop, "🥚 SHOP EGG")
+CreateToggle(SecShopEgg, "Common Egg", nil)
+CreateToggle(SecShopEgg, "Uncommon Egg", nil)
+CreateToggle(SecShopEgg, "Rare Egg", nil)
+CreateToggle(SecShopEgg, "Mythichal Egg", nil)
+
+local SecShopSeed = CreateSection(TabShop, "🌱 SHOP SEED")
+CreateToggle(SecShopSeed, "Carrot", nil)
+CreateToggle(SecShopSeed, "Strawberry", nil)
+CreateToggle(SecShopSeed, "Blueberry", nil)
+CreateToggle(SecShopSeed, "Tomato", nil)
+
+-- Kontrol Jendela
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -296,7 +322,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- 7. Fitur Geser (Draggable)
+-- Draggable
 local dragging, dragInput, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -319,4 +345,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Full Features Berhasil Dimuat!")
+print("ZedHub Ultimate Full Features Berhasil Dimuat!")
