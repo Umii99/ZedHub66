@@ -1,6 +1,6 @@
 --[[
-    ZedHub Fall Shop Event Edition - Grow A Garden
-    Halaman Fall Shop di Tab Event dengan 4 Kategori Terpisah & Selected List
+    ZedHub Shady Scarecrown Edition - Grow A Garden
+    Halaman Shady Scarecrown dengan Selected List & Give A Seed On/Off
 ]]
 
 local Players = game:GetService("Players")
@@ -150,7 +150,7 @@ local function CreateTab(tabName)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -10, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 1800)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 2000)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -284,7 +284,7 @@ local function CreateToggle(parentSec, text)
     return row
 end
 
--- Tombol Selected (Dropdown List Buka-Tutup untuk Pilihan Item)
+-- Tombol Selected (Dropdown List Buka-Tutup seperti Fall Shop)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -335,8 +335,8 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable)
     return dropFrame
 end
 
--- Tombol Khusus Auto Buy On/Off (Gaya Premium)
-local function CreateAutoBuyToggle(parentSec, text)
+-- Tombol Khusus Action On/Off (Gaya Premium)
+local function CreateActionToggle(parentSec, text)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
     row.BackgroundTransparency = 0.3
@@ -372,42 +372,47 @@ local function CreateAutoBuyToggle(parentSec, text)
     return row
 end
 
--- === PENGISIAN KONTEN TAB EVENT (FALL SHOP) ===
+-- === PENGISIAN KONTEN TAB EVENT ===
 
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFallHarvest, "Required Collection Plant")
 CreateToggle(SecFallHarvest, "Required Submit Plant")
 
--- Halaman Baru: FALL SHOP (Buka-Tutup) di Tab Event
+-- Halaman Fall Shop (Sebelumnya)
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP", Color3.fromRGB(236, 72, 153))
-
--- 1. Fall Shop Pets & Egg
 CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {
     "Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", 
     "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"
 })
-CreateAutoBuyToggle(SecFallShop, "Auto Buy Pets & Egg On/Off")
+CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off")
 
--- 2. Fall Shop Cosmetic & Crate
 CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {
     "Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", 
     "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"
 })
-CreateAutoBuyToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off")
+CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off")
 
--- 3. Fall Shop Seed & Seed Pack
 CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {
     "Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", 
     "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"
 })
-CreateAutoBuyToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off")
+CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off")
 
--- 4. Fall Shop Gear
 CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {
     "Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", 
     "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn Rake"
 })
-CreateAutoBuyToggle(SecFallShop, "Auto Buy Gear On/Off")
+CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off")
+
+
+-- Halaman Baru: SHADY SCARECROWN (Di bawah Fall Shop)
+local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROWN", Color3.fromRGB(251, 191, 36))
+
+CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {
+    "All Seed", "Gold Egg Seed"
+})
+
+CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off")
 
 
 -- === PENGISIAN KONTEN TAB LAINNYA ===
@@ -416,21 +421,21 @@ CreateToggle(SecShopSeed, "Carrot")
 CreateToggle(SecShopSeed, "Strawberry")
 CreateToggle(SecShopSeed, "Blueberry")
 CreateToggle(SecShopSeed, "Tomato")
-CreateAutoBuyToggle(SecShopSeed, "Auto Buy On/Off")
+CreateActionToggle(SecShopSeed, "Auto Buy On/Off")
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
 CreateToggle(SecShopGear, "Watering Can")
 CreateToggle(SecShopGear, "Basic Shovel")
 CreateToggle(SecShopGear, "Advanced Sprinkler")
 CreateToggle(SecShopGear, "Godly Sprinkler")
-CreateAutoBuyToggle(SecShopGear, "Auto Buy On/Off")
+CreateActionToggle(SecShopGear, "Auto Buy On/Off")
 
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
 CreateToggle(SecShopEgg, "Common Egg")
 CreateToggle(SecShopEgg, "Rare Egg")
 CreateToggle(SecShopEgg, "Epic Egg")
 CreateToggle(SecShopEgg, "Gold Egg")
-CreateAutoBuyToggle(SecShopEgg, "Auto Buy On/Off")
+CreateActionToggle(SecShopEgg, "Auto Buy On/Off")
 
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 CreateToggle(SecSell, "Auto Sell If Backpack Full")
@@ -515,4 +520,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Shop Event Page Loaded Successfully!")
+print("ZedHub Shady Scarecrown Loaded Successfully!")
