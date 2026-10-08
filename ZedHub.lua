@@ -1,7 +1,7 @@
 --[[
-    ZEDHUB - FINAL ABSOLUTE STRICT AFK SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL STRICT 200-SLOT PURE FRUIT SCRIPT (GROW A GARDEN)
     - UI Murni milikmu dengan callback CreateToggle ON/OFF yang sempurna
-    - Backend Auto Sell dengan Pengaman Mutlak (Anti-Jual sebelum mencapai 200 slot)
+    - Backend Auto Sell dengan Filter Ketat (Alat pertanian dijamin tidak ikut terhitung)
     - Backend Auto Buy (Selected & Buy All untuk Main Shop & 4 Fall Market)
 ]]
 
@@ -522,7 +522,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- ABSOLUTE STRICT AFK BACKEND ENGINE (Anti Salah Jual)
+-- STRICT PURE FRUIT 200-SLOT BACKEND ENGINE (Anti Salah Jual)
 -- =========================================================================
 local IsSelling = false
 
@@ -532,7 +532,20 @@ local function GetBackpackCount()
         for _, item in ipairs(Backpack:GetChildren()) do
             if item:IsA("Tool") then
                 local nameLower = string.lower(item.Name)
-                if not string.find(nameLower, "seed") and not string.find(nameLower, "sprinkler") and not string.find(nameLower, "wrench") then
+                
+                -- Pengecualian ketat: Memastikan alat pertanian & pegangan TIDAK ikut dihitung
+                local isNotFruit = string.find(nameLower, "seed") or 
+                                   string.find(nameLower, "sprinkler") or 
+                                   string.find(nameLower, "wrench") or 
+                                   string.find(nameLower, "shovel") or 
+                                   string.find(nameLower, "basket") or
+                                   string.find(nameLower, "can") or 
+                                   string.find(nameLower, "watering") or
+                                   string.find(nameLower, "tool") or
+                                   string.find(nameLower, "scythe") or
+                                   string.find(nameLower, "hoe")
+
+                if not isNotFruit then
                     currentCount = currentCount + 1
                 end
             end
@@ -583,23 +596,21 @@ local function SellInventory()
     IsSelling = false
 end
 
--- Looping Utama: Pengaman Mutlak untuk AFK (Hanya jalan pas tembus 200)
+-- Looping Utama: Murni menunggu sampai buah mencapai tepat 200 slot
 task.spawn(function()
     while task.wait(1) do
         local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
         local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
         if not IsSelling then
-            -- JIKA HANYA "Auto Sell If Backpack Full" YANG NYALA
             if backpackOn and not fruitOn then
                 local currentItems = GetBackpackCount()
                 
-                -- SYARAT MUTLAK: Selama tas belum 200 buah, loop ini DIAM TOTAL!
+                -- Selama buah murni di tas belum menyentuh 200, skrip diam total!
                 if currentItems >= 200 then
                     SellInventory()
                 end
                 
-            -- JIKA "Auto Sell Fruit" NYALA (Jual terus-menerus)
             elseif fruitOn then
                 SellInventory()
             end
@@ -627,7 +638,7 @@ task.spawn(function()
                 end
             end
 
-for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
+            for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
                 if data.BuyAll then
                     buyEvt:FireServer(catName, "BUY_ALL")
                     task.wait(0.3)
@@ -681,4 +692,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Absolute Strict AFK Engine Loaded Successfully!")
+print("ZedHub Strict Pure Fruit 200-Slot Engine Loaded Successfully!")
