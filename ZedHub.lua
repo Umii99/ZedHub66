@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - HIPHUB SINGLE SELECT + SEARCH DROPDOWN (GROW A GARDEN)
+    ZEDHUB - MULTI-SELECT DROPDOWN + SEARCH (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -26,16 +26,16 @@ getgenv().ZedHubConfig = {
     AutoSellFruit = false,
     
     FallMarketBuy = {
-        FallGear = { Active = false, BuyAll = false, SelectedItem = "" },
-        FallSeed = { Active = false, BuyAll = false, SelectedItem = "" },
-        FallPets = { Active = false, BuyAll = false, SelectedItem = "" },
-        FallCrate = { Active = false, BuyAll = false, SelectedItem = "" }
+        FallGear = { Active = false, BuyAll = false, Items = {} },
+        FallSeed = { Active = false, BuyAll = false, Items = {} },
+        FallPets = { Active = false, BuyAll = false, Items = {} },
+        FallCrate = { Active = false, BuyAll = false, Items = {} }
     },
     
     MainShopBuy = {
-        MainEgg = { Active = false, BuyAll = false, SelectedItem = "" },
-        MainSeed = { Active = false, BuyAll = false, SelectedItem = "" },
-        MainGear = { Active = false, BuyAll = false, SelectedItem = "" }
+        MainEgg = { Active = false, BuyAll = false, Items = {} },
+        MainSeed = { Active = false, BuyAll = false, Items = {} },
+        MainGear = { Active = false, BuyAll = false, Items = {} }
     }
 }
 
@@ -335,8 +335,8 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pilihan Tunggal + Search Bar ala Hiphub Pro
-local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelected)
+-- Dropdown Multi-Select + Search Bar (Bisa Pilih Banyak Item Sekaligus)
+local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
     dropFrame.BackgroundTransparency = 0.5
@@ -353,21 +353,11 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
     dropBtn.BackgroundTransparency = 0.4
     dropBtn.Size = UDim2.new(1, 0, 0, 26)
     dropBtn.Font = Enum.Font.GothamBold
-    dropBtn.Text = "  📂 " .. titleText
+    dropBtn.Text = "  📂 " .. titleText .. " [Selected]"
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropBtn.TextSize = 10.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
-
-    local selectedValLabel = Instance.new("TextLabel", dropBtn)
-    selectedValLabel.BackgroundTransparency = 1
-    selectedValLabel.Position = UDim2.new(1, -165, 0, 0)
-    selectedValLabel.Size = UDim2.new(0, 140, 1, 0)
-    selectedValLabel.Font = Enum.Font.GothamBold
-    selectedValLabel.Text = itemsTable[1] or "SELECT..."
-    selectedValLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
-    selectedValLabel.TextSize = 10
-    selectedValLabel.TextXAlignment = Enum.TextXAlignment.Right
 
     local dropArrow = Instance.new("TextLabel", dropBtn)
     dropArrow.BackgroundTransparency = 1
@@ -396,7 +386,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
     dcPadding.PaddingRight = UDim.new(0, 6)
     dcPadding.PaddingBottom = UDim.new(0, 4)
 
-    -- Search Box ala Hiphub
+    -- Search Box
     local searchBox = Instance.new("TextBox", dropdownContent)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
     searchBox.BackgroundTransparency = 0.4
@@ -420,6 +410,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 3)
 
+    local selectedItems = {}
     local itemRows = {}
 
     for _, itemName in ipairs(itemsTable) do
@@ -435,13 +426,36 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
+        local box = Instance.new("Frame", itemRow)
+        box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+        box.Position = UDim2.new(1, -18, 0.5, -5)
+        box.Size = UDim2.new(0, 10, 0, 10)
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
+
+        local check = Instance.new("TextLabel", box)
+        check.BackgroundTransparency = 1
+        check.Size = UDim2.new(1, 0, 1, 0)
+        check.Font = Enum.Font.GothamBold
+        check.Text = ""
+        check.TextColor3 = Color3.fromRGB(255, 255, 255)
+        check.TextSize = 8.5
+
         table.insert(itemRows, {Btn = itemRow, Name = itemName})
 
+        local isSelected = false
         itemRow.MouseButton1Click:Connect(function()
-            selectedValLabel.Text = itemName
-            dropdownContent.Visible = false
-            dropArrow.Text = "▼"
-            if onSelected then onSelected(itemName) end
+            isSelected = not isSelected
+            box.BackgroundColor3 = isSelected and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
+            check.Text = isSelected and "✓" or ""
+
+            if isSelected then
+                table.insert(selectedItems, itemName)
+            else
+                for i, v in ipairs(selectedItems) do
+                    if v == itemName then table.remove(selectedItems, i) end
+                end
+            end
+            if onItemsChanged then onItemsChanged(selectedItems) end
         end)
     end
 
@@ -465,9 +479,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
         isListOpen = not isListOpen
         dropdownContent.Visible = isListOpen
         dropArrow.Text = isListOpen and "▲" or "▼"
-        if not isListOpen then
-            searchBox.Text = ""
-        end
     end)
 
     return dropFrame
@@ -516,21 +527,21 @@ CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgen
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallPets.SelectedItem = selected end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.SelectedItem = selected end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.SelectedItem = selected end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallGear.SelectedItem = selected end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
 local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
-CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(selected)
-    getgenv().ZedHubConfig.ShadyScarecrowMode = (selected == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED"
+CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
+    if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
 CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
@@ -538,17 +549,17 @@ local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
 CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
 
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
-CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainEgg.SelectedItem = selected end)
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
 CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
 CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
 
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED")
-CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainSeed.SelectedItem = selected end)
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
 CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
 CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
-CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainGear.SelectedItem = selected end)
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
 CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
@@ -581,7 +592,6 @@ local ServerRow = Instance.new("Frame", ServerBody)
 ServerRow.BackgroundTransparency = 1
 ServerRow.Size = UDim2.new(1, 0, 0, 28)
 
-ListInput = Instance.new("TextBox", ServerRow) -- aman
 local ServerInput = Instance.new("TextBox", ServerRow)
 ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
@@ -630,8 +640,8 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        val_delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + val_delta.X, startPos.Y.Scale, startPos.Y.Offset + val_delta.Y)
     end
 end)
 
@@ -641,4 +651,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Search & Single Select Dropdown UI Loaded Successfully!")
+print("ZedHub Multi-Select Search Dropdown UI Loaded Successfully!")
