@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - HIPHUB STYLE SWITCH TOGGLE UI (GROW A GARDEN)
+    ZEDHUB - MASTER FALL SHOP AUTO BUY UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -26,10 +26,11 @@ getgenv().ZedHubConfig = {
     AutoSellFruit = false,
     
     FallMarketBuy = {
-        FallGear = { Active = false, BuyAll = false, Items = {} },
-        FallSeed = { Active = false, BuyAll = false, Items = {} },
-        FallPets = { Active = false, BuyAll = false, Items = {} },
-        FallCrate = { Active = false, BuyAll = false, Items = {} }
+        Active = false, -- Master Toggle untuk Fall Shop
+        FallGear = { Items = {} },
+        FallSeed = { Items = {} },
+        FallPets = { Items = {} },
+        FallCrate = { Items = {} }
     },
     
     MainShopBuy = {
@@ -236,7 +237,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Section dengan Judul Diperbesar (15)
+-- Fungsi Accordion Section
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -310,15 +311,13 @@ local function CreateToggle(parentSec, text, callback)
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
-    -- Pill Background (Kapsul Switch ala Hiphub)
     local pill = Instance.new("Frame", row)
     pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
     pill.Size = UDim2.new(0, 36, 0, 16)
     local pillCorner = Instance.new("UICorner", pill)
-    pillCorner.CornerRadius = UDim.new(1, 0) -- Bentuk kapsul penuh
+    pillCorner.CornerRadius = UDim.new(1, 0)
 
-    -- Bulatan Knob di dalam Pill
     local knob = Instance.new("Frame", pill)
     knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
     knob.Position = UDim2.new(0, 2, 0.5, -6)
@@ -330,23 +329,20 @@ local function CreateToggle(parentSec, text, callback)
     row.MouseButton1Click:Connect(function()
         state = not state
         if state then
-            pill.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Biru terang saat aktif
+            pill.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            knob.Position = UDim2.new(1, -14, 0.5, -6) -- Bergeser ke kanan
+            knob.Position = UDim2.new(1, -14, 0.5, -6)
         else
             pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
             knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
-            knob.Position = UDim2.new(0, 2, 0.5, -6) -- Kembali ke kiri
+            knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
-        
-        if callback then 
-            callback(state) 
-        end
+        if callback then callback(state) end
     end)
     return row
 end
 
--- Dropdown Pop-up
+-- Dropdown Pop-up dengan List Lengkap
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -384,7 +380,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 11
 
-    -- Pop-up Floating Overlay
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
     popupOverlay.BackgroundTransparency = 0.1
@@ -399,7 +394,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupStroke.Color = Color3.fromRGB(59, 130, 246)
     popupStroke.Thickness = 1.5
 
-    -- Header Pop-up
     local popupHeader = Instance.new("Frame", popupOverlay)
     popupHeader.BackgroundColor3 = Color3.fromRGB(20, 45, 90)
     popupHeader.Size = UDim2.new(1, 0, 0, 32)
@@ -433,7 +427,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     pbPadding.PaddingRight = UDim.new(0, 8)
     pbPadding.PaddingBottom = UDim.new(0, 8)
 
-    -- Kotak Search
     local searchBox = Instance.new("TextBox", popupBody)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
     searchBox.BackgroundTransparency = 0.3
@@ -447,7 +440,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     searchBox.ZIndex = 12
     Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
 
-    -- Scrolling List Container
     local listContainer = Instance.new("ScrollingFrame", popupBody)
     listContainer.BackgroundTransparency = 1
     listContainer.Size = UDim2.new(1, 0, 0, 185)
@@ -545,7 +537,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle dengan Switch Pill ala Hiphub (Warna Kuning Emas saat aktif)
+-- Fungsi Action Toggle Master untuk Fall Shop (1 Tombol Utama di Bawah)
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -559,7 +551,6 @@ local function CreateActionToggle(parentSec, text, callback)
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
-    -- Pill Background ala Hiphub
     local pill = Instance.new("Frame", row)
     pill.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
@@ -567,7 +558,6 @@ local function CreateActionToggle(parentSec, text, callback)
     local pillCorner = Instance.new("UICorner", pill)
     pillCorner.CornerRadius = UDim.new(1, 0)
 
-    -- Bulatan Knob di dalam Pill
     local knob = Instance.new("Frame", pill)
     knob.BackgroundColor3 = Color3.fromRGB(180, 140, 100)
     knob.Position = UDim2.new(0, 2, 0.5, -6)
@@ -579,13 +569,13 @@ local function CreateActionToggle(parentSec, text, callback)
     row.MouseButton1Click:Connect(function()
         state = not state
         if state then
-            pill.BackgroundColor3 = Color3.fromRGB(234, 179, 8) -- Kuning Emas saat aktif ala Hiphub
+            pill.BackgroundColor3 = Color3.fromRGB(234, 179, 8)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            knob.Position = UDim2.new(1, -14, 0.5, -6) -- Geser ke kanan
+            knob.Position = UDim2.new(1, -14, 0.5, -6)
         else
             pill.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
             knob.BackgroundColor3 = Color3.fromRGB(180, 140, 100)
-            knob.Position = UDim2.new(0, 2, 0.5, -6) -- Kembali ke kiri
+            knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
         if callback then callback(state) end
     end)
@@ -597,27 +587,25 @@ local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST")
 CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
+-- FALL SHOP SECTION: Dropdown lengkap + 1 Tombol Master Auto Buy Fall Shop di bawahnya
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Active = state end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Active = state end)
-
-CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
-CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
+-- 1 Tombol Master Auto Buy Fall Shop di bagian paling bawah
+CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
 
 local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
 CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
     if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
-CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
+CreateToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
 local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
-CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
+CreateToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
 
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
 CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
@@ -700,7 +688,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-len_dragging, dragStart, startPos = nil, nil, nil
+local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
@@ -722,4 +710,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Hiphub Style Switch UI Loaded Successfully!")
+print("ZedHub Master Fall Shop UI Loaded Successfully!")
