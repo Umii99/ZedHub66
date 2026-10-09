@@ -1,26 +1,22 @@
 --[[
-    ZEDHUB - FINAL GITHUB & CODE REFERENCED SCRIPT (GROW A GARDEN)
-    - UI Murni milikmu lengkap dengan tab, accordion, dan dual toggle Auto Sell
-    - Backend: Logika pintar terpadu (Jika Backpack Max aktif, Auto Sell ditahan dan hanya trigger saat tas penuh).
+    ZEDHUB - FIXED UI & SAFE PLAYERGUI SCRIPT (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
-local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameEvents = ReplicatedStorage:FindFirstChild("GameEvents")
 
 local LocalPlayer = Players.LocalPlayer
 local Backpack = LocalPlayer:WaitForChild("Backpack")
-local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (Pusat Kendali UI & Dual Auto Sell)
+-- CONFIGURATION STATE
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -28,8 +24,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false, -- Tombol Allow Sell If Backpack Is Max
-    AutoSellFruit = false,    -- Tombol Auto Sell Biasa
+    AutoSellBackpack = false,
+    AutoSellFruit = false,
     
     FallMarketBuy = {
         FallGear = { Active = false, BuyAll = false, Items = {} },
@@ -48,8 +44,7 @@ getgenv().ZedHubConfig = {
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZedHubStrictUI"
 ScreenGui.ResetOnSpawn = false
-local success = pcall(function() ScreenGui.Parent = CoreGui end)
-if not success then ScreenGui.Parent = PlayerGui end
+ScreenGui.Parent = PlayerGui -- Dijamin langsung muncul di PlayerGui
 
 -- Floating Button (Minimize State)
 local FloatingBtn = Instance.new("TextButton")
@@ -505,7 +500,7 @@ ServerInput.PlaceholderText = "2007"
 ServerInput.Text = ""
 ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
 ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize, 11
+ServerInput.TextSize = 11 -- Diperbaiki dari koma menjadi titik dua
 Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
 
 local ClickBtn = Instance.new("TextButton", ServerRow)
@@ -572,22 +567,18 @@ local function IsMaxInventory()
     return count >= 260
 end
 
--- Looping Utama Menggunakan Logika Pintar Referensimu
+-- Looping Utama
 task.spawn(function()
     while task.wait(2) do
-        local allowSellIfMax = getgenv().ZedHubConfig.AutoSellBackpack -- Tombol Allow Sell If Backpack Is Max
-        local autoSellFruit = getgenv().ZedHubConfig.AutoSellFruit     -- Tombol Auto Sell Biasa
+        local allowSellIfMax = getgenv().ZedHubConfig.AutoSellBackpack
+        local autoSellFruit = getgenv().ZedHubConfig.AutoSellFruit
 
         if not IsSelling and autoSellFruit then
             if not allowSellIfMax then
-                -- Jika Allow Sell If Max dimatikan, Auto Sell berjalan bebas/berkala
                 CallSellInventory()
                 task.wait(5)
             elseif IsMaxInventory() then
-                -- Jika Allow Sell If Max dinyalakan, jual HANYA JIKA tas benar-benar max (260)
                 CallSellInventory()
-                
-                -- Jeda aman sampai tas kosong kembali di bawah 200
                 repeat
                     task.wait(5)
                     local checkEmpty = 0
@@ -604,7 +595,7 @@ task.spawn(function()
     end
 end)
 
--- Auto Buy Engine (Main Shop & 4 Fall Market)
+-- Auto Buy Engine
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
@@ -639,7 +630,6 @@ task.spawn(function()
         end)
     end
 end)
-
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -678,4 +668,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Code Integrated & Loaded Successfully!")
+print("ZedHub UI & Backend Loaded Successfully!")
