@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - DROPDOWN POPUP STYLE ALA HIPHUB (GROW A GARDEN)
+    ZEDHUB - FIXED PROFESSIONAL DROPDOWN UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown ala Video Hiphub (Buka-Tutup dengan Kotak Pilihan Rapi di Dalamnya)[span_2](start_span)[span_2](end_span)
+-- Dropdown ala Video Hiphub (Buka-Tutup dengan Kotak Pilihan Rapi di Dalamnya)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -368,7 +368,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9.5
 
-    -- Container daftar item yang bisa di-scroll ala Hiphub[span_3](start_span)[span_3](end_span)
+    -- Container daftar item yang bisa di-scroll
     local listContainer = Instance.new("ScrollingFrame", dropFrame)
     listContainer.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     listContainer.BackgroundTransparency = 0.4
@@ -605,10 +605,10 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
-UserInputService.InputEnded:Connect(function`input`)
+UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
     end
 end)
 
-print("ZedHub Professional Dropdown UI Loaded Successfully!")
+print("ZedHub Fixed Dropdown UI Loaded Successfully!")
