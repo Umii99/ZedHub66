@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ACCENT BLUE BRIGHT & LARGER SECTION TITLES (GROW A GARDEN)
+    ZEDHUB - DROPDOWN POPUP STYLE ALA HIPHUB (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -236,7 +236,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
-local function CreateAccordionSection(parent, titleText, _)
+local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
     sec.BackgroundTransparency = 0.4
@@ -257,8 +257,8 @@ local function CreateAccordionSection(parent, titleText, _)
     headerBtn.Size = UDim2.new(1, 0, 0, 28)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
-    headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253) -- Biru terang seragam ala Hiphub[span_4](start_span)[span_4](end_span)
-    headerBtn.TextSize = 13 -- Ukuran teks diperbesar agar sangat jelas[span_5](start_span)[span_5](end_span)
+    headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
+    headerBtn.TextSize = 13
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -335,6 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
+-- Dropdown ala Video Hiphub (Buka-Tutup dengan Kotak Pilihan Rapi di Dalamnya)[span_2](start_span)[span_2](end_span)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -350,33 +351,79 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     local dropBtn = Instance.new("TextButton", dropFrame)
     dropBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     dropBtn.BackgroundTransparency = 0.4
-    dropBtn.Size = UDim2.new(1, 0, 0, 24)
+    dropBtn.Size = UDim2.new(1, 0, 0, 26)
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText .. " [Selected]"
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 10
+    dropBtn.TextSize = 10.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
-    local listContainer = Instance.new("Frame", dropFrame)
-    listContainer.BackgroundTransparency = 1
-    listContainer.Size = UDim2.new(1, 0, 0, 0)
-    listContainer.AutomaticSize = Enum.AutomaticSize.Y
+    local dropArrow = Instance.new("TextLabel", dropBtn)
+    dropArrow.BackgroundTransparency = 1
+    dropArrow.Position = UDim2.new(1, -22, 0, 0)
+    dropArrow.Size = UDim2.new(0, 18, 1, 0)
+    dropArrow.Font = Enum.Font.GothamBold
+    dropArrow.Text = "▼"
+    dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
+    dropArrow.TextSize = 9.5
+
+    -- Container daftar item yang bisa di-scroll ala Hiphub[span_3](start_span)[span_3](end_span)
+    local listContainer = Instance.new("ScrollingFrame", dropFrame)
+    listContainer.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+    listContainer.BackgroundTransparency = 0.4
+    listContainer.Size = UDim2.new(1, -6, 0, 95)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 26) + 10)
+    listContainer.ScrollBarThickness = 3
     listContainer.Visible = false
+    Instance.new("UICorner", listContainer).CornerRadius = UDim.new(0, 4)
 
     local listLayout = Instance.new("UIListLayout", listContainer)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 3)
 
     local listPadding = Instance.new("UIPadding", listContainer)
-    listPadding.PaddingLeft = UDim.new(0, 8)
-    listPadding.PaddingBottom = UDim.new(0, 3)
+    listPadding.PaddingTop = UDim.new(0, 4)
+    listPadding.PaddingLeft = UDim.new(0, 6)
+    listPadding.PaddingRight = UDim.new(0, 6)
+    listPadding.PaddingBottom = UDim.new(0, 4)
 
     local selectedItems = {}
 
     for _, itemName in ipairs(itemsTable) do
-        CreateToggle(listContainer, itemName, function(active)
-            if active then
+        local itemRow = Instance.new("TextButton", listContainer)
+        itemRow.BackgroundColor3 = Color3.fromRGB(20, 30, 55)
+        itemRow.BackgroundTransparency = 0.6
+        itemRow.Size = UDim2.new(1, 0, 0, 22)
+        itemRow.AutoButtonColor = false
+        itemRow.Font = Enum.Font.Gotham
+        itemRow.Text = "    " .. itemName
+        itemRow.TextColor3 = Color3.fromRGB(200, 210, 230)
+        itemRow.TextSize = 10
+        itemRow.TextXAlignment = Enum.TextXAlignment.Left
+        Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
+
+        local box = Instance.new("Frame", itemRow)
+        box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+        box.Position = UDim2.new(1, -18, 0.5, -5)
+        box.Size = UDim2.new(0, 10, 0, 10)
+        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
+
+        local check = Instance.new("TextLabel", box)
+        check.BackgroundTransparency = 1
+        check.Size = UDim2.new(1, 0, 1, 0)
+        check.Font = Enum.Font.GothamBold
+        check.Text = ""
+        check.TextColor3 = Color3.fromRGB(255, 255, 255)
+        check.TextSize = 8.5
+
+        local isSelected = false
+        itemRow.MouseButton1Click:Connect(function()
+            isSelected = not isSelected
+            box.BackgroundColor3 = isSelected and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
+            check.Text = isSelected and "✓" or ""
+
+            if isSelected then
                 table.insert(selectedItems, itemName)
             else
                 for i, v in ipairs(selectedItems) do
@@ -391,6 +438,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.MouseButton1Click:Connect(function()
         isListOpen = not isListOpen
         listContainer.Visible = isListOpen
+        dropArrow.Text = isListOpen and "▲" or "▼"
     end)
 
     return dropFrame
@@ -426,7 +474,7 @@ local function CreateActionToggle(parentSec, text, callback)
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
+        box.BackgroundColor3 = state and Color3.fromRGB(234, 179, 8) or Color3.fromRGB(60, 40, 20)
         check.Text = state and "✓" or ""
         if callback then callback(state) end
     end)
@@ -557,10 +605,10 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
-UserInputService.InputEnded:Connect(function(input)
+UserInputService.InputEnded:Connect(function`input`)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
     end
 end)
 
-print("ZedHub Bright Blue Titles UI Loaded Successfully!")
+print("ZedHub Professional Dropdown UI Loaded Successfully!")
