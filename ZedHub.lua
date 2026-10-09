@@ -1,14 +1,12 @@
 --[[
-    ZEDHUB - FULL SCRIPT & FIXED BACKEND LOGIC (GROW A GARDEN)
+    ZEDHUB - PURE UI + PREMIUM TAB STYLE + EMPTY BACKEND (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GameEvents = ReplicatedStorage:FindFirstChild("GameEvents")
 
 local LocalPlayer = Players.LocalPlayer
-local Backpack = LocalPlayer:WaitForChild("Backpack")
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
@@ -16,7 +14,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (UI Murni Tetap Utuh)
+-- CONFIGURATION STATE (UI MURNI TETAP UTUH)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -24,8 +22,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false, -- Tombol Auto Sell If Backpack Full
-    AutoSellFruit = false,    -- Tombol Auto Sell Fruit
+    AllowSellIfBackpackFull = false,
+    AutoSellFruit = false,
     
     FallMarketBuy = {
         FallGear = { Active = false, BuyAll = false, Items = {} },
@@ -171,6 +169,7 @@ ContentHolder.BackgroundTransparency = 1
 ContentHolder.Position = UDim2.new(0, 135, 0, 0)
 ContentHolder.Size = UDim2.new(1, -135, 1, 0)
 
+-- Fungsi Tab dengan Gaya Highlighting Premium (Jelas & Terang Saat Dipilih)
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
@@ -188,32 +187,56 @@ local function CreateTab(tabName)
     TabBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     TabBtn.BackgroundTransparency = 0.6
     TabBtn.Size = UDim2.new(1, -6, 0, 32)
-    TabBtn.Font = Enum.Font.GothamMedium
+    TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = "    " .. tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
     TabBtn.TextSize = 11.5
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
 
+    local TabStroke = Instance.new("UIStroke", TabBtn)
+    TabStroke.Color = Color3.fromRGB(59, 130, 246)
+    TabStroke.Transparency = 1
+
     TabBtn.MouseButton1Click:Connect(function()
+        for _, child in pairs(Sidebar:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+                child.BackgroundTransparency = 0.6
+                child.TextColor3 = Color3.fromRGB(160, 175, 200)
+                local stroke = child:FindFirstChildOfClass("UIStroke")
+                if stroke then stroke.Transparency = 1 end
+            end
+        end
+
         for _, p in pairs(ContentHolder:GetChildren()) do
             if p:IsA("ScrollingFrame") then p.Visible = false end
         end
+
         Page.Visible = true
+        TabBtn.BackgroundColor3 = Color3.fromRGB(30, 58, 138)
+        TabBtn.BackgroundTransparency = 0.2
+        TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TabStroke.Transparency = 0
     end)
 
-    if #ContentHolder:GetChildren() == 1 then Page.Visible = true end
+    if #ContentHolder:GetChildren() == 1 then
+        Page.Visible = true
+        TabBtn.BackgroundColor3 = Color3.fromRGB(30, 58, 138)
+        TabBtn.BackgroundTransparency = 0.2
+        TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TabStroke.Transparency = 0
+    end
+
     return Page
 end
 
--- Tab Menu Utama di Sidebar
 local TabInfo = CreateTab("Info")
 local TabEvent = CreateTab("Event")
 local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Buka-Tutup
 local function CreateAccordionSection(parent, titleText, accentColor)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -273,7 +296,6 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     return container
 end
 
--- Tombol Checkbox
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -314,7 +336,6 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Tombol Selected (Dropdown List Buka-Tutup)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -376,7 +397,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Tombol Khusus Action On/Off
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -414,13 +434,11 @@ local function CreateActionToggle(parentSec, text, callback)
     return row
 end
 
--- === PENGISIAN KONTEN TAB EVENT ===
-
+-- === TAB EVENT & SHOP ===
 local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
 CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
--- Fall Shop
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP", Color3.fromRGB(236, 72, 153))
 CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
@@ -434,19 +452,14 @@ CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(sta
 CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
--- Shady Scarecrown
 local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW", Color3.fromRGB(251, 191, 36))
 CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
     if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
 CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
--- Auto Acorn
 local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN", Color3.fromRGB(56, 189, 248))
 CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
-
-
--- === PENGISIAN KONTEN TAB SHOP ===
 
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
 CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
@@ -464,11 +477,11 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (UI Asli Terjaga) ===
+-- === TAB AUTO SELLING ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 
-CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
-    getgenv().ZedHubConfig.AutoSellBackpack = state
+CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
+    getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
 end)
 
 CreateToggle(SecSell, "Auto Sell Fruit", function(state)
@@ -515,125 +528,8 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOGIC: SESUAI PERMINTAAN (TIDAK ADA BUG, LOGIKA BERSIH)
+-- BACKEND KOSONG (SIAP DIISI KODE KUSTOMMU)
 -- =========================================================================
-local IsSelling = false
-
-local function CallSellInventory()
-    local Character = LocalPlayer.Character
-    if not Character then return end
-    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-    if not HumanoidRootPart then return end
-
-    if IsSelling then return end
-    IsSelling = true
-
-    print("ZedHub Selling -> Menuju kasir untuk menjual...")
-    local originalCFrame = HumanoidRootPart.CFrame
-
-    -- 1. Teleport ke kasir penjualan
-    HumanoidRootPart.CFrame = CFrame.new(62, 4, -26)
-    task.wait(0.3)
-
-    -- 2. Tembak event jual resmi
-    local sellEvt = GameEvents and GameEvents:FindFirstChild("Sell_Inventory")
-    if sellEvt then
-        pcall(function()
-            sellEvt:FireServer()
-        end)
-    end
-    task.wait(0.5)
-
-    -- 3. Teleport balik ke kebun
-    HumanoidRootPart.CFrame = originalCFrame
-    task.wait(0.4)
-
-    print("ZedHub Selling -> Selesai.")
-    IsSelling = false
-end
-
--- Fungsi cek slot maksimal inventaris (260 slot)
-local function IsMaxInventory()
-    local count = 0
-    pcall(function()
-        if Backpack then
-            for _, item in ipairs(Backpack:GetChildren()) do
-                if item:IsA("Tool") then
-                    count = count + 1
-                end
-            end
-        end
-    end)
-    return count >= 260
-end
-
--- Looping Utama Sesuai Logika Referensi
-task.spawn(function()
-    while task.wait(2) do
-        local allowSellIfMax = getgenv().ZedHubConfig.AutoSellBackpack -- Tombol Allow Sell If Backpack Is Max
-        local autoSellFruit = getgenv().ZedHubConfig.AutoSellFruit       -- Tombol Auto Sell Fruit
-
-        if not IsSelling and autoSellFruit then
-            if not allowSellIfMax then
-                -- Jika Allow Sell If Backpack Is Max (OFF) dan Auto Sell On -> Jual terus-menerus
-                CallSellInventory()
-                task.wait(5)
-            elseif IsMaxInventory() then
-                -- Jika Allow Sell If Backpack Is Max (ON) dan tas sudah memenuhi syarat (Max) -> Call sell
-                CallSellInventory()
-                
-                -- Jeda pengaman sampai tas kembali kosong di bawah 200
-                repeat
-                    task.wait(5)
-                    local checkEmpty = 0
-                    pcall(function()
-                        if Backpack then
-                            for _, item in ipairs(Backpack:GetChildren()) do
-                                if item:IsA("Tool") then checkEmpty = checkEmpty + 1 end
-                            end
-                        end
-                    end)
-                until checkEmpty < 200 or not getgenv().ZedHubConfig.AutoSellBackpack
-            end
-        end
-    end
-end)
-
--- Auto Buy Engine (Main Shop & 4 Fall Market)
-task.spawn(function()
-    while task.wait(2) do
-        pcall(function()
-            local buyEvt = GameEvents and (GameEvents:FindFirstChild("BuyEventShop") or GameEvents:FindFirstChild("BuyMarketItem") or GameEvents:FindFirstChild("BuySeedStock") or GameEvents:FindFirstChild("BuyItem"))
-            if not buyEvt then return end
-
-            for catName, data in pairs(getgenv().ZedHubConfig.FallMarketBuy) do
-                if data.BuyAll then
-                    buyEvt:FireServer(catName, "BUY_ALL")
-                    task.wait(0.3)
-                elseif data.Active and data.Items and #data.Items > 0 then
-                    for _, itemName in pairs(data.Items) do
-                        if not data.Active then break end
-                        buyEvt:FireServer(catName, itemName)
-                        task.wait(0.25)
-                    end
-                end
-            end
-
-            for catName, data in pairs(getgenv().ZedHubConfig.MainShopBuy) do
-                if data.BuyAll then
-                    buyEvt:FireServer(catName, "BUY_ALL")
-                    task.wait(0.3)
-                elseif data.Active and data.Items and #data.Items > 0 then
-                    for _, itemName in pairs(data.Items) do
-                        if not data.Active then break end
-                        buyEvt:FireServer(catName, itemName)
-                        task.wait(0.25)
-                    end
-                end
-            end
-        end)
-    end
-end)
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -672,4 +568,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Complete UI & Logic Loaded Successfully!")
+print("ZedHub Premium UI Loaded Successfully!")
