@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ENHANCED BLUE HIGHLIGHT & LARGER TEXT DROPDOWN (GROW A GARDEN)
+    ZEDHUB - DROPDOWN WITH SUMMARY COUNTER & BLUE HIGHLIGHT (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Multi-Select + Search (Teks lebih besar, warna item dipilih: Biru Terang & Teks Putih Terang)
+-- Dropdown Multi-Select + Search (Dengan Indikator Ringkasan Status di Tombol Utama)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -353,11 +353,22 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.BackgroundTransparency = 0.4
     dropBtn.Size = UDim2.new(1, 0, 0, 26)
     dropBtn.Font = Enum.Font.GothamBold
-    dropBtn.Text = "  📂 " .. titleText .. " [Selected]"
+    dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropBtn.TextSize = 10.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
+
+    -- Label status ringkasan di sebelah kanan tombol utama (menampilkan jumlah atau item terakhir)
+    local summaryLabel = Instance.new("TextLabel", dropBtn)
+    summaryLabel.BackgroundTransparency = 1
+    summaryLabel.Position = UDim2.new(1, -155, 0, 0)
+    summaryLabel.Size = UDim2.new(0, 130, 1, 0)
+    summaryLabel.Font = Enum.Font.GothamBold
+    summaryLabel.Text = "[0 Selected]"
+    summaryLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
+    summaryLabel.TextSize = 10
+    summaryLabel.TextXAlignment = Enum.TextXAlignment.Right
 
     local dropArrow = Instance.new("TextLabel", dropBtn)
     dropArrow.BackgroundTransparency = 1
@@ -417,14 +428,11 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         local itemRow = Instance.new("TextButton", listContainer)
         itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
         itemRow.BackgroundTransparency = 0.6
-        -- Ukuran tinggi baris item sedikit diperbesar agar pas dengan teks yang lebih besar
         itemRow.Size = UDim2.new(1, 0, 0, 24)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
-        -- Teks awal warna abu-abu kebiruan terang
         itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
-        -- Ukuran teks item diperbesar dari 10 menjadi 11.5 agar lebih jelas
         itemRow.TextSize = 11.5
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
@@ -436,19 +444,26 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
             isSelected = not isSelected
             
             if isSelected then
-                -- Background Biru Terang & Teks Putih Terang saat dipilih
                 itemRow.BackgroundColor3 = Color3.fromRGB(37, 99, 235)
                 itemRow.BackgroundTransparency = 0.1
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
-                -- Kembali ke warna normal
                 itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
                 itemRow.BackgroundTransparency = 0.6
                 itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
                 for i, v in ipairs(selectedItems) do
                     if v == itemName then table.remove(selectedItems, i) end
                 end
+            end
+
+            -- Memperbarui teks ringkasan pada tombol utama
+            if #selectedItems == 0 then
+                summaryLabel.Text = "[0 Selected]"
+            elseif #selectedItems == 1 then
+                summaryLabel.Text = "[" .. selectedItems[1] .. "]"
+            else
+                summaryLabel.Text = "[" .. #selectedItems .. " Items Selected]"
             end
             
             if onItemsChanged then onItemsChanged(selectedItems) end
@@ -647,4 +662,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Enhanced Text & Highlight UI Loaded Successfully!")
+print("ZedHub Dropdown Summary Counter UI Loaded Successfully!")
