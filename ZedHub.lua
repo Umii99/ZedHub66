@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - PURE UI + PREMIUM TAB STYLE + EMPTY BACKEND (GROW A GARDEN)
+    ZEDHUB - COMPACT HIPHUB SIZED UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -60,14 +60,14 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 12
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame
+-- Main Frame (Dibuat Lebih Compact/Kecil ala Hiphub: 520 x 280)
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 580, 0, 350)
+MainFrame.Size = UDim2.new(0, 520, 0, 280)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
@@ -80,119 +80,118 @@ local TopBar = Instance.new("Frame")
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(1, 0, 0, 34)
+TopBar.Size = UDim2.new(1, 0, 0, 30)
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 8)
 
 local Title = Instance.new("TextLabel")
 Title.Parent = TopBar
 Title.BackgroundTransparency = 1
-Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Position = UDim2.new(0, 12, 0, 0)
 Title.Size = UDim2.new(0, 250, 1, 0)
 Title.Font = Enum.Font.GothamBold
 Title.Text = "🪐 ZedHub  Grow A Garden"
 Title.TextColor3 = Color3.fromRGB(240, 240, 255)
-Title.TextSize = 12
+Title.TextSize = 11
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- FPS Label di Top Bar
 local FPSLabel = Instance.new("TextLabel")
 FPSLabel.Parent = TopBar
 FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-FPSLabel.Position = UDim2.new(1, -120, 0.5, -10)
-FPSLabel.Size = UDim2.new(0, 52, 0, 20)
+FPSLabel.Position = UDim2.new(1, -110, 0.5, -9)
+FPSLabel.Size = UDim2.new(0, 45, 0, 18)
 FPSLabel.Font = Enum.Font.GothamMedium
 FPSLabel.Text = "60 FPS"
 FPSLabel.TextColor3 = Color3.fromRGB(148, 163, 184)
-FPSLabel.TextSize = 10
+FPSLabel.TextSize = 9.5
 Instance.new("UICorner", FPSLabel).CornerRadius = UDim.new(0, 4)
 
 -- Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-MinimizeBtn.Position = UDim2.new(1, -60, 0.5, -10)
-MinimizeBtn.Size = UDim2.new(0, 20, 0, 20)
+MinimizeBtn.Position = UDim2.new(1, -55, 0.5, -9)
+MinimizeBtn.Size = UDim2.new(0, 18, 0, 18)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Text = "-"
 MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-MinimizeBtn.TextSize = 14
+MinimizeBtn.TextSize = 13
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 4)
 
 -- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = TopBar
 CloseBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
-CloseBtn.Position = UDim2.new(1, -36, 0.5, -10)
-CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+CloseBtn.Position = UDim2.new(1, -32, 0.5, -9)
+CloseBtn.Size = UDim2.new(0, 18, 0, 18)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 10
+CloseBtn.TextSize = 9.5
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
 -- Body Layout
 local Body = Instance.new("Frame", MainFrame)
 Body.BackgroundTransparency = 1
-Body.Position = UDim2.new(0, 0, 0, 34)
-Body.Size = UDim2.new(1, 0, 1, -34)
+Body.Position = UDim2.new(0, 0, 0, 30)
+Body.Size = UDim2.new(1, 0, 1, -30)
 
 -- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
 Sidebar.BorderSizePixel = 0
-Sidebar.Size = UDim2.new(0, 130, 1, 0)
+Sidebar.Size = UDim2.new(0, 120, 1, 0)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 Sidebar.ScrollBarThickness = 2
 local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
-SBLayout.Padding = UDim.new(0, 4)
+SBLayout.Padding = UDim.new(0, 3)
 
--- User Profile Box di Bawah Sidebar
+-- User Profile Box di Bawah Sidebar (disesuaikan tingginya agar muat di ukuran compact)
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-UserBox.Size = UDim2.new(1, -6, 0, 38)
-UserBox.Position = UDim2.new(0, 3, 0, 220)
-Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 6)
+UserBox.Size = UDim2.new(1, -6, 0, 34)
+UserBox.Position = UDim2.new(0, 3, 0, 180)
+Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 5)
 local UserTxt = Instance.new("TextLabel", UserBox)
 UserTxt.BackgroundTransparency = 1
 UserTxt.Size = UDim2.new(1, 0, 1, 0)
 UserTxt.Font = Enum.Font.GothamBold
 UserTxt.Text = "  👤 user_123\n  💎 Premium"
 UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
-UserTxt.TextSize = 9.5
-UserTxt.TextXAlignment = Enum.TextXAlignment.Left
+UserTxt.TextSize = 9
 
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
-ContentHolder.Position = UDim2.new(0, 135, 0, 0)
-ContentHolder.Size = UDim2.new(1, -135, 1, 0)
+ContentHolder.Position = UDim2.new(0, 125, 0, 0)
+ContentHolder.Size = UDim2.new(1, -125, 1, 0)
 
--- Fungsi Tab dengan Gaya Highlighting Premium (Jelas & Terang Saat Dipilih)
+-- Fungsi Tab dengan Gaya Highlighting Premium
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
-    Page.Size = UDim2.new(1, -10, 1, 0)
+    Page.Size = UDim2.new(1, -8, 1, 0)
     Page.CanvasSize = UDim2.new(0, 0, 0, 2500)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
     local PLayout = Instance.new("UIListLayout", Page)
     PLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    PLayout.Padding = UDim.new(0, 8)
+    PLayout.Padding = UDim.new(0, 6)
 
     local TabBtn = Instance.new("TextButton", Sidebar)
     TabBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     TabBtn.BackgroundTransparency = 0.6
-    TabBtn.Size = UDim2.new(1, -6, 0, 32)
+    TabBtn.Size = UDim2.new(1, -6, 0, 28)
     TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = "    " .. tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
-    TabBtn.TextSize = 11.5
+    TabBtn.TextSize = 11
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 5)
 
     local TabStroke = Instance.new("UIStroke", TabBtn)
     TabStroke.Color = Color3.fromRGB(59, 130, 246)
@@ -243,7 +242,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     sec.BackgroundTransparency = 0.4
     sec.Size = UDim2.new(1, 0, 0, 0)
     sec.AutomaticSize = Enum.AutomaticSize.Y
-    Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 6)
+    Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 5)
     
     local stroke = Instance.new("UIStroke", sec)
     stroke.Color = accentColor or Color3.fromRGB(59, 130, 246)
@@ -251,25 +250,25 @@ local function CreateAccordionSection(parent, titleText, accentColor)
 
     local mainLayout = Instance.new("UIListLayout", sec)
     mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    mainLayout.Padding = UDim.new(0, 6)
+    mainLayout.Padding = UDim.new(0, 5)
 
     local headerBtn = Instance.new("TextButton", sec)
     headerBtn.BackgroundTransparency = 1
-    headerBtn.Size = UDim2.new(1, 0, 0, 30)
+    headerBtn.Size = UDim2.new(1, 0, 0, 26)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
     headerBtn.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    headerBtn.TextSize = 11.5
+    headerBtn.TextSize = 11
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
     chevron.BackgroundTransparency = 1
-    chevron.Position = UDim2.new(1, -24, 0, 0)
-    chevron.Size = UDim2.new(0, 20, 1, 0)
+    chevron.Position = UDim2.new(1, -22, 0, 0)
+    chevron.Size = UDim2.new(0, 18, 1, 0)
     chevron.Font = Enum.Font.GothamBold
     chevron.Text = "▲"
     chevron.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    chevron.TextSize = 10
+    chevron.TextSize = 9.5
 
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
@@ -279,12 +278,12 @@ local function CreateAccordionSection(parent, titleText, accentColor)
 
     local containerLayout = Instance.new("UIListLayout", container)
     containerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    containerLayout.Padding = UDim.new(0, 6)
+    containerLayout.Padding = UDim.new(0, 5)
 
     local padding = Instance.new("UIPadding", container)
-    padding.PaddingBottom = UDim.new(0, 6)
-    padding.PaddingLeft = UDim.new(0, 6)
-    padding.PaddingRight = UDim.new(0, 6)
+    padding.PaddingBottom = UDim.new(0, 5)
+    padding.PaddingLeft = UDim.new(0, 5)
+    padding.PaddingRight = UDim.new(0, 5)
 
     local isOpen = true
     headerBtn.MouseButton1Click:Connect(function()
@@ -300,20 +299,20 @@ local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, 0, 0, 26)
+    row.Size = UDim2.new(1, 0, 0, 24)
     row.AutoButtonColor = false
     row.Font = Enum.Font.Gotham
     row.Text = "    " .. text
     row.TextColor3 = Color3.fromRGB(210, 220, 240)
-    row.TextSize = 11
+    row.TextSize = 10.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local box = Instance.new("Frame", row)
     box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -20, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    box.Position = UDim2.new(1, -18, 0.5, -5)
+    box.Size = UDim2.new(0, 10, 0, 10)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
 
     local check = Instance.new("TextLabel", box)
     check.BackgroundTransparency = 1
@@ -321,7 +320,7 @@ local function CreateToggle(parentSec, text, callback)
     check.Font = Enum.Font.GothamBold
     check.Text = ""
     check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 9
+    check.TextSize = 8.5
 
     local state = false
     row.MouseButton1Click:Connect(function()
@@ -342,20 +341,20 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropFrame.BackgroundTransparency = 0.5
     dropFrame.Size = UDim2.new(1, 0, 0, 0)
     dropFrame.AutomaticSize = Enum.AutomaticSize.Y
-    Instance.new("UICorner", dropFrame).CornerRadius = UDim.new(0, 5)
+    Instance.new("UICorner", dropFrame).CornerRadius = UDim.new(0, 4)
 
     local dropLayout = Instance.new("UIListLayout", dropFrame)
     dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    dropLayout.Padding = UDim.new(0, 4)
+    dropLayout.Padding = UDim.new(0, 3)
 
     local dropBtn = Instance.new("TextButton", dropFrame)
     dropBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     dropBtn.BackgroundTransparency = 0.4
-    dropBtn.Size = UDim2.new(1, 0, 0, 26)
+    dropBtn.Size = UDim2.new(1, 0, 0, 24)
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText .. " [Selected]"
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 10.5
+    dropBtn.TextSize = 10
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
@@ -367,11 +366,11 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     local listLayout = Instance.new("UIListLayout", listContainer)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    listLayout.Padding = UDim.new(0, 4)
+    listLayout.Padding = UDim.new(0, 3)
 
     local listPadding = Instance.new("UIPadding", listContainer)
-    listPadding.PaddingLeft = UDim.new(0, 10)
-    listPadding.PaddingBottom = UDim.new(0, 4)
+    listPadding.PaddingLeft = UDim.new(0, 8)
+    listPadding.PaddingBottom = UDim.new(0, 3)
 
     local selectedItems = {}
 
@@ -401,20 +400,20 @@ local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
     row.BackgroundTransparency = 0.3
-    row.Size = UDim2.new(1, 0, 0, 28)
+    row.Size = UDim2.new(1, 0, 0, 26)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    ⚡ " .. text
     row.TextColor3 = Color3.fromRGB(234, 179, 8)
-    row.TextSize = 11
+    row.TextSize = 10.5
     row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 5)
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local box = Instance.new("Frame", row)
     box.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
-    box.Position = UDim2.new(1, -22, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    box.Position = UDim2.new(1, -18, 0.5, -5)
+    box.Size = UDim2.new(0, 10, 0, 10)
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
 
     local check = Instance.new("TextLabel", box)
     check.BackgroundTransparency = 1
@@ -422,7 +421,7 @@ local function CreateActionToggle(parentSec, text, callback)
     check.Font = Enum.Font.GothamBold
     check.Text = ""
     check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 9
+    check.TextSize = 8.5
 
     local state = false
     row.MouseButton1Click:Connect(function()
@@ -491,19 +490,19 @@ end)
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
 local WebhookBox = Instance.new("TextBox", WebhookBody)
 WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-WebhookBox.Size = UDim2.new(1, 0, 0, 30)
+WebhookBox.Size = UDim2.new(1, 0, 0, 28)
 WebhookBox.Font = Enum.Font.Gotham
 WebhookBox.PlaceholderText = "URL Webhook Discord..."
 WebhookBox.Text = ""
 WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
 WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-WebhookBox.TextSize = 11
+WebhookBox.TextSize = 10.5
 Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
 
 local ServerBody = CreateAccordionSection(TabInfo, "SERVER", Color3.fromRGB(96, 165, 250))
 local ServerRow = Instance.new("Frame", ServerBody)
 ServerRow.BackgroundTransparency = 1
-ServerRow.Size = UDim2.new(1, 0, 0, 30)
+ServerRow.Size = UDim2.new(1, 0, 0, 28)
 
 local ServerInput = Instance.new("TextBox", ServerRow)
 ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -513,7 +512,7 @@ ServerInput.PlaceholderText = "2007"
 ServerInput.Text = ""
 ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
 ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize = 11
+ServerInput.TextSize = 10.5
 Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
 
 local ClickBtn = Instance.new("TextButton", ServerRow)
@@ -523,13 +522,9 @@ ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
 ClickBtn.Font = Enum.Font.GothamBold
 ClickBtn.Text = "Click"
 ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ClickBtn.TextSize = 11
+ClickBtn.TextSize = 10.5
 Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
-
--- =========================================================================
--- BACKEND KOSONG (SIAP DIISI KODE KUSTOMMU)
--- =========================================================================
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -568,4 +563,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Premium UI Loaded Successfully!")
+print("ZedHub Compact Hiphub-Sized UI Loaded Successfully!")
