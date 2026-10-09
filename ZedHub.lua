@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - FINAL PROFESSIONAL DROPDOWN UI (GROW A GARDEN)
+    ZEDHUB - ULTIMATE PROFESSIONAL DROPDOWN (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -14,7 +14,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (UI MURNI TETAP UTUH)
+-- CONFIGURATION STATE
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown ala Video Hiphub dengan Scrolling Frame Rapi
+-- Dropdown Menu Pop-up / Scrollable ala Hiphub Pro
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -368,12 +368,12 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9.5
 
-    -- Container daftar item yang bisa di-scroll ala Hiphub
+    -- Kotak pop-up list item yang bisa di-scroll (awalnya disembunyikan/tertutup)
     local listContainer = Instance.new("ScrollingFrame", dropFrame)
     listContainer.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    listContainer.BackgroundTransparency = 0.4
-    listContainer.Size = UDim2.new(1, -6, 0, 95)
-    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 26) + 10)
+    listContainer.BackgroundTransparency = 0.2
+    listContainer.Size = UDim2.new(1, -4, 0, 100)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 25) + 10)
     listContainer.ScrollBarThickness = 3
     listContainer.Visible = false
     Instance.new("UICorner", listContainer).CornerRadius = UDim.new(0, 4)
@@ -392,13 +392,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        itemRow.BackgroundColor3 = Color3.fromRGB(20, 30, 55)
-        itemRow.BackgroundTransparency = 0.6
+        itemRow.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
+        itemRow.BackgroundTransparency = 0.4
         itemRow.Size = UDim2.new(1, 0, 0, 22)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.Gotham
         itemRow.Text = "    " .. itemName
-        itemRow.TextColor3 = Color3.fromRGB(200, 210, 230)
+        itemRow.TextColor3 = Color3.fromRGB(220, 230, 245)
         itemRow.TextSize = 10
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
@@ -611,4 +611,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Professional Dropdown UI Loaded Successfully!")
+print("ZedHub Ultimate Professional Dropdown UI Loaded Successfully!")
