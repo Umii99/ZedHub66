@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MULTI-SELECT DROPDOWN + SEARCH (GROW A GARDEN)
+    ZEDHUB - MULTI-SELECT HIGHLIGHT BLUE DROPDOWN + SEARCH (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Multi-Select + Search (Bisa Pilih Banyak Item Sekaligus / Checkbox Aktif)
+-- Dropdown Multi-Select + Search (Baris Item Berubah Biru Saat Dipilih, Tanpa Checkbox)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -415,8 +415,9 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        itemRow.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-        itemRow.BackgroundTransparency = 0.5
+        -- Warna default item (tidak dipilih)
+        itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+        itemRow.BackgroundTransparency = 0.6
         itemRow.Size = UDim2.new(1, 0, 0, 21)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
@@ -426,35 +427,28 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
-        local box = Instance.new("Frame", itemRow)
-        box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-        box.Position = UDim2.new(1, -18, 0.5, -5)
-        box.Size = UDim2.new(0, 10, 0, 10)
-        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
-
-        local check = Instance.new("TextLabel", box)
-        check.BackgroundTransparency = 1
-        check.Size = UDim2.new(1, 0, 1, 0)
-        check.Font = Enum.Font.GothamBold
-        check.Text = ""
-        check.TextColor3 = Color3.fromRGB(255, 255, 255)
-        check.TextSize = 8.5
-
         table.insert(itemRows, {Btn = itemRow, Name = itemName})
 
         local isSelected = false
         itemRow.MouseButton1Click:Connect(function()
             isSelected = not isSelected
-            box.BackgroundColor3 = isSelected and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
-            check.Text = isSelected and "✓" or ""
-
+            
             if isSelected then
+                -- Warna saat dipilih: Biru terang menyala ala tab aktif
+                itemRow.BackgroundColor3 = Color3.fromRGB(30, 58, 138)
+                itemRow.BackgroundTransparency = 0.2
+                itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
+                -- Kembali ke warna normal saat dibatalkan
+                itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+                itemRow.BackgroundTransparency = 0.6
+                itemRow.TextColor3 = Color3.fromRGB(210, 220, 240)
                 for i, v in ipairs(selectedItems) do
                     if v == itemName then table.remove(selectedItems, i) end
                 end
             end
+            
             if onItemsChanged then onItemsChanged(selectedItems) end
         end)
     end
@@ -651,4 +645,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Multi-Select Search Dropdown UI Loaded Successfully!")
+print("ZedHub Multi-Select Highlight Blue UI Loaded Successfully!")
