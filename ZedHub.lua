@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MAX ENLARGED TEXT UI (GROW A GARDEN)
+    ZEDHUB - ENLARGED & WIDER SELECTED LABEL UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -168,7 +168,7 @@ ContentHolder.BackgroundTransparency = 1
 ContentHolder.Position = UDim2.new(0, 130, 0, 0)
 ContentHolder.Size = UDim2.new(1, -130, 1, 0)
 
--- Fungsi Tab dengan Teks Menu Sidebar Diperbesar Sangat Jelas (14)
+-- Fungsi Tab dengan Teks Menu Sidebar Diperbesar (14)
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
@@ -189,7 +189,7 @@ local function CreateTab(tabName)
     TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = "    " .. tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
-    TabBtn.TextSize = 14 -- Diperbesar maksimal
+    TabBtn.TextSize = 14
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 5)
 
@@ -236,7 +236,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Section dengan Judul Diperbesar Sangat Jelas (15)
+-- Fungsi Accordion Section dengan Judul Diperbesar (15)
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -259,7 +259,7 @@ local function CreateAccordionSection(parent, titleText)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
     headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    headerBtn.TextSize = 15 -- Diperbesar maksimal
+    headerBtn.TextSize = 15
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -306,7 +306,7 @@ local function CreateToggle(parentSec, text, callback)
     row.Font = Enum.Font.GothamBold
     row.Text = "    " .. text
     row.TextColor3 = Color3.fromRGB(220, 230, 250)
-    row.TextSize = 13.5 -- Diperbesar maksimal
+    row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
@@ -337,12 +337,12 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up dengan Teks Tombol Utama, Ringkasan Selected, & Nama Item Diperbesar Maksimal
+-- Dropdown Pop-up: Label Kiri Diperbesar, Area Kotak Selected di Kanan Diperlebar & Hurufnya Diperbesar
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
     dropFrame.BackgroundTransparency = 0.5
-    dropFrame.Size = UDim2.new(1, 0, 0, 30)
+    dropFrame.Size = UDim2.new(1, 0, 0, 32)
     Instance.new("UICorner", dropFrame).CornerRadius = UDim.new(0, 4)
 
     local dropBtn = Instance.new("TextButton", dropFrame)
@@ -352,18 +352,19 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 13.5 -- Diperbesar maksimal
+    dropBtn.TextSize = 14.5 -- Teks label kiri diperbesar maksimal
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
+    -- Kotak teks Selected di sebelah kanan (DIPERLEBAR ke 210 piksel dan font diperbesar ke 13.5)
     local summaryLabel = Instance.new("TextLabel", dropBtn)
     summaryLabel.BackgroundTransparency = 1
-    summaryLabel.Position = UDim2.new(1, -175, 0, 0)
-    summaryLabel.Size = UDim2.new(0, 150, 1, 0)
+    summaryLabel.Position = UDim2.new(1, -230, 0, 0)
+    summaryLabel.Size = UDim2.new(0, 210, 1, 0)
     summaryLabel.Font = Enum.Font.GothamBold
     summaryLabel.Text = "[0 Selected]"
     summaryLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
-    summaryLabel.TextSize = 12.5 -- Diperbesar maksimal (Teks nama item di tombol utama)
+    summaryLabel.TextSize = 13.5
     summaryLabel.TextXAlignment = Enum.TextXAlignment.Right
 
     local dropArrow = Instance.new("TextLabel", dropBtn)
@@ -461,7 +462,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamBold
         itemRow.Text = "    " .. itemName
-        -- Teks Nama Item di Pop-up Diperbesar Maksimal (14.5)
         itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
         itemRow.TextSize = 14.5
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
@@ -488,12 +488,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 end
             end
 
+            -- Format teks selected: 1 item tampilkan nama item, >1 item tampilkan jumlah item (2 Items, 3 Items, dst)
             if #selectedItems == 0 then
                 summaryLabel.Text = "[0 Selected]"
             elseif #selectedItems == 1 then
                 summaryLabel.Text = "[" .. selectedItems[1] .. "]"
             else
-                summaryLabel.Text = "[" .. #selectedItems + " Items Selected]"
+                summaryLabel.Text = "[" .. #selectedItems .. " Items Selected]"
             end
             
             if onItemsChanged then onItemsChanged(selectedItems) end
@@ -537,7 +538,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle (Auto Buy, Auto Buy All, dll) dengan Teks Diperbesar (13.5)
+-- Fungsi Action Toggle dengan Teks Diperbesar (13.5)
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -547,7 +548,7 @@ local function CreateActionToggle(parentSec, text, callback)
     row.Font = Enum.Font.GothamBold
     row.Text = "    ⚡ " .. text
     row.TextColor3 = Color3.fromRGB(234, 179, 8)
-    row.TextSize = 13.5 -- Diperbesar maksimal
+    row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
@@ -705,4 +706,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Maximum Enlarged Text UI Loaded Successfully!")
+print("ZedHub Wider & Larger Selected Label UI Loaded Successfully!")
