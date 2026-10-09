@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - COMPACT HIPHUB SIZED UI (GROW A GARDEN)
+    ZEDHUB - LARGER SECTION TEXT & HIPHUB PROPORTION (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -60,14 +60,14 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 12
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Dibuat Lebih Compact/Kecil ala Hiphub: 520 x 280)
+-- Main Frame (Proporsi Hiphub: 520 x 310)
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 520, 0, 280)
+MainFrame.Size = UDim2.new(0, 520, 0, 310)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
@@ -148,11 +148,11 @@ local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SBLayout.Padding = UDim.new(0, 3)
 
--- User Profile Box di Bawah Sidebar (disesuaikan tingginya agar muat di ukuran compact)
+-- User Profile Box di Bawah Sidebar
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 UserBox.Size = UDim2.new(1, -6, 0, 34)
-UserBox.Position = UDim2.new(0, 3, 0, 180)
+UserBox.Position = UDim2.new(0, 3, 0, 210)
 Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 5)
 local UserTxt = Instance.new("TextLabel", UserBox)
 UserTxt.BackgroundTransparency = 1
@@ -254,11 +254,11 @@ local function CreateAccordionSection(parent, titleText, accentColor)
 
     local headerBtn = Instance.new("TextButton", sec)
     headerBtn.BackgroundTransparency = 1
-    headerBtn.Size = UDim2.new(1, 0, 0, 26)
+    headerBtn.Size = UDim2.new(1, 0, 0, 28)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
     headerBtn.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    headerBtn.TextSize = 11
+    headerBtn.TextSize = 12 -- UKURAN TEKS SECTION DIPERBESAR DI SINI
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -268,7 +268,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     chevron.Font = Enum.Font.GothamBold
     chevron.Text = "▲"
     chevron.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    chevron.TextSize = 9.5
+    chevron.TextSize = 10
 
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
@@ -563,4 +563,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Compact Hiphub-Sized UI Loaded Successfully!")
+print("ZedHub Larger Section Title UI Loaded Successfully!")
