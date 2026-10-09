@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Multi-Select + Search Bar (Bisa Pilih Banyak Item Sekaligus)
+-- Dropdown Multi-Select + Search (Bisa Pilih Banyak Item Sekaligus / Checkbox Aktif)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -368,7 +368,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Main Container untuk Dropdown (Search Bar + Scrolling List)
+    -- Container Dropdown (Search Bar + Scrolling List)
     local dropdownContent = Instance.new("Frame", dropFrame)
     dropdownContent.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     dropdownContent.BackgroundTransparency = 0.2
@@ -386,13 +386,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dcPadding.PaddingRight = UDim.new(0, 6)
     dcPadding.PaddingBottom = UDim.new(0, 4)
 
-    -- Search Box
+    -- Kotak Search
     local searchBox = Instance.new("TextBox", dropdownContent)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
     searchBox.BackgroundTransparency = 0.4
     searchBox.Size = UDim2.new(1, 0, 0, 22)
     searchBox.Font = Enum.Font.Gotham
-    searchBox.PlaceholderText = "🔍 Search..."
+    searchBox.PlaceholderText = "🔍 Search item..."
     searchBox.Text = ""
     searchBox.TextColor3 = Color3.fromRGB(240, 240, 255)
     searchBox.PlaceholderColor3 = Color3.fromRGB(120, 135, 160)
@@ -459,7 +459,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         end)
     end
 
-    -- Fungsi Filter Search Otomatis
+    -- Sistem Filter Search
     searchBox:GetPropertyChangedSignal("Text"):Connect(function()
         local query = searchBox.Text:lower()
         local visibleCount = 0
@@ -640,8 +640,8 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        val_delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + val_delta.X, startPos.Y.Scale, startPos.Y.Offset + val_delta.Y)
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
