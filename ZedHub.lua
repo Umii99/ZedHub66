@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - CUSTOMIZED POP-UP DROPDOWN (GROW A GARDEN)
+    ZEDHUB - ADJUSTED POPUP POSITION (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up: Background Biru, Posisi Agak ke Kanan, Tanpa Tombol X, Teks Item Putih Terang & Besar
+-- Dropdown Pop-up: Posisi digeser lebih ke kanan dan ke bawah
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -373,13 +373,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Pop-up Floating Overlay: Background Biru, Sedikit Diperlebar (270) & Diperpanjang (260), Posisi Agak ke Kanan (0.58)
+    -- Pop-up Floating Overlay: Geser ke kanan (0.62) dan turun ke bawah (0.55)
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
     popupOverlay.BackgroundTransparency = 0.1
     popupOverlay.Size = UDim2.new(0, 270, 0, 260)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
-    popupOverlay.Position = UDim2.new(0.58, 0, 0.5, 0)
+    popupOverlay.Position = UDim2.new(0.62, 0, 0.55, 0)
     popupOverlay.Visible = false
     popupOverlay.ZIndex = 10
     Instance.new("UICorner", popupOverlay).CornerRadius = UDim.new(0, 8)
@@ -459,7 +459,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
-        -- Teks item warna putih terang dan diperbesar (12)
         itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
         itemRow.TextSize = 12
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
@@ -519,10 +518,8 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         dropArrow.Text = isListOpen and "▲" or "▼"
     end)
 
-    -- Pop-up otomatis tertutup jika mengklik area bebas di luar pop-up (misalnya di MainFrame)
     MainFrame.InputBegan:Connect(function(input)
         if isListOpen and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            -- Beri sedikit jeda agar klik pada tombol dropdown sendiri tidak langsung menutup pop-up
             task.delay(0.05, function()
                 if isListOpen then
                     isListOpen = false
@@ -704,4 +701,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Custom Popup UI Loaded Successfully!")
+print("ZedHub Adjusted Popup Position UI Loaded Successfully!")
