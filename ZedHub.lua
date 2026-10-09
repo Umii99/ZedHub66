@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ALL TEXT ENLARGED UI (GROW A GARDEN)
+    ZEDHUB - MAX ENLARGED TEXT UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -52,12 +52,12 @@ FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 FloatingBtn.BorderColor3 = Color3.fromRGB(59, 130, 246)
 FloatingBtn.BorderSizePixel = 1
 FloatingBtn.Position = UDim2.new(0, 15, 0, 15)
-FloatingBtn.Size = UDim2.new(0, 120, 0, 36)
+FloatingBtn.Size = UDim2.new(0, 130, 0, 38)
 FloatingBtn.Visible = false
 FloatingBtn.Font = Enum.Font.GothamBold
 FloatingBtn.Text = "🪐 ZedHub [Buka]"
 FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
-FloatingBtn.TextSize = 13
+FloatingBtn.TextSize = 13.5
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
 -- Main Frame (Tinggi 380, Lebar 520)
@@ -80,7 +80,7 @@ local TopBar = Instance.new("Frame")
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 TopBar.BorderSizePixel = 0
-TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.Size = UDim2.new(1, 0, 0, 32)
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 8)
 
 local Title = Instance.new("TextLabel")
@@ -91,57 +91,57 @@ Title.Size = UDim2.new(0, 250, 1, 0)
 Title.Font = Enum.Font.GothamBold
 Title.Text = "🪐 ZedHub  Grow A Garden"
 Title.TextColor3 = Color3.fromRGB(240, 240, 255)
-Title.TextSize = 12
+Title.TextSize = 13
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- FPS Label di Top Bar
 local FPSLabel = Instance.new("TextLabel")
 FPSLabel.Parent = TopBar
 FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-FPSLabel.Position = UDim2.new(1, -110, 0.5, -9)
-FPSLabel.Size = UDim2.new(0, 45, 0, 18)
+FPSLabel.Position = UDim2.new(1, -115, 0.5, -10)
+FPSLabel.Size = UDim2.new(0, 48, 0, 20)
 FPSLabel.Font = Enum.Font.GothamMedium
 FPSLabel.Text = "60 FPS"
 FPSLabel.TextColor3 = Color3.fromRGB(148, 163, 184)
-FPSLabel.TextSize = 10.5
+FPSLabel.TextSize = 11
 Instance.new("UICorner", FPSLabel).CornerRadius = UDim.new(0, 4)
 
 -- Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-MinimizeBtn.Position = UDim2.new(1, -55, 0.5, -9)
-MinimizeBtn.Size = UDim2.new(0, 18, 0, 18)
+MinimizeBtn.Position = UDim2.new(1, -58, 0.5, -10)
+MinimizeBtn.Size = UDim2.new(0, 20, 0, 20)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Text = "-"
 MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-MinimizeBtn.TextSize = 14
+MinimizeBtn.TextSize = 15
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 4)
 
 -- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = TopBar
 CloseBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
-CloseBtn.Position = UDim2.new(1, -32, 0.5, -9)
-CloseBtn.Size = UDim2.new(0, 18, 0, 18)
+CloseBtn.Position = UDim2.new(1, -34, 0.5, -10)
+CloseBtn.Size = UDim2.new(0, 20, 0, 20)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 10.5
+CloseBtn.TextSize = 11
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
 -- Body Layout
 local Body = Instance.new("Frame", MainFrame)
 Body.BackgroundTransparency = 1
-Body.Position = UDim2.new(0, 0, 0, 30)
-Body.Size = UDim2.new(1, 0, 1, -30)
+Body.Position = UDim2.new(0, 0, 0, 32)
+Body.Size = UDim2.new(1, 0, 1, -32)
 
 -- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
 Sidebar.BackgroundTransparency = 0.3
 Sidebar.BorderSizePixel = 0
-Sidebar.Size = UDim2.new(0, 120, 1, 0)
+Sidebar.Size = UDim2.new(0, 125, 1, 0)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
 Sidebar.ScrollBarThickness = 2
 local SBLayout = Instance.new("UIListLayout", Sidebar)
@@ -151,7 +151,7 @@ SBLayout.Padding = UDim.new(0, 3)
 -- User Profile Box di Bawah Sidebar
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-UserBox.Size = UDim2.new(1, -6, 0, 36)
+UserBox.Size = UDim2.new(1, -6, 0, 38)
 UserBox.Position = UDim2.new(0, 3, 0, 210)
 Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 5)
 local UserTxt = Instance.new("TextLabel", UserBox)
@@ -160,15 +160,15 @@ UserTxt.Size = UDim2.new(1, 0, 1, 0)
 UserTxt.Font = Enum.Font.GothamBold
 UserTxt.Text = "  👤 user_123\n  💎 Premium"
 UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
-UserTxt.TextSize = 10
+UserTxt.TextSize = 10.5
 
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundTransparency = 1
-ContentHolder.Position = UDim2.new(0, 125, 0, 0)
-ContentHolder.Size = UDim2.new(1, -125, 1, 0)
+ContentHolder.Position = UDim2.new(0, 130, 0, 0)
+ContentHolder.Size = UDim2.new(1, -130, 1, 0)
 
--- Fungsi Tab dengan Teks Menu Sidebar Diperbesar (12.5)
+-- Fungsi Tab dengan Teks Menu Sidebar Diperbesar Sangat Jelas (14)
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
@@ -185,11 +185,11 @@ local function CreateTab(tabName)
     local TabBtn = Instance.new("TextButton", Sidebar)
     TabBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     TabBtn.BackgroundTransparency = 0.6
-    TabBtn.Size = UDim2.new(1, -6, 0, 30)
+    TabBtn.Size = UDim2.new(1, -6, 0, 32)
     TabBtn.Font = Enum.Font.GothamBold
     TabBtn.Text = "    " .. tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 175, 200)
-    TabBtn.TextSize = 12.5 -- Diperbesar agar jelas
+    TabBtn.TextSize = 14 -- Diperbesar maksimal
     TabBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 5)
 
@@ -236,7 +236,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Section dengan Teks Judul Diperbesar (14)
+-- Fungsi Accordion Section dengan Judul Diperbesar Sangat Jelas (15)
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
@@ -251,15 +251,15 @@ local function CreateAccordionSection(parent, titleText)
 
     local mainLayout = Instance.new("UIListLayout", sec)
     mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    mainLayout.Padding = UDim.new(0, 5)
+    mainLayout.Padding = UDim.new(0, 6)
 
     local headerBtn = Instance.new("TextButton", sec)
     headerBtn.BackgroundTransparency = 1
-    headerBtn.Size = UDim2.new(1, 0, 0, 30)
+    headerBtn.Size = UDim2.new(1, 0, 0, 32)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
     headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    headerBtn.TextSize = 14 -- Diperbesar
+    headerBtn.TextSize = 15 -- Diperbesar maksimal
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -269,7 +269,7 @@ local function CreateAccordionSection(parent, titleText)
     chevron.Font = Enum.Font.GothamBold
     chevron.Text = "▲"
     chevron.TextColor3 = Color3.fromRGB(147, 197, 253)
-    chevron.TextSize = 11.5
+    chevron.TextSize = 12
 
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
@@ -279,12 +279,12 @@ local function CreateAccordionSection(parent, titleText)
 
     local containerLayout = Instance.new("UIListLayout", container)
     containerLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    containerLayout.Padding = UDim.new(0, 5)
+    containerLayout.Padding = UDim.new(0, 6)
 
     local padding = Instance.new("UIPadding", container)
-    padding.PaddingBottom = UDim.new(0, 5)
-    padding.PaddingLeft = UDim.new(0, 5)
-    padding.PaddingRight = UDim.new(0, 5)
+    padding.PaddingBottom = UDim.new(0, 6)
+    padding.PaddingLeft = UDim.new(0, 6)
+    padding.PaddingRight = UDim.new(0, 6)
 
     local isOpen = true
     headerBtn.MouseButton1Click:Connect(function()
@@ -296,24 +296,24 @@ local function CreateAccordionSection(parent, titleText)
     return container
 end
 
--- Fungsi Toggle dengan Teks Diperbesar (12)
+-- Fungsi Toggle dengan Teks Diperbesar (13.5)
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     row.BackgroundTransparency = 0.6
-    row.Size = UDim2.new(1, 0, 0, 26)
+    row.Size = UDim2.new(1, 0, 0, 28)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    " .. text
     row.TextColor3 = Color3.fromRGB(220, 230, 250)
-    row.TextSize = 12 -- Diperbesar
+    row.TextSize = 13.5 -- Diperbesar maksimal
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local box = Instance.new("Frame", row)
     box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -20, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
+    box.Position = UDim2.new(1, -22, 0.5, -7)
+    box.Size = UDim2.new(0, 14, 0, 14)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
 
     local check = Instance.new("TextLabel", box)
@@ -322,7 +322,7 @@ local function CreateToggle(parentSec, text, callback)
     check.Font = Enum.Font.GothamBold
     check.Text = ""
     check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 10
+    check.TextSize = 11
 
     local state = false
     row.MouseButton1Click:Connect(function()
@@ -337,12 +337,12 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up dengan Teks Tombol & Teks Item Diperbesar Sangat Jelas
+-- Dropdown Pop-up dengan Teks Tombol Utama, Ringkasan Selected, & Nama Item Diperbesar Maksimal
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
     dropFrame.BackgroundTransparency = 0.5
-    dropFrame.Size = UDim2.new(1, 0, 0, 28)
+    dropFrame.Size = UDim2.new(1, 0, 0, 30)
     Instance.new("UICorner", dropFrame).CornerRadius = UDim.new(0, 4)
 
     local dropBtn = Instance.new("TextButton", dropFrame)
@@ -352,18 +352,18 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 12 -- Diperbesar
+    dropBtn.TextSize = 13.5 -- Diperbesar maksimal
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
     local summaryLabel = Instance.new("TextLabel", dropBtn)
     summaryLabel.BackgroundTransparency = 1
-    summaryLabel.Position = UDim2.new(1, -165, 0, 0)
-    summaryLabel.Size = UDim2.new(0, 140, 1, 0)
+    summaryLabel.Position = UDim2.new(1, -175, 0, 0)
+    summaryLabel.Size = UDim2.new(0, 150, 1, 0)
     summaryLabel.Font = Enum.Font.GothamBold
     summaryLabel.Text = "[0 Selected]"
     summaryLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
-    summaryLabel.TextSize = 11.5 -- Diperbesar
+    summaryLabel.TextSize = 12.5 -- Diperbesar maksimal (Teks nama item di tombol utama)
     summaryLabel.TextXAlignment = Enum.TextXAlignment.Right
 
     local dropArrow = Instance.new("TextLabel", dropBtn)
@@ -373,13 +373,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.Font = Enum.Font.GothamBold
     dropArrow.Text = "▼"
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropArrow.TextSize = 10
+    dropArrow.TextSize = 11
 
     -- Pop-up Floating Overlay
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
     popupOverlay.BackgroundTransparency = 0.1
-    popupOverlay.Size = UDim2.new(0, 280, 0, 270)
+    popupOverlay.Size = UDim2.new(0, 285, 0, 275)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
     popupOverlay.Position = UDim2.new(0.69, 0, 0.55, 0)
     popupOverlay.Visible = false
@@ -404,7 +404,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupTitle.Font = Enum.Font.GothamBold
     popupTitle.Text = "⚙️ " .. titleText
     popupTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-    popupTitle.TextSize = 13 -- Diperbesar
+    popupTitle.TextSize = 13.5
     popupTitle.TextXAlignment = Enum.TextXAlignment.Left
     popupTitle.ZIndex = 12
 
@@ -424,7 +424,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     pbPadding.PaddingRight = UDim.new(0, 8)
     pbPadding.PaddingBottom = UDim.new(0, 8)
 
-    -- Kotak Search dengan Teks Diperbesar (12.5)
+    -- Kotak Search
     local searchBox = Instance.new("TextBox", popupBody)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
     searchBox.BackgroundTransparency = 0.3
@@ -434,7 +434,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     searchBox.Text = ""
     searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     searchBox.PlaceholderColor3 = Color3.fromRGB(160, 185, 220)
-    searchBox.TextSize = 12.5 -- Diperbesar
+    searchBox.TextSize = 13
     searchBox.ZIndex = 12
     Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
 
@@ -442,7 +442,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     local listContainer = Instance.new("ScrollingFrame", popupBody)
     listContainer.BackgroundTransparency = 1
     listContainer.Size = UDim2.new(1, 0, 0, 185)
-    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 30) + 10)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 32) + 10)
     listContainer.ScrollBarThickness = 3
     listContainer.ZIndex = 12
 
@@ -457,13 +457,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         local itemRow = Instance.new("TextButton", listContainer)
         itemRow.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
         itemRow.BackgroundTransparency = 0.4
-        itemRow.Size = UDim2.new(1, 0, 0, 27)
+        itemRow.Size = UDim2.new(1, 0, 0, 28)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamBold
         itemRow.Text = "    " .. itemName
-        -- Teks Item Warna Putih Terang dan Diperbesar Sangat Jelas (13.5)
+        -- Teks Nama Item di Pop-up Diperbesar Maksimal (14.5)
         itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
-        itemRow.TextSize = 13.5 
+        itemRow.TextSize = 14.5
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         itemRow.ZIndex = 13
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
@@ -493,7 +493,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
             elseif #selectedItems == 1 then
                 summaryLabel.Text = "[" .. selectedItems[1] .. "]"
             else
-                summaryLabel.Text = "[" .. #selectedItems .. " Items Selected]"
+                summaryLabel.Text = "[" .. #selectedItems + " Items Selected]"
             end
             
             if onItemsChanged then onItemsChanged(selectedItems) end
@@ -511,7 +511,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 rowData.Btn.Visible = false
             end
         end
-        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 30) + 10)
+        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 32) + 10)
     end)
 
     local isListOpen = false
@@ -537,7 +537,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle dengan Teks Diperbesar (12)
+-- Fungsi Action Toggle (Auto Buy, Auto Buy All, dll) dengan Teks Diperbesar (13.5)
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -547,14 +547,14 @@ local function CreateActionToggle(parentSec, text, callback)
     row.Font = Enum.Font.GothamBold
     row.Text = "    ⚡ " .. text
     row.TextColor3 = Color3.fromRGB(234, 179, 8)
-    row.TextSize = 12 -- Diperbesar
+    row.TextSize = 13.5 -- Diperbesar maksimal
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local box = Instance.new("Frame", row)
     box.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
-    box.Position = UDim2.new(1, -20, 0.5, -6)
-    box.Size = UDim2.new(0, 12, 0, 12)
+    box.Position = UDim2.new(1, -22, 0.5, -7)
+    box.Size = UDim2.new(0, 14, 0, 14)
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
 
     local check = Instance.new("TextLabel", box)
@@ -563,7 +563,7 @@ local function CreateActionToggle(parentSec, text, callback)
     check.Font = Enum.Font.GothamBold
     check.Text = ""
     check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 10
+    check.TextSize = 11
 
     local state = false
     row.MouseButton1Click:Connect(function()
@@ -632,19 +632,19 @@ end)
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
 local WebhookBox = Instance.new("TextBox", WebhookBody)
 WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-WebhookBox.Size = UDim2.new(1, 0, 0, 30)
+WebhookBox.Size = UDim2.new(1, 0, 0, 32)
 WebhookBox.Font = Enum.Font.Gotham
 WebhookBox.PlaceholderText = "URL Webhook Discord..."
 WebhookBox.Text = ""
 WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
 WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-WebhookBox.TextSize = 12 -- Diperbesar
+WebhookBox.TextSize = 13
 Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
 
 local ServerBody = CreateAccordionSection(TabInfo, "SERVER")
 local ServerRow = Instance.new("Frame", ServerBody)
 ServerRow.BackgroundTransparency = 1
-ServerRow.Size = UDim2.new(1, 0, 0, 30)
+ServerRow.Size = UDim2.new(1, 0, 0, 32)
 
 local ServerInput = Instance.new("TextBox", ServerRow)
 ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -654,7 +654,7 @@ ServerInput.PlaceholderText = "2007"
 ServerInput.Text = ""
 ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
 ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize = 12 -- Diperbesar
+ServerInput.TextSize = 13
 Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
 
 local ClickBtn = Instance.new("TextButton", ServerRow)
@@ -664,7 +664,7 @@ ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
 ClickBtn.Font = Enum.Font.GothamBold
 ClickBtn.Text = "Click"
 ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ClickBtn.TextSize = 12 -- Diperbesar
+ClickBtn.TextSize = 13
 Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
@@ -705,4 +705,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Enriched Large Text UI Loaded Successfully!")
+print("ZedHub Maximum Enlarged Text UI Loaded Successfully!")
