@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - FINAL POPUP ALIGNMENT (GROW A GARDEN)
+    ZEDHUB - FINAL FINE-TUNED POPUP POSITION (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up: Posisi digeser pas mentok ke kanan di dalam frame utama
+-- Dropdown Pop-up: Posisi digeser sedikit lagi ke kanan (0.69)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -373,13 +373,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Pop-up Floating Overlay: Mentok ke kanan di dalam frame (0.68)
+    -- Pop-up Floating Overlay: Geser ke kanan (0.69)
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
     popupOverlay.BackgroundTransparency = 0.1
     popupOverlay.Size = UDim2.new(0, 270, 0, 260)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
-    popupOverlay.Position = UDim2.new(0.68, 0, 0.55, 0)
+    popupOverlay.Position = UDim2.new(0.69, 0, 0.55, 0)
     popupOverlay.Visible = false
     popupOverlay.ZIndex = 10
     Instance.new("UICorner", popupOverlay).CornerRadius = UDim.new(0, 8)
@@ -701,4 +701,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Popup Perfectly Aligned UI Loaded Successfully!")
+print("ZedHub Fine-Tuned Popup Position UI Loaded Successfully!")
