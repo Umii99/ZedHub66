@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME)
+    ZEDHUB - GROW A GARDEN (INTEGRATED SHOP LOGIC)
 ]]
 
 local Players = game:GetService("Players")
@@ -73,7 +73,7 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Parent = MainFrame
-MainStroke.Color = Color3.fromRGB(59, 130, 246) -- Neon Blue Border
+MainStroke.Color = Color3.fromRGB(59, 130, 246)
 MainStroke.Thickness = 1.5
 
 -- Top Bar
@@ -239,7 +239,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Section
+-- Fungsi Accordion Section (Teks Diperbesar ke 16.5)
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -262,7 +262,7 @@ local function CreateAccordionSection(parent, titleText)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
     headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    headerBtn.TextSize = 15
+    headerBtn.TextSize = 16.5
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -272,7 +272,7 @@ local function CreateAccordionSection(parent, titleText)
     chevron.Font = Enum.Font.GothamBold
     chevron.Text = "▲"
     chevron.TextColor3 = Color3.fromRGB(147, 197, 253)
-    chevron.TextSize = 12
+    chevron.TextSize = 13
 
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
@@ -673,6 +673,77 @@ ClickBtn.TextSize = 13
 Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
+-- =========================================================================
+-- LOGIC EXECUTION LOOP (SPEED HUB INTEGRATION)
+-- =========================================================================
+task.spawn(function()
+    -- Asumsi modul shop dan remote events mengikut struktur game
+    local success, shop = pcall(function() return require(ReplicatedStorage:WaitForChild("Modules", 2):WaitForChild("Shop", 2)) end)
+    local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5)
+
+    while task.wait(0.5) do
+        pcall(function()
+            if not shop or not gameEvents then return end
+
+            -- 1. SHOP SEED
+            if getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active then
+                local selectedList = getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items
+                if #selectedList > 0 then
+                    for _, itemName in ipairs(selectedList) do
+                        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", itemName)
+                        if v_6 then
+                            gameEvents.BuySeedStock:FireServer("Shop", v_6)
+                        end
+                    end
+                end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then
+                local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", "no")
+                if v_6 then
+                    gameEvents.BuySeedStock:FireServer("Shop", v_6)
+                end
+            end
+
+            -- 2. SHOP EGG
+            if getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active then
+                local selectedList = getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items
+                if #selectedList > 0 then
+                    for _, itemName in ipairs(selectedList) do
+                        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", itemName)
+                        if v_6 then
+                            gameEvents.BuyPetEgg:FireServer(v_6)
+                        end
+                        task.wait(0.2)
+                    end
+                end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then
+                local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", "no")
+                if v_6 then
+                    gameEvents.BuyPetEgg:FireServer(v_6)
+                end
+            end
+
+            -- 3. SHOP GEAR
+            if getgenv().ZedHubConfig.MainShopBuy.MainGear.Active then
+                local selectedList = getgenv().ZedHubConfig.MainShopBuy.MainGear.Items
+                if #selectedList > 0 then
+                    for _, itemName in ipairs(selectedList) do
+                        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", itemName)
+                        if v_6 then
+                            gameEvents.BuyGearStock:FireServer(v_6)
+                        end
+                    end
+                end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then
+                local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", "no")
+                if v_6 then
+                    gameEvents.BuyGearStock:FireServer(v_6)
+                end
+            end
+        end)
+    end
+end)
+
+
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
@@ -710,4 +781,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Premium Midnight Slate & Neon Blue Theme Loaded Successfully!")
+print("ZedHub Shop Logic Integrated Successfully!")
