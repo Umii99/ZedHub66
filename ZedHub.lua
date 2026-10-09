@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ULTIMATE PROFESSIONAL DROPDOWN (GROW A GARDEN)
+    ZEDHUB - HIPHUB SINGLE SELECT DROPDOWN (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -26,16 +26,16 @@ getgenv().ZedHubConfig = {
     AutoSellFruit = false,
     
     FallMarketBuy = {
-        FallGear = { Active = false, BuyAll = false, Items = {} },
-        FallSeed = { Active = false, BuyAll = false, Items = {} },
-        FallPets = { Active = false, BuyAll = false, Items = {} },
-        FallCrate = { Active = false, BuyAll = false, Items = {} }
+        FallGear = { Active = false, BuyAll = false, SelectedItem = "" },
+        FallSeed = { Active = false, BuyAll = false, SelectedItem = "" },
+        FallPets = { Active = false, BuyAll = false, SelectedItem = "" },
+        FallCrate = { Active = false, BuyAll = false, SelectedItem = "" }
     },
     
     MainShopBuy = {
-        MainEgg = { Active = false, BuyAll = false, Items = {} },
-        MainSeed = { Active = false, BuyAll = false, Items = {} },
-        MainGear = { Active = false, BuyAll = false, Items = {} }
+        MainEgg = { Active = false, BuyAll = false, SelectedItem = "" },
+        MainSeed = { Active = false, BuyAll = false, SelectedItem = "" },
+        MainGear = { Active = false, BuyAll = false, SelectedItem = "" }
     }
 }
 
@@ -302,7 +302,7 @@ local function CreateToggle(parentSec, text, callback)
     row.Size = UDim2.new(1, 0, 0, 24)
     row.AutoButtonColor = false
     row.Font = Enum.Font.Gotham
-    row.Text = "    " .. text
+    row.Text = "    " + text
     row.TextColor3 = Color3.fromRGB(210, 220, 240)
     row.TextSize = 10.5
     row.TextXAlignment = Enum.TextXAlignment.Left
@@ -335,8 +335,8 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Menu Pop-up / Scrollable ala Hiphub Pro
-local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
+-- Dropdown Pilihan Tunggal ala Hiphub (Menampilkan item terpilih di tombol)
+local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelected)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
     dropFrame.BackgroundTransparency = 0.5
@@ -353,22 +353,33 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.BackgroundTransparency = 0.4
     dropBtn.Size = UDim2.new(1, 0, 0, 26)
     dropBtn.Font = Enum.Font.GothamBold
-    dropBtn.Text = "  📂 " .. titleText .. " [Selected]"
+    dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropBtn.TextSize = 10.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
+    -- Label status pilihan aktif di sebelah kanan tombol (ala Hiphub)
+    local selectedValLabel = Instance.new("TextLabel", dropBtn)
+    selectedValLabel.BackgroundTransparency = 1
+    selectedValLabel.Position = UDim2.new(1, -165, 0, 0)
+    selectedValLabel.Size = UDim2.new(0, 140, 1, 0)
+    selectedValLabel.Font = Enum.Font.GothamBold
+    selectedValLabel.Text = itemsTable[1] or "SELECT..."
+    selectedValLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
+    selectedValLabel.TextSize = 10
+    selectedValLabel.TextXAlignment = Enum.TextXAlignment.Right
+
     local dropArrow = Instance.new("TextLabel", dropBtn)
     dropArrow.BackgroundTransparency = 1
-    dropArrow.Position = UDim2.new(1, -22, 0, 0)
-    dropArrow.Size = UDim2.new(0, 18, 1, 0)
+    dropArrow.Position = UDim2.new(1, -20, 0, 0)
+    dropArrow.Size = UDim2.new(0, 15, 1, 0)
     dropArrow.Font = Enum.Font.GothamBold
     dropArrow.Text = "▼"
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropArrow.TextSize = 9.5
+    dropArrow.TextSize = 9
 
-    -- Kotak pop-up list item yang bisa di-scroll (awalnya disembunyikan/tertutup)
+    -- Container list item scrollable ala Hiphub
     local listContainer = Instance.new("ScrollingFrame", dropFrame)
     listContainer.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     listContainer.BackgroundTransparency = 0.2
@@ -388,49 +399,24 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     listPadding.PaddingRight = UDim.new(0, 6)
     listPadding.PaddingBottom = UDim.new(0, 4)
 
-    local selectedItems = {}
-
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
         itemRow.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
         itemRow.BackgroundTransparency = 0.4
         itemRow.Size = UDim2.new(1, 0, 0, 22)
         itemRow.AutoButtonColor = false
-        itemRow.Font = Enum.Font.Gotham
+        itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
         itemRow.TextColor3 = Color3.fromRGB(220, 230, 245)
         itemRow.TextSize = 10
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
-        local box = Instance.new("Frame", itemRow)
-        box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-        box.Position = UDim2.new(1, -18, 0.5, -5)
-        box.Size = UDim2.new(0, 10, 0, 10)
-        Instance.new("UICorner", box).CornerRadius = UDim.new(0, 2)
-
-        local check = Instance.new("TextLabel", box)
-        check.BackgroundTransparency = 1
-        check.Size = UDim2.new(1, 0, 1, 0)
-        check.Font = Enum.Font.GothamBold
-        check.Text = ""
-        check.TextColor3 = Color3.fromRGB(255, 255, 255)
-        check.TextSize = 8.5
-
-        local isSelected = false
         itemRow.MouseButton1Click:Connect(function()
-            isSelected = not isSelected
-            box.BackgroundColor3 = isSelected and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
-            check.Text = isSelected and "✓" or ""
-
-            if isSelected then
-                table.insert(selectedItems, itemName)
-            else
-                for i, v in ipairs(selectedItems) do
-                    if v == itemName then table.remove(selectedItems, i) end
-                end
-            end
-            if onItemsChanged then onItemsChanged(selectedItems) end
+            selectedValLabel.Text = itemName
+            listContainer.Visible = false
+            dropArrow.Text = "▼"
+            if onSelected then onSelected(itemName) end
         end)
     end
 
@@ -487,21 +473,21 @@ CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgen
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallPets.SelectedItem = selected end)
 CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Cosmetic & Crate", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.SelectedItem = selected end)
 CreateActionToggle(SecFallShop, "Auto Buy Cosmetic & Crate On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Seed & Seed Pack", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.SelectedItem = selected end)
 CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Active = state end)
 
-CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(selected) getgenv().ZedHubConfig.FallMarketBuy.FallGear.SelectedItem = selected end)
 CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
 local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
-CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
-    if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
+CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(selected)
+    getgenv().ZedHubConfig.ShadyScarecrowMode = (selected == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED"
 end)
 CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
@@ -509,17 +495,17 @@ local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
 CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
 
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
-CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainEgg.SelectedItem = selected end)
 CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
 CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
 
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED")
-CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainSeed.SelectedItem = selected end)
 CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
 CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
-CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(selected) getgenv().ZedHubConfig.MainShopBuy.MainGear.SelectedItem = selected end)
 CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
@@ -611,4 +597,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Ultimate Professional Dropdown UI Loaded Successfully!")
+print("ZedHub Hiphub Single Select Dropdown UI Loaded Successfully!")
