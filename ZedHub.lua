@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - HIPHUB SINGLE SELECT DROPDOWN (GROW A GARDEN)
+    ZEDHUB - HIPHUB SINGLE SELECT + SEARCH DROPDOWN (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -302,7 +302,7 @@ local function CreateToggle(parentSec, text, callback)
     row.Size = UDim2.new(1, 0, 0, 24)
     row.AutoButtonColor = false
     row.Font = Enum.Font.Gotham
-    row.Text = "    " + text
+    row.Text = "    " .. text
     row.TextColor3 = Color3.fromRGB(210, 220, 240)
     row.TextSize = 10.5
     row.TextXAlignment = Enum.TextXAlignment.Left
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pilihan Tunggal ala Hiphub (Menampilkan item terpilih di tombol)
+-- Dropdown Pilihan Tunggal + Search Bar ala Hiphub Pro
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelected)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -359,7 +359,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
-    -- Label status pilihan aktif di sebelah kanan tombol (ala Hiphub)
     local selectedValLabel = Instance.new("TextLabel", dropBtn)
     selectedValLabel.BackgroundTransparency = 1
     selectedValLabel.Position = UDim2.new(1, -165, 0, 0)
@@ -379,52 +378,96 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onSelect
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Container list item scrollable ala Hiphub
-    local listContainer = Instance.new("ScrollingFrame", dropFrame)
-    listContainer.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    listContainer.BackgroundTransparency = 0.2
-    listContainer.Size = UDim2.new(1, -4, 0, 100)
-    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 25) + 10)
+    -- Main Container untuk Dropdown (Search Bar + Scrolling List)
+    local dropdownContent = Instance.new("Frame", dropFrame)
+    dropdownContent.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+    dropdownContent.BackgroundTransparency = 0.2
+    dropdownContent.Size = UDim2.new(1, -4, 0, 125)
+    dropdownContent.Visible = false
+    Instance.new("UICorner", dropdownContent).CornerRadius = UDim.new(0, 4)
+
+    local dcLayout = Instance.new("UIListLayout", dropdownContent)
+    dcLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    dcLayout.Padding = UDim.new(0, 3)
+
+    local dcPadding = Instance.new("UIPadding", dropdownContent)
+    dcPadding.PaddingTop = UDim.new(0, 4)
+    dcPadding.PaddingLeft = UDim.new(0, 6)
+    dcPadding.PaddingRight = UDim.new(0, 6)
+    dcPadding.PaddingBottom = UDim.new(0, 4)
+
+    -- Search Box ala Hiphub
+    local searchBox = Instance.new("TextBox", dropdownContent)
+    searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
+    searchBox.BackgroundTransparency = 0.4
+    searchBox.Size = UDim2.new(1, 0, 0, 22)
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.PlaceholderText = "🔍 Search..."
+    searchBox.Text = ""
+    searchBox.TextColor3 = Color3.fromRGB(240, 240, 255)
+    searchBox.PlaceholderColor3 = Color3.fromRGB(120, 135, 160)
+    searchBox.TextSize = 10
+    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 3)
+
+    -- Scrolling List Container
+    local listContainer = Instance.new("ScrollingFrame", dropdownContent)
+    listContainer.BackgroundTransparency = 1
+    listContainer.Size = UDim2.new(1, 0, 0, 92)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 24) + 10)
     listContainer.ScrollBarThickness = 3
-    listContainer.Visible = false
-    Instance.new("UICorner", listContainer).CornerRadius = UDim.new(0, 4)
 
     local listLayout = Instance.new("UIListLayout", listContainer)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 3)
 
-    local listPadding = Instance.new("UIPadding", listContainer)
-    listPadding.PaddingTop = UDim.new(0, 4)
-    listPadding.PaddingLeft = UDim.new(0, 6)
-    listPadding.PaddingRight = UDim.new(0, 6)
-    listPadding.PaddingBottom = UDim.new(0, 4)
+    local itemRows = {}
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        itemRow.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
-        itemRow.BackgroundTransparency = 0.4
-        itemRow.Size = UDim2.new(1, 0, 0, 22)
+        itemRow.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
+        itemRow.BackgroundTransparency = 0.5
+        itemRow.Size = UDim2.new(1, 0, 0, 21)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
-        itemRow.TextColor3 = Color3.fromRGB(220, 230, 245)
+        itemRow.TextColor3 = Color3.fromRGB(210, 220, 240)
         itemRow.TextSize = 10
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
+        table.insert(itemRows, {Btn = itemRow, Name = itemName})
+
         itemRow.MouseButton1Click:Connect(function()
             selectedValLabel.Text = itemName
-            listContainer.Visible = false
+            dropdownContent.Visible = false
             dropArrow.Text = "▼"
             if onSelected then onSelected(itemName) end
         end)
     end
 
+    -- Fungsi Filter Search Otomatis
+    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local query = searchBox.Text:lower()
+        local visibleCount = 0
+        for _, rowData in ipairs(itemRows) do
+            if query == "" or string.find(rowData.Name:lower(), query) then
+                rowData.Btn.Visible = true
+                visibleCount = visibleCount + 1
+            else
+                rowData.Btn.Visible = false
+            end
+        end
+        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 24) + 10)
+    end)
+
     local isListOpen = false
     dropBtn.MouseButton1Click:Connect(function()
         isListOpen = not isListOpen
-        listContainer.Visible = isListOpen
+        dropdownContent.Visible = isListOpen
         dropArrow.Text = isListOpen and "▲" or "▼"
+        if not isListOpen then
+            searchBox.Text = ""
+        end
     end)
 
     return dropFrame
@@ -538,6 +581,7 @@ local ServerRow = Instance.new("Frame", ServerBody)
 ServerRow.BackgroundTransparency = 1
 ServerRow.Size = UDim2.new(1, 0, 0, 28)
 
+ListInput = Instance.new("TextBox", ServerRow) -- aman
 local ServerInput = Instance.new("TextBox", ServerRow)
 ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
@@ -597,4 +641,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Hiphub Single Select Dropdown UI Loaded Successfully!")
+print("ZedHub Search & Single Select Dropdown UI Loaded Successfully!")
