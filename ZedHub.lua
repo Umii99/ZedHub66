@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - LARGER SECTION TEXT & HIPHUB PROPORTION (GROW A GARDEN)
+    ZEDHUB - ACCENT BLUE BRIGHT & LARGER SECTION TITLES (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -236,7 +236,7 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
-local function CreateAccordionSection(parent, titleText, accentColor)
+local function CreateAccordionSection(parent, titleText, _)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
     sec.BackgroundTransparency = 0.4
@@ -245,7 +245,7 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 5)
     
     local stroke = Instance.new("UIStroke", sec)
-    stroke.Color = accentColor or Color3.fromRGB(59, 130, 246)
+    stroke.Color = Color3.fromRGB(59, 130, 246)
     stroke.Transparency = 0.6
 
     local mainLayout = Instance.new("UIListLayout", sec)
@@ -257,8 +257,8 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     headerBtn.Size = UDim2.new(1, 0, 0, 28)
     headerBtn.Font = Enum.Font.GothamBold
     headerBtn.Text = "  🔹 " .. titleText
-    headerBtn.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    headerBtn.TextSize = 12 -- UKURAN TEKS SECTION DIPERBESAR DI SINI
+    headerBtn.TextColor3 = Color3.fromRGB(147, 197, 253) -- Biru terang seragam ala Hiphub[span_4](start_span)[span_4](end_span)
+    headerBtn.TextSize = 13 -- Ukuran teks diperbesar agar sangat jelas[span_5](start_span)[span_5](end_span)
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
     local chevron = Instance.new("TextLabel", headerBtn)
@@ -267,8 +267,8 @@ local function CreateAccordionSection(parent, titleText, accentColor)
     chevron.Size = UDim2.new(0, 18, 1, 0)
     chevron.Font = Enum.Font.GothamBold
     chevron.Text = "▲"
-    chevron.TextColor3 = accentColor or Color3.fromRGB(96, 165, 250)
-    chevron.TextSize = 10
+    chevron.TextColor3 = Color3.fromRGB(147, 197, 253)
+    chevron.TextSize = 10.5
 
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
@@ -426,7 +426,7 @@ local function CreateActionToggle(parentSec, text, callback)
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(234, 179, 8) or Color3.fromRGB(60, 40, 20)
+        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
         check.Text = state and "✓" or ""
         if callback then callback(state) end
     end)
@@ -434,11 +434,11 @@ local function CreateActionToggle(parentSec, text, callback)
 end
 
 -- === TAB EVENT & SHOP ===
-local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST", Color3.fromRGB(251, 146, 60))
+local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST")
 CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
-local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP", Color3.fromRGB(236, 72, 153))
+local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
 CreateSelectedDropdown(SecFallShop, "Fall Shop Pets & Egg", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Pets & Egg On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Active = state end)
 
@@ -451,33 +451,33 @@ CreateActionToggle(SecFallShop, "Auto Buy Seed & Seed Pack On/Off", function(sta
 CreateSelectedDropdown(SecFallShop, "Fall Shop Gear", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Gear On/Off", function(state) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Active = state end)
 
-local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW", Color3.fromRGB(251, 191, 36))
+local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
 CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
     if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
 end)
 CreateActionToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
 
-local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN", Color3.fromRGB(56, 189, 248))
+local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
 CreateActionToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
 
-local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG", Color3.fromRGB(168, 85, 247))
+local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
 CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
 CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
 CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
 
-local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED", Color3.fromRGB(52, 211, 153))
+local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED")
 CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
 CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
 CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
-local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR", Color3.fromRGB(59, 130, 246))
+local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
 CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
 CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
 -- === TAB AUTO SELLING ===
-local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
+local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
     getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
@@ -487,7 +487,7 @@ CreateToggle(SecSell, "Auto Sell Fruit", function(state)
     getgenv().ZedHubConfig.AutoSellFruit = state
 end)
 
-local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK", Color3.fromRGB(251, 191, 36))
+local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
 local WebhookBox = Instance.new("TextBox", WebhookBody)
 WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 WebhookBox.Size = UDim2.new(1, 0, 0, 28)
@@ -499,7 +499,7 @@ WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
 WebhookBox.TextSize = 10.5
 Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
 
-local ServerBody = CreateAccordionSection(TabInfo, "SERVER", Color3.fromRGB(96, 165, 250))
+local ServerBody = CreateAccordionSection(TabInfo, "SERVER")
 local ServerRow = Instance.new("Frame", ServerBody)
 ServerRow.BackgroundTransparency = 1
 ServerRow.Size = UDim2.new(1, 0, 0, 28)
@@ -563,4 +563,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Larger Section Title UI Loaded Successfully!")
+print("ZedHub Bright Blue Titles UI Loaded Successfully!")
