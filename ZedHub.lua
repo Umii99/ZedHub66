@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - WHITE TEXT TOGGLES UI (GROW A GARDEN)
+    ZEDHUB - HIPHUB STYLE SWITCH TOGGLE UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -296,7 +296,7 @@ local function CreateAccordionSection(parent, titleText)
     return container
 end
 
--- Fungsi Toggle: Teks diubah menjadi PUTIH TERANG (Color3.fromRGB(255, 255, 255))
+-- Fungsi Toggle dengan Switch Pill ala Hiphub
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -305,30 +305,39 @@ local function CreateToggle(parentSec, text, callback)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    " .. text
-    row.TextColor3 = Color3.fromRGB(255, 255, 255) -- Diubah jadi putih terang
+    row.TextColor3 = Color3.fromRGB(255, 255, 255)
     row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
-    local box = Instance.new("Frame", row)
-    box.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    box.Position = UDim2.new(1, -22, 0.5, -7)
-    box.Size = UDim2.new(0, 14, 0, 14)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    -- Pill Background (Kapsul Switch ala Hiphub)
+    local pill = Instance.new("Frame", row)
+    pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    pill.Position = UDim2.new(1, -42, 0.5, -8)
+    pill.Size = UDim2.new(0, 36, 0, 16)
+    local pillCorner = Instance.new("UICorner", pill)
+    pillCorner.CornerRadius = UDim.new(1, 0) -- Bentuk kapsul penuh
 
-    local check = Instance.new("TextLabel", box)
-    check.BackgroundTransparency = 1
-    check.Size = UDim2.new(1, 0, 1, 0)
-    check.Font = Enum.Font.GothamBold
-    check.Text = ""
-    check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 11
+    -- Bulatan Knob di dalam Pill
+    local knob = Instance.new("Frame", pill)
+    knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
+    knob.Position = UDim2.new(0, 2, 0.5, -6)
+    knob.Size = UDim2.new(0, 12, 0, 12)
+    local knobCorner = Instance.new("UICorner", knob)
+    knobCorner.CornerRadius = UDim.new(1, 0)
 
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(59, 130, 246) or Color3.fromRGB(30, 41, 59)
-        check.Text = state and "✓" or ""
+        if state then
+            pill.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Biru terang saat aktif
+            knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            knob.Position = UDim2.new(1, -14, 0.5, -6) -- Bergeser ke kanan
+        else
+            pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+            knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
+            knob.Position = UDim2.new(0, 2, 0.5, -6) -- Kembali ke kiri
+        end
         
         if callback then 
             callback(state) 
@@ -536,7 +545,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle: Teks diubah menjadi PUTIH TERANG (Color3.fromRGB(255, 255, 255))
+-- Fungsi Action Toggle dengan Switch Pill ala Hiphub (Warna Kuning Emas saat aktif)
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -545,30 +554,39 @@ local function CreateActionToggle(parentSec, text, callback)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    ⚡ " .. text
-    row.TextColor3 = Color3.fromRGB(255, 255, 255) -- Diubah jadi putih terang
+    row.TextColor3 = Color3.fromRGB(255, 255, 255)
     row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
-    local box = Instance.new("Frame", row)
-    box.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
-    box.Position = UDim2.new(1, -22, 0.5, -7)
-    box.Size = UDim2.new(0, 14, 0, 14)
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 3)
+    -- Pill Background ala Hiphub
+    local pill = Instance.new("Frame", row)
+    pill.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
+    pill.Position = UDim2.new(1, -42, 0.5, -8)
+    pill.Size = UDim2.new(0, 36, 0, 16)
+    local pillCorner = Instance.new("UICorner", pill)
+    pillCorner.CornerRadius = UDim.new(1, 0)
 
-    local check = Instance.new("TextLabel", box)
-    check.BackgroundTransparency = 1
-    check.Size = UDim2.new(1, 0, 1, 0)
-    check.Font = Enum.Font.GothamBold
-    check.Text = ""
-    check.TextColor3 = Color3.fromRGB(255, 255, 255)
-    check.TextSize = 11
+    -- Bulatan Knob di dalam Pill
+    local knob = Instance.new("Frame", pill)
+    knob.BackgroundColor3 = Color3.fromRGB(180, 140, 100)
+    knob.Position = UDim2.new(0, 2, 0.5, -6)
+    knob.Size = UDim2.new(0, 12, 0, 12)
+    local knobCorner = Instance.new("UICorner", knob)
+    knobCorner.CornerRadius = UDim.new(1, 0)
 
     local state = false
     row.MouseButton1Click:Connect(function()
         state = not state
-        box.BackgroundColor3 = state and Color3.fromRGB(234, 179, 8) or Color3.fromRGB(60, 40, 20)
-        check.Text = state and "✓" or ""
+        if state then
+            pill.BackgroundColor3 = Color3.fromRGB(234, 179, 8) -- Kuning Emas saat aktif ala Hiphub
+            knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            knob.Position = UDim2.new(1, -14, 0.5, -6) -- Geser ke kanan
+        else
+            pill.BackgroundColor3 = Color3.fromRGB(60, 40, 20)
+            knob.BackgroundColor3 = Color3.fromRGB(180, 140, 100)
+            knob.Position = UDim2.new(0, 2, 0.5, -6) -- Kembali ke kiri
+        end
         if callback then callback(state) end
     end)
     return row
@@ -682,7 +700,7 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-local dragging, dragStart, startPos
+len_dragging, dragStart, startPos = nil, nil, nil
 TopBar.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
@@ -704,4 +722,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub White Text Toggles UI Loaded Successfully!")
+print("ZedHub Hiphub Style Switch UI Loaded Successfully!")
