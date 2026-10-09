@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - UNIFORM SWITCH TOGGLE UI (GROW A GARDEN)
+    ZEDHUB - SIDEBAR BACKGROUND COLOR ADJUSTED UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -137,10 +137,10 @@ Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 32)
 Body.Size = UDim2.new(1, 0, 1, -32)
 
--- Sidebar Kiri Utama
+-- Sidebar Kiri Utama (Background di area garis merah diubah menjadi Biru Terang)
 local Sidebar = Instance.new("ScrollingFrame", Body)
-Sidebar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
-Sidebar.BackgroundTransparency = 0.3
+Sidebar.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Diubah ke Biru Terang sesuai permintaan
+Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 Sidebar.Size = UDim2.new(0, 125, 1, 0)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -297,7 +297,7 @@ local function CreateAccordionSection(parent, titleText)
     return container
 end
 
--- Fungsi Toggle Standar (Warna ON/OFF disamakan terang & konsisten)
+-- Fungsi Toggle Standar
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -537,7 +537,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle (Auto Buy / Master Toggle dengan warna seragam yang terang)
+-- Fungsi Action Toggle
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -552,14 +552,14 @@ local function CreateActionToggle(parentSec, text, callback)
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local pill = Instance.new("Frame", row)
-    pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59) -- Warna OFF disamakan
+    pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
     pill.Size = UDim2.new(0, 36, 0, 16)
     local pillCorner = Instance.new("UICorner", pill)
     pillCorner.CornerRadius = UDim.new(1, 0)
 
     local knob = Instance.new("Frame", pill)
-    knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184) -- Warna Knob OFF disamakan
+    knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
     knob.Position = UDim2.new(0, 2, 0.5, -6)
     knob.Size = UDim2.new(0, 12, 0, 12)
     local knobCorner = Instance.new("UICorner", knob)
@@ -569,7 +569,7 @@ local function CreateActionToggle(parentSec, text, callback)
     row.MouseButton1Click:Connect(function()
         state = not state
         if state then
-            pill.BackgroundColor3 = Color3.fromRGB(234, 179, 8) -- Warna ON konsisten (Kuning Emas)
+            pill.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             knob.Position = UDim2.new(1, -14, 0.5, -6)
         else
@@ -708,4 +708,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Uniform Switch Toggles Loaded Successfully!")
+print("ZedHub Sidebar Background Updated Successfully!")
