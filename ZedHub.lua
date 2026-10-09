@@ -1,22 +1,25 @@
 --[[
-    ZEDHUB - FIXED UI & SAFE PLAYERGUI SCRIPT (GROW A GARDEN)
+    ZEDHUB - FINAL DUAL AUTO SELL & SIGNAL TRIGGERED SCRIPT (GROW A GARDEN)
+    - UI Murni milikmu lengkap dengan tab, accordion, dan dual toggle Auto Sell
+    - Backend: Murni mendeteksi isyarat notifikasi "Max / Full" dari game sebagai trigger TP kasir sekali jalan (Tanpa spam)
 ]]
 
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameEvents = ReplicatedStorage:FindFirstChild("GameEvents")
 
 local LocalPlayer = Players.LocalPlayer
-local Backpack = LocalPlayer:WaitForChild("Backpack")
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui")
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
 end
 
 -- =========================================================================
--- CONFIGURATION STATE
+-- CONFIGURATION STATE (Pusat Kendali UI & Dual Auto Sell)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -24,8 +27,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AutoSellBackpack = false,
-    AutoSellFruit = false,
+    AutoSellBackpack = false, -- Tombol Trigger Sinyal Max Backpack
+    AutoSellFruit = false,    -- Tombol Jual Terus-menerus (Persiapan Threshold)
     
     FallMarketBuy = {
         FallGear = { Active = false, BuyAll = false, Items = {} },
@@ -44,7 +47,8 @@ getgenv().ZedHubConfig = {
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZedHubStrictUI"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui -- Dijamin langsung muncul di PlayerGui
+local success = pcall(function() ScreenGui.Parent = CoreGui end)
+if not success then ScreenGui.Parent = PlayerGui end
 
 -- Floating Button (Minimize State)
 local FloatingBtn = Instance.new("TextButton")
@@ -464,7 +468,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING ===
+-- === TAB AUTO SELLING (DENGAN DUA TOMBOL UTUH) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT", Color3.fromRGB(129, 140, 248))
 
 CreateToggle(SecSell, "Auto Sell If Backpack Full", function(state)
@@ -500,7 +504,7 @@ ServerInput.PlaceholderText = "2007"
 ServerInput.Text = ""
 ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
 ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize = 11 -- Diperbaiki dari koma menjadi titik dua
+ServerInput.TextSize = 11
 Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
 
 local ClickBtn = Instance.new("TextButton", ServerRow)
@@ -515,11 +519,11 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND INTELIGEN: INTEGRASI LOGIKA BACKPACK FULL & AUTO SELL
+-- BACKEND: SIGNAL TRIGGERED (NOTIFIKASI MAX/FULL) & DUAL AUTO SELL
 -- =========================================================================
 local IsSelling = false
 
-local function CallSellInventory()
+local function SellInventoryOnce()
     local Character = LocalPlayer.Character
     if not Character then return end
     local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
@@ -528,14 +532,14 @@ local function CallSellInventory()
     if IsSelling then return end
     IsSelling = true
 
-    print("ZedHub Selling -> Menuju kasir untuk menjual...")
+    print("ZedHub Signal -> Isyarat Max/Full Backpack tertangkap! Menuju kasir...")
     local originalCFrame = HumanoidRootPart.CFrame
 
-    -- 1. Teleport ke kasir penjualan
+    -- 1. Teleport ke kasir penjualan (62, 4, -26)
     HumanoidRootPart.CFrame = CFrame.new(62, 4, -26)
     task.wait(0.3)
 
-    -- 2. Tembak event jual resmi
+    -- 2. Picu event Sell_Inventory (Sell All My Backpack)
     local sellEvt = GameEvents and GameEvents:FindFirstChild("Sell_Inventory")
     if sellEvt then
         pcall(function()
@@ -548,54 +552,50 @@ local function CallSellInventory()
     HumanoidRootPart.CFrame = originalCFrame
     task.wait(0.4)
 
-    print("ZedHub Selling -> Selesai.")
+    print("ZedHub Signal -> Penjualan selesai. Kembali siaga.")
+    
+    -- Jeda pengaman agar tidak berulang-ulang
+    task.wait(10)
     IsSelling = false
 end
 
--- Fungsi cek slot maksimal inventaris (260 slot)
-local function IsMaxInventory()
-    local count = 0
-    pcall(function()
-        if Backpack then
-            for _, item in ipairs(Backpack:GetChildren()) do
-                if item:IsA("Tool") then
-                    count = count + 1
-                end
-            end
-        end
-    end)
-    return count >= 260
-end
-
--- Looping Utama
+-- Looping Utama: Memantau Isyarat Notifikasi Max Backpack atau Tombol Threshold
 task.spawn(function()
-    while task.wait(2) do
-        local allowSellIfMax = getgenv().ZedHubConfig.AutoSellBackpack
-        local autoSellFruit = getgenv().ZedHubConfig.AutoSellFruit
+    while task.wait(1.5) do
+        local backpackOn = getgenv().ZedHubConfig.AutoSellBackpack
+        local fruitOn = getgenv().ZedHubConfig.AutoSellFruit
 
-        if not IsSelling and autoSellFruit then
-            if not allowSellIfMax then
-                CallSellInventory()
-                task.wait(5)
-            elseif IsMaxInventory() then
-                CallSellInventory()
-                repeat
-                    task.wait(5)
-                    local checkEmpty = 0
-                    pcall(function()
-                        if Backpack then
-                            for _, item in ipairs(Backpack:GetChildren()) do
-                                if item:IsA("Tool") then checkEmpty = checkEmpty + 1 end
+        if not IsSelling then
+            -- Mode 1: Auto Sell Jika Isyarat Notifikasi Max Backpack Terdeteksi
+            if backpackOn and not fruitOn then
+                local maxSignalFound = false
+                
+                pcall(function()
+                    for _, ui in ipairs(PlayerGui:GetDescendants()) do
+                        if (ui:IsA("TextLabel") or ui:IsA("TextButton")) and ui.Visible then
+                            local txt = string.lower(ui.Text)
+                            if string.find(txt, "full") or string.find(txt, "max") or string.find(txt, "penuh") or string.find(txt, "maximum") then
+                                maxSignalFound = true
+                                break
                             end
                         end
-                    end)
-                until checkEmpty < 200 or not getgenv().ZedHubConfig.AutoSellBackpack
+                    end
+                end)
+
+                if maxSignalFound then
+                    SellInventoryOnce()
+                end
+                
+            -- Mode 2: Auto Sell Fruit (Persiapan Threshold)
+            elseif fruitOn then
+                SellInventoryOnce()
+                task.wait(5)
             end
         end
     end
 end)
 
--- Auto Buy Engine
+-- Auto Buy Engine (Main Shop & 4 Fall Market)
 task.spawn(function()
     while task.wait(2) do
         pcall(function()
@@ -630,6 +630,7 @@ task.spawn(function()
         end)
     end
 end)
+
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -668,4 +669,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub UI & Backend Loaded Successfully!")
+print("ZedHub Signal Triggered Selling Engine Loaded Successfully!")
