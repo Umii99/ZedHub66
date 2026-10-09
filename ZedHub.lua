@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MULTI-SELECT HIGHLIGHT BLUE DROPDOWN + SEARCH (GROW A GARDEN)
+    ZEDHUB - CLEAN MULTI-SELECT BLUE HIGHLIGHT + SEARCH (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Multi-Select + Search (Baris Item Berubah Biru Saat Dipilih, Tanpa Checkbox)
+-- Dropdown Multi-Select + Search (Full Baris Berwarna Biru Saat Dipilih, TANPA CHECKBOX)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -415,7 +415,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        -- Warna default item (tidak dipilih)
         itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
         itemRow.BackgroundTransparency = 0.6
         itemRow.Size = UDim2.new(1, 0, 0, 21)
@@ -434,13 +433,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
             isSelected = not isSelected
             
             if isSelected then
-                -- Warna saat dipilih: Biru terang menyala ala tab aktif
+                -- Warna biru terang menyala ala tab aktif
                 itemRow.BackgroundColor3 = Color3.fromRGB(30, 58, 138)
                 itemRow.BackgroundTransparency = 0.2
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
-                -- Kembali ke warna normal saat dibatalkan
+                -- Kembali ke warna gelap normal
                 itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
                 itemRow.BackgroundTransparency = 0.6
                 itemRow.TextColor3 = Color3.fromRGB(210, 220, 240)
@@ -645,4 +644,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Multi-Select Highlight Blue UI Loaded Successfully!")
+print("ZedHub Clean Blue Highlight UI Loaded Successfully!")
