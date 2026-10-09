@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - EXTENDED MAIN UI HEIGHT (GROW A GARDEN)
+    ZEDHUB - CUSTOMIZED POP-UP DROPDOWN (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -60,7 +60,7 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 12
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Diperpanjang ke bawah menjadi 380 piksel, lebar tetap 520)
+-- Main Frame (Tinggi 380, Lebar 520)
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Standard ala Hiphub dengan Pop-up
+-- Dropdown Pop-up: Background Biru, Posisi Agak ke Kanan, Tanpa Tombol X, Teks Item Putih Terang & Besar
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -373,13 +373,13 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Pop-up Floating Overlay
+    -- Pop-up Floating Overlay: Background Biru, Sedikit Diperlebar (270) & Diperpanjang (260), Posisi Agak ke Kanan (0.58)
     local popupOverlay = Instance.new("Frame", ScreenGui)
-    popupOverlay.BackgroundColor3 = Color3.fromRGB(8, 12, 22)
-    popupOverlay.BackgroundTransparency = 0.15
-    popupOverlay.Size = UDim2.new(0, 240, 0, 210)
+    popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
+    popupOverlay.BackgroundTransparency = 0.1
+    popupOverlay.Size = UDim2.new(0, 270, 0, 260)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
-    popupOverlay.Position = UDim2.new(0.5, 0, 0.5, 0)
+    popupOverlay.Position = UDim2.new(0.58, 0, 0.5, 0)
     popupOverlay.Visible = false
     popupOverlay.ZIndex = 10
     Instance.new("UICorner", popupOverlay).CornerRadius = UDim.new(0, 8)
@@ -388,67 +388,59 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupStroke.Color = Color3.fromRGB(59, 130, 246)
     popupStroke.Thickness = 1.5
 
+    -- Header Pop-up (Tanpa tombol X)
     local popupHeader = Instance.new("Frame", popupOverlay)
-    popupHeader.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
-    popupHeader.Size = UDim2.new(1, 0, 0, 28)
+    popupHeader.BackgroundColor3 = Color3.fromRGB(20, 45, 90)
+    popupHeader.Size = UDim2.new(1, 0, 0, 30)
     popupHeader.ZIndex = 11
     Instance.new("UICorner", popupHeader).CornerRadius = UDim.new(0, 8)
 
     local popupTitle = Instance.new("TextLabel", popupHeader)
     popupTitle.BackgroundTransparency = 1
-    popupTitle.Position = UDim2.new(0, 10, 0, 0)
-    popupTitle.Size = UDim2.new(0, 160, 1, 0)
+    popupTitle.Position = UDim2.new(0, 12, 0, 0)
+    popupTitle.Size = UDim2.new(1, -20, 1, 0)
     popupTitle.Font = Enum.Font.GothamBold
     popupTitle.Text = "⚙️ " .. titleText
-    popupTitle.TextColor3 = Color3.fromRGB(240, 240, 255)
-    popupTitle.TextSize = 11
+    popupTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    popupTitle.TextSize = 12
     popupTitle.TextXAlignment = Enum.TextXAlignment.Left
     popupTitle.ZIndex = 12
 
-    local popupClose = Instance.new("TextButton", popupHeader)
-    popupClose.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
-    popupClose.Position = UDim2.new(1, -24, 0.5, -9)
-    popupClose.Size = UDim2.new(0, 18, 0, 18)
-    popupClose.Font = Enum.Font.GothamBold
-    popupClose.Text = "X"
-    popupClose.TextColor3 = Color3.fromRGB(255, 255, 255)
-    popupClose.TextSize = 9
-    popupClose.ZIndex = 12
-    Instance.new("UICorner", popupClose).CornerRadius = UDim.new(0, 4)
-
     local popupBody = Instance.new("Frame", popupOverlay)
     popupBody.BackgroundTransparency = 1
-    popupBody.Position = UDim2.new(0, 0, 0, 32)
-    popupBody.Size = UDim2.new(1, 0, 1, -32)
+    popupBody.Position = UDim2.new(0, 0, 0, 34)
+    popupBody.Size = UDim2.new(1, 0, 1, -34)
     popupBody.ZIndex = 11
 
     local pbLayout = Instance.new("UIListLayout", popupBody)
     pbLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    pbLayout.Padding = UDim.new(0, 4)
+    pbLayout.Padding = UDim.new(0, 5)
 
     local pbPadding = Instance.new("UIPadding", popupBody)
     pbPadding.PaddingTop = UDim.new(0, 4)
-    pbPadding.PaddingLeft = UDim.new(0, 6)
-    pbPadding.PaddingRight = UDim.new(0, 6)
-    pbPadding.PaddingBottom = UDim.new(0, 6)
+    pbPadding.PaddingLeft = UDim.new(0, 8)
+    pbPadding.PaddingRight = UDim.new(0, 8)
+    pbPadding.PaddingBottom = UDim.new(0, 8)
 
+    -- Kotak Search
     local searchBox = Instance.new("TextBox", popupBody)
-    searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
+    searchBox.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
     searchBox.BackgroundTransparency = 0.3
-    searchBox.Size = UDim2.new(1, 0, 0, 24)
+    searchBox.Size = UDim2.new(1, 0, 0, 26)
     searchBox.Font = Enum.Font.Gotham
     searchBox.PlaceholderText = "🔍 Search item..."
     searchBox.Text = ""
-    searchBox.TextColor3 = Color3.fromRGB(240, 240, 255)
-    searchBox.PlaceholderColor3 = Color3.fromRGB(120, 135, 160)
-    searchBox.TextSize = 11
+    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    searchBox.PlaceholderColor3 = Color3.fromRGB(160, 185, 220)
+    searchBox.TextSize = 11.5
     searchBox.ZIndex = 12
     Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
 
+    -- Scrolling List Container
     local listContainer = Instance.new("ScrollingFrame", popupBody)
     listContainer.BackgroundTransparency = 1
-    listContainer.Size = UDim2.new(1, 0, 0, 140)
-    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 26) + 10)
+    listContainer.Size = UDim2.new(1, 0, 0, 180)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 28) + 10)
     listContainer.ScrollBarThickness = 3
     listContainer.ZIndex = 12
 
@@ -461,14 +453,15 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        itemRow.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
-        itemRow.BackgroundTransparency = 0.5
-        itemRow.Size = UDim2.new(1, 0, 0, 23)
+        itemRow.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
+        itemRow.BackgroundTransparency = 0.4
+        itemRow.Size = UDim2.new(1, 0, 0, 25)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
-        itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
-        itemRow.TextSize = 11
+        -- Teks item warna putih terang dan diperbesar (12)
+        itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
+        itemRow.TextSize = 12
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         itemRow.ZIndex = 13
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
@@ -485,9 +478,9 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
-                itemRow.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
-                itemRow.BackgroundTransparency = 0.5
-                itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
+                itemRow.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
+                itemRow.BackgroundTransparency = 0.4
+                itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 for i, v in ipairs(selectedItems) do
                     if v == itemName then table.remove(selectedItems, i) end
                 end
@@ -516,7 +509,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 rowData.Btn.Visible = false
             end
         end
-        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 26) + 10)
+        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 28) + 10)
     end)
 
     local isListOpen = false
@@ -526,11 +519,19 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         dropArrow.Text = isListOpen and "▲" or "▼"
     end)
 
-    popupClose.MouseButton1Click:Connect(function()
-        isListOpen = false
-        popupOverlay.Visible = false
-        dropArrow.Text = "▼"
-        searchBox.Text = ""
+    -- Pop-up otomatis tertutup jika mengklik area bebas di luar pop-up (misalnya di MainFrame)
+    MainFrame.InputBegan:Connect(function(input)
+        if isListOpen and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            -- Beri sedikit jeda agar klik pada tombol dropdown sendiri tidak langsung menutup pop-up
+            task.delay(0.05, function()
+                if isListOpen then
+                    isListOpen = false
+                    popupOverlay.Visible = false
+                    dropArrow.Text = "▼"
+                    searchBox.Text = ""
+                end
+            end)
+        end
     end)
 
     return dropFrame
@@ -703,4 +704,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Main UI Extended Height Loaded Successfully!")
+print("ZedHub Custom Popup UI Loaded Successfully!")
