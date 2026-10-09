@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - CLEAN MULTI-SELECT BLUE HIGHLIGHT + SEARCH (GROW A GARDEN)
+    ZEDHUB - ENHANCED BLUE HIGHLIGHT & LARGER TEXT DROPDOWN (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Multi-Select + Search (Full Baris Berwarna Biru Saat Dipilih, TANPA CHECKBOX)
+-- Dropdown Multi-Select + Search (Teks lebih besar, warna item dipilih: Biru Terang & Teks Putih Terang)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -372,7 +372,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     local dropdownContent = Instance.new("Frame", dropFrame)
     dropdownContent.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     dropdownContent.BackgroundTransparency = 0.2
-    dropdownContent.Size = UDim2.new(1, -4, 0, 125)
+    dropdownContent.Size = UDim2.new(1, -4, 0, 135)
     dropdownContent.Visible = false
     Instance.new("UICorner", dropdownContent).CornerRadius = UDim.new(0, 4)
 
@@ -390,20 +390,20 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     local searchBox = Instance.new("TextBox", dropdownContent)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
     searchBox.BackgroundTransparency = 0.4
-    searchBox.Size = UDim2.new(1, 0, 0, 22)
+    searchBox.Size = UDim2.new(1, 0, 0, 24)
     searchBox.Font = Enum.Font.Gotham
     searchBox.PlaceholderText = "🔍 Search item..."
     searchBox.Text = ""
     searchBox.TextColor3 = Color3.fromRGB(240, 240, 255)
     searchBox.PlaceholderColor3 = Color3.fromRGB(120, 135, 160)
-    searchBox.TextSize = 10
+    searchBox.TextSize = 11
     Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 3)
 
     -- Scrolling List Container
     local listContainer = Instance.new("ScrollingFrame", dropdownContent)
     listContainer.BackgroundTransparency = 1
-    listContainer.Size = UDim2.new(1, 0, 0, 92)
-    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 24) + 10)
+    listContainer.Size = UDim2.new(1, 0, 0, 98)
+    listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 27) + 10)
     listContainer.ScrollBarThickness = 3
 
     local listLayout = Instance.new("UIListLayout", listContainer)
@@ -417,12 +417,15 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         local itemRow = Instance.new("TextButton", listContainer)
         itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
         itemRow.BackgroundTransparency = 0.6
-        itemRow.Size = UDim2.new(1, 0, 0, 21)
+        -- Ukuran tinggi baris item sedikit diperbesar agar pas dengan teks yang lebih besar
+        itemRow.Size = UDim2.new(1, 0, 0, 24)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamMedium
         itemRow.Text = "    " .. itemName
-        itemRow.TextColor3 = Color3.fromRGB(210, 220, 240)
-        itemRow.TextSize = 10
+        -- Teks awal warna abu-abu kebiruan terang
+        itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
+        -- Ukuran teks item diperbesar dari 10 menjadi 11.5 agar lebih jelas
+        itemRow.TextSize = 11.5
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
@@ -433,16 +436,16 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
             isSelected = not isSelected
             
             if isSelected then
-                -- Warna biru terang menyala ala tab aktif
-                itemRow.BackgroundColor3 = Color3.fromRGB(30, 58, 138)
-                itemRow.BackgroundTransparency = 0.2
+                -- Background Biru Terang & Teks Putih Terang saat dipilih
+                itemRow.BackgroundColor3 = Color3.fromRGB(37, 99, 235)
+                itemRow.BackgroundTransparency = 0.1
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
-                -- Kembali ke warna gelap normal
+                -- Kembali ke warna normal
                 itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
                 itemRow.BackgroundTransparency = 0.6
-                itemRow.TextColor3 = Color3.fromRGB(210, 220, 240)
+                itemRow.TextColor3 = Color3.fromRGB(200, 215, 240)
                 for i, v in ipairs(selectedItems) do
                     if v == itemName then table.remove(selectedItems, i) end
                 end
@@ -464,7 +467,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 rowData.Btn.Visible = false
             end
         end
-        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 24) + 10)
+        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 27) + 10)
     end)
 
     local isListOpen = false
@@ -644,4 +647,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Clean Blue Highlight UI Loaded Successfully!")
+print("ZedHub Enhanced Text & Highlight UI Loaded Successfully!")
