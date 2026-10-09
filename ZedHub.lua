@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ENLARGED & WIDER SELECTED LABEL UI (GROW A GARDEN)
+    ZEDHUB - WHITE TEXT TOGGLES UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -296,7 +296,7 @@ local function CreateAccordionSection(parent, titleText)
     return container
 end
 
--- Fungsi Toggle dengan Teks Diperbesar (13.5)
+-- Fungsi Toggle: Teks diubah menjadi PUTIH TERANG (Color3.fromRGB(255, 255, 255))
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -305,7 +305,7 @@ local function CreateToggle(parentSec, text, callback)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    " .. text
-    row.TextColor3 = Color3.fromRGB(220, 230, 250)
+    row.TextColor3 = Color3.fromRGB(255, 255, 255) -- Diubah jadi putih terang
     row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
@@ -337,7 +337,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up: Label Kiri Diperbesar, Area Kotak Selected di Kanan Diperlebar & Hurufnya Diperbesar
+-- Dropdown Pop-up
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -352,11 +352,10 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 14.5 -- Teks label kiri diperbesar maksimal
+    dropBtn.TextSize = 14.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
-    -- Kotak teks Selected di sebelah kanan (DIPERLEBAR ke 210 piksel dan font diperbesar ke 13.5)
     local summaryLabel = Instance.new("TextLabel", dropBtn)
     summaryLabel.BackgroundTransparency = 1
     summaryLabel.Position = UDim2.new(1, -230, 0, 0)
@@ -488,7 +487,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 end
             end
 
-            -- Format teks selected: 1 item tampilkan nama item, >1 item tampilkan jumlah item (2 Items, 3 Items, dst)
             if #selectedItems == 0 then
                 summaryLabel.Text = "[0 Selected]"
             elseif #selectedItems == 1 then
@@ -538,7 +536,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle dengan Teks Diperbesar (13.5)
+-- Fungsi Action Toggle: Teks diubah menjadi PUTIH TERANG (Color3.fromRGB(255, 255, 255))
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -547,7 +545,7 @@ local function CreateActionToggle(parentSec, text, callback)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
     row.Text = "    ⚡ " .. text
-    row.TextColor3 = Color3.fromRGB(234, 179, 8)
+    row.TextColor3 = Color3.fromRGB(255, 255, 255) -- Diubah jadi putih terang
     row.TextSize = 13.5
     row.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
@@ -706,4 +704,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Wider & Larger Selected Label UI Loaded Successfully!")
+print("ZedHub White Text Toggles UI Loaded Successfully!")
