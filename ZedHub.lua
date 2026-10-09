@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - UNIFORM CONTENT BACKGROUND UI (GROW A GARDEN)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME)
 ]]
 
 local Players = game:GetService("Players")
@@ -49,7 +49,7 @@ ScreenGui.Parent = PlayerGui
 local FloatingBtn = Instance.new("TextButton")
 FloatingBtn.Name = "FloatingBtn"
 FloatingBtn.Parent = ScreenGui
-FloatingBtn.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 FloatingBtn.BorderColor3 = Color3.fromRGB(59, 130, 246)
 FloatingBtn.BorderSizePixel = 1
 FloatingBtn.Position = UDim2.new(0, 15, 0, 15)
@@ -61,7 +61,7 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 13.5
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Tinggi 380, Lebar 520)
+-- Main Frame (Midnight Slate Dark Base)
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -73,8 +73,8 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Parent = MainFrame
-MainStroke.Color = Color3.fromRGB(51, 65, 85)
-MainStroke.Thickness = 1.2
+MainStroke.Color = Color3.fromRGB(59, 130, 246) -- Neon Blue Border
+MainStroke.Thickness = 1.5
 
 -- Top Bar
 local TopBar = Instance.new("Frame")
@@ -139,8 +139,8 @@ Body.Size = UDim2.new(1, 0, 1, -32)
 
 -- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
-Sidebar.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-Sidebar.BackgroundTransparency = 0.2
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+Sidebar.BackgroundTransparency = 0.5
 Sidebar.BorderSizePixel = 0
 Sidebar.Size = UDim2.new(0, 125, 1, 0)
 Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -165,14 +165,13 @@ UserTxt.TextSize = 10.5
 
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
-ContentHolder.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Background area kanan disamakan
-ContentHolder.BackgroundTransparency = 0.2
+ContentHolder.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
+ContentHolder.BackgroundTransparency = 1
 ContentHolder.BorderSizePixel = 0
 ContentHolder.Position = UDim2.new(0, 130, 0, 0)
 ContentHolder.Size = UDim2.new(1, -130, 1, 0)
-Instance.new("UICorner", ContentHolder).CornerRadius = UDim.new(0, 5)
 
--- Fungsi Tab dengan Teks Menu Sidebar Diperbesar (14)
+-- Fungsi Tab
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
@@ -243,15 +242,15 @@ local TabSettings = CreateTab("Settings")
 -- Fungsi Accordion Section
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
-    sec.BackgroundColor3 = Color3.fromRGB(3, 7, 18)
-    sec.BackgroundTransparency = 0.4
+    sec.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+    sec.BackgroundTransparency = 0.3
     sec.Size = UDim2.new(1, 0, 0, 0)
     sec.AutomaticSize = Enum.AutomaticSize.Y
     Instance.new("UICorner", sec).CornerRadius = UDim.new(0, 5)
     
     local stroke = Instance.new("UIStroke", sec)
     stroke.Color = Color3.fromRGB(59, 130, 246)
-    stroke.Transparency = 0.6
+    stroke.Transparency = 0.5
 
     local mainLayout = Instance.new("UIListLayout", sec)
     mainLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -303,8 +302,8 @@ end
 -- Fungsi Toggle Standar
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
-    row.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    row.BackgroundTransparency = 0.6
+    row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    row.BackgroundTransparency = 0.5
     row.Size = UDim2.new(1, 0, 0, 28)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
@@ -315,7 +314,7 @@ local function CreateToggle(parentSec, text, callback)
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local pill = Instance.new("Frame", row)
-    pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
     pill.Size = UDim2.new(0, 36, 0, 16)
     local pillCorner = Instance.new("UICorner", pill)
@@ -336,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             knob.Position = UDim2.new(1, -14, 0.5, -6)
         else
-            pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+            pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
             knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
             knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
@@ -348,7 +347,7 @@ end
 -- Dropdown Pop-up dengan List Lengkap
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
-    dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
+    dropFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     dropFrame.BackgroundTransparency = 0.5
     dropFrame.Size = UDim2.new(1, 0, 0, 32)
     Instance.new("UICorner", dropFrame).CornerRadius = UDim.new(0, 4)
@@ -384,8 +383,8 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextSize = 11
 
     local popupOverlay = Instance.new("Frame", ScreenGui)
-    popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 30, 65)
-    popupOverlay.BackgroundTransparency = 0.1
+    popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+    popupOverlay.BackgroundTransparency = 0.05
     popupOverlay.Size = UDim2.new(0, 285, 0, 275)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
     popupOverlay.Position = UDim2.new(0.69, 0, 0.55, 0)
@@ -398,7 +397,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupStroke.Thickness = 1.5
 
     local popupHeader = Instance.new("Frame", popupOverlay)
-    popupHeader.BackgroundColor3 = Color3.fromRGB(20, 45, 90)
+    popupHeader.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     popupHeader.Size = UDim2.new(1, 0, 0, 32)
     popupHeader.ZIndex = 11
     Instance.new("UICorner", popupHeader).CornerRadius = UDim.new(0, 8)
@@ -431,7 +430,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     pbPadding.PaddingBottom = UDim.new(0, 8)
 
     local searchBox = Instance.new("TextBox", popupBody)
-    searchBox.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
+    searchBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     searchBox.BackgroundTransparency = 0.3
     searchBox.Size = UDim2.new(1, 0, 0, 28)
     searchBox.Font = Enum.Font.Gotham
@@ -459,7 +458,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
-        itemRow.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
+        itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
         itemRow.BackgroundTransparency = 0.4
         itemRow.Size = UDim2.new(1, 0, 0, 28)
         itemRow.AutoButtonColor = false
@@ -478,12 +477,12 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
             isSelected = not isSelected
             
             if isSelected then
-                itemRow.BackgroundColor3 = Color3.fromRGB(37, 99, 235)
+                itemRow.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
                 itemRow.BackgroundTransparency = 0.1
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 table.insert(selectedItems, itemName)
             else
-                itemRow.BackgroundColor3 = Color3.fromRGB(25, 45, 85)
+                itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
                 itemRow.BackgroundTransparency = 0.4
                 itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
                 for i, v in ipairs(selectedItems) do
@@ -543,8 +542,8 @@ end
 -- Fungsi Action Toggle
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
-    row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
-    row.BackgroundTransparency = 0.3
+    row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    row.BackgroundTransparency = 0.5
     row.Size = UDim2.new(1, 0, 0, 28)
     row.AutoButtonColor = false
     row.Font = Enum.Font.GothamBold
@@ -555,7 +554,7 @@ local function CreateActionToggle(parentSec, text, callback)
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
 
     local pill = Instance.new("Frame", row)
-    pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+    pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
     pill.Size = UDim2.new(0, 36, 0, 16)
     local pillCorner = Instance.new("UICorner", pill)
@@ -576,7 +575,7 @@ local function CreateActionToggle(parentSec, text, callback)
             knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             knob.Position = UDim2.new(1, -14, 0.5, -6)
         else
-            pill.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
+            pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
             knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
             knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
@@ -637,7 +636,7 @@ end)
 
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
 local WebhookBox = Instance.new("TextBox", WebhookBody)
-WebhookBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+WebhookBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
 WebhookBox.Size = UDim2.new(1, 0, 0, 32)
 WebhookBox.Font = Enum.Font.Gotham
 WebhookBox.PlaceholderText = "URL Webhook Discord..."
@@ -653,7 +652,7 @@ ServerRow.BackgroundTransparency = 1
 ServerRow.Size = UDim2.new(1, 0, 0, 32)
 
 local ServerInput = Instance.new("TextBox", ServerRow)
-ServerInput.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
+ServerInput.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
 ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
 ServerInput.Font = Enum.Font.Gotham
 ServerInput.PlaceholderText = "2007"
@@ -711,4 +710,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Uniform Content Background Loaded Successfully!")
+print("ZedHub Premium Midnight Slate & Neon Blue Theme Loaded Successfully!")
