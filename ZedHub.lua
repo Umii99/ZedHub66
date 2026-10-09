@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - ENLARGED DROPDOWN LABEL & COUNT FORMAT UI (GROW A GARDEN)
+    ZEDHUB - FIXED & MAX ENLARGED TEXT UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -337,7 +337,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up: Teks Nama Dropdown (yang dilingkari) Diperbesar Maksimal (14.5) & Logika Multi-Item (2 items, 3 items)
+-- Dropdown Pop-up: Teks Nama Dropdown Diperbesar (14.5) & Logika Multi-Item (2 items, 3 items, dst)
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -352,7 +352,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 14.5 -- Bagian yang dilingkari diperbesar maksimal!
+    dropBtn.TextSize = 14.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
@@ -363,7 +363,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     summaryLabel.Font = Enum.Font.GothamBold
     summaryLabel.Text = "[0 Selected]"
     summaryLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
-    summaryLabel.TextSize = 13 -- Diperbesar agar jelas
+    summaryLabel.TextSize = 13
     summaryLabel.TextXAlignment = Enum.TextXAlignment.Right
 
     local dropArrow = Instance.new("TextLabel", dropBtn)
@@ -460,7 +460,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         itemRow.Size = UDim2.new(1, 0, 0, 28)
         itemRow.AutoButtonColor = false
         itemRow.Font = Enum.Font.GothamBold
-        itemRow.Text = "    " + itemName
         itemRow.Text = "    " .. itemName
         itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
         itemRow.TextSize = 14.5
@@ -488,7 +487,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 end
             end
 
-            -- Logika format teks: 1 item tampilkan nama, >1 item tampilkan jumlah (2 Items, 3 Items, dst)
             if #selectedItems == 0 then
                 summaryLabel.Text = "[0 Selected]"
             elseif #selectedItems == 1 then
@@ -538,7 +536,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle (Auto Buy, Auto Buy All, dll) dengan Teks Diperbesar (13.5)
+-- Fungsi Action Toggle dengan Teks Diperbesar (13.5)
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 27, 75)
@@ -706,4 +704,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Dropdown Label & Count Logic Updated Successfully!")
+print("ZedHub Fixed & Restored UI Loaded Successfully!")
