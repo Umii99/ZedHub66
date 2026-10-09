@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - HIPHUB EXACT STYLE POPUP DROPDOWN (GROW A GARDEN)
+    ZEDHUB - EXTENDED MAIN UI HEIGHT (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -60,14 +60,14 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 12
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Proporsi Hiphub: 520 x 310)
+-- Main Frame (Diperpanjang ke bawah menjadi 380 piksel, lebar tetap 520)
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 MainFrame.BorderSizePixel = 0
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.Size = UDim2.new(0, 520, 0, 310)
+MainFrame.Size = UDim2.new(0, 520, 0, 380)
 Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
@@ -335,7 +335,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Hiphub Exact Style: Floating Overlay Popup Menu
+-- Dropdown Standard ala Hiphub dengan Pop-up
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(10, 15, 30)
@@ -373,11 +373,11 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
     dropArrow.TextSize = 9
 
-    -- Pop-up Floating Overlay persis ala Hiphub di tengah/atas menu utama
+    -- Pop-up Floating Overlay
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(8, 12, 22)
     popupOverlay.BackgroundTransparency = 0.15
-    popupOverlay.Size = UDim2.new(0, 240, 0, 185)
+    popupOverlay.Size = UDim2.new(0, 240, 0, 210)
     popupOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
     popupOverlay.Position = UDim2.new(0.5, 0, 0.5, 0)
     popupOverlay.Visible = false
@@ -388,7 +388,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupStroke.Color = Color3.fromRGB(59, 130, 246)
     popupStroke.Thickness = 1.5
 
-    -- Header Pop-up (Judul & Tombol Close / Tab Mini ala Hiphub)
     local popupHeader = Instance.new("Frame", popupOverlay)
     popupHeader.BackgroundColor3 = Color3.fromRGB(20, 30, 50)
     popupHeader.Size = UDim2.new(1, 0, 0, 28)
@@ -417,7 +416,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupClose.ZIndex = 12
     Instance.new("UICorner", popupClose).CornerRadius = UDim.new(0, 4)
 
-    -- Container Konten di dalam Pop-up (Search Bar + List)
     local popupBody = Instance.new("Frame", popupOverlay)
     popupBody.BackgroundTransparency = 1
     popupBody.Position = UDim2.new(0, 0, 0, 32)
@@ -434,7 +432,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     pbPadding.PaddingRight = UDim.new(0, 6)
     pbPadding.PaddingBottom = UDim.new(0, 6)
 
-    -- Kotak Search di dalam Pop-up
     local searchBox = Instance.new("TextBox", popupBody)
     searchBox.BackgroundColor3 = Color3.fromRGB(25, 35, 60)
     searchBox.BackgroundTransparency = 0.3
@@ -448,10 +445,9 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     searchBox.ZIndex = 12
     Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
 
-    -- Scrolling List Container di dalam Pop-up
     local listContainer = Instance.new("ScrollingFrame", popupBody)
     listContainer.BackgroundTransparency = 1
-    listContainer.Size = UDim2.new(1, 0, 0, 118)
+    listContainer.Size = UDim2.new(1, 0, 0, 140)
     listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 26) + 10)
     listContainer.ScrollBarThickness = 3
     listContainer.ZIndex = 12
@@ -707,4 +703,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Hiphub Exact Style Popup Dropdown UI Loaded Successfully!")
+print("ZedHub Main UI Extended Height Loaded Successfully!")
