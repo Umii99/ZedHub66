@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - SIDEBAR BACKGROUND COLOR ADJUSTED UI (GROW A GARDEN)
+    ZEDHUB - UNIFORM CONTENT BACKGROUND UI (GROW A GARDEN)
 ]]
 
 local Players = game:GetService("Players")
@@ -137,9 +137,9 @@ Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 32)
 Body.Size = UDim2.new(1, 0, 1, -32)
 
--- Sidebar Kiri Utama (Background di area garis merah diubah menjadi Biru Terang)
+-- Sidebar Kiri Utama
 local Sidebar = Instance.new("ScrollingFrame", Body)
-Sidebar.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Diubah ke Biru Terang sesuai permintaan
+Sidebar.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
 Sidebar.BackgroundTransparency = 0.2
 Sidebar.BorderSizePixel = 0
 Sidebar.Size = UDim2.new(0, 125, 1, 0)
@@ -165,9 +165,12 @@ UserTxt.TextSize = 10.5
 
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
-ContentHolder.BackgroundTransparency = 1
+ContentHolder.BackgroundColor3 = Color3.fromRGB(59, 130, 246) -- Background area kanan disamakan
+ContentHolder.BackgroundTransparency = 0.2
+ContentHolder.BorderSizePixel = 0
 ContentHolder.Position = UDim2.new(0, 130, 0, 0)
 ContentHolder.Size = UDim2.new(1, -130, 1, 0)
+Instance.new("UICorner", ContentHolder).CornerRadius = UDim.new(0, 5)
 
 -- Fungsi Tab dengan Teks Menu Sidebar Diperbesar (14)
 local function CreateTab(tabName)
@@ -708,4 +711,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Sidebar Background Updated Successfully!")
+print("ZedHub Uniform Content Background Loaded Successfully!")
