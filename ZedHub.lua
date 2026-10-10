@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY: MAIN SHOP + FALL SHOP)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & SPEED HUB AUTO SELL)
 ]]
 
 local Players = game:GetService("Players")
@@ -20,7 +20,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (TERMASUK FALL MARKET & MAIN SHOP)
+-- CONFIGURATION STATE & ENABLED TABLE (SPEED HUB LOGIC)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -46,12 +46,15 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' agar sinkron dengan logika kode callback dropdown/toggle Fall Shop kamu
+-- Tabel 'enabled' persis seperti struktur Speed Hub
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
     ["Select Fall Market Cosmetic Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items,
     ["Select Fall Market Pet Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items,
+    ["Auto Sell"] = false,
+    ["Allow Sell If Backpack Is Max"] = false,
+    ["Delay To Sell Inventory"] = 1,
 }
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -641,10 +644,12 @@ CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHub
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
+    enabled["Allow Sell If Backpack Is Max"] = state
     getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
 end)
 
 CreateToggle(SecSell, "Auto Sell Fruit", function(state)
+    enabled["Auto Sell"] = state
     getgenv().ZedHubConfig.AutoSellFruit = state
 end)
 
@@ -688,38 +693,26 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & AUTO SELL (MAIN SHOPS & FALL MARKET)
+-- BACKEND LOOP (AUTO BUY + SPEED HUB AUTO SELL LOGIC)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
-
-            -- === AUTO SELL FRUIT LOGIC ===
-            if getgenv().ZedHubConfig.AutoSellFruit then
-                local shouldSell = false
-                local isMax = false
-                
-                if toolFunction and type(toolFunction.IsMaxInventory) == "function" then
-                    isMax = toolFunction.IsMaxInventory()
-                end
-
-                if not getgenv().ZedHubConfig.AllowSellIfBackpackFull then
-                    shouldSell = true
-                elseif isMax then
-                    shouldSell = true
-                end
-
-                if shouldSell then
+            -- === LOGIKA AUTO SELL SPEED HUB ===
+            if enabled["Auto Sell"] then
+                if not enabled["Allow Sell If Backpack Is Max"] then
                     if sellFunction and type(sellFunction.CallSell) == "function" then
                         sellFunction.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellEvent") then
-                        gameEvents.SellEvent:FireServer("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellFruit") then
-                        gameEvents.SellFruit:FireServer()
+                    end
+                elseif toolFunction and type(toolFunction.IsMaxInventory) == "function" and toolFunction.IsMaxInventory() then
+                    if sellFunction and type(sellFunction.CallSell) == "function" then
+                        sellFunction.CallSell("Auto Sell")
                     end
                 end
+                task.wait(tonumber(enabled["Delay To Sell Inventory"]) or 1)
             end
+
+            local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
             -- === 1. FALL MARKET AUTO BUY ===
             if getgenv().ZedHubConfig.FallMarketBuy.Active then
@@ -857,4 +850,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Market & Main Shop Auto Buy Loaded Successfully!")
+print("ZedHub Full Features Loaded Successfully!")
