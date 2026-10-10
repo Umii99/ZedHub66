@@ -605,7 +605,7 @@ local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
 
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 
 CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
@@ -686,46 +686,34 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY (MAIN SHOPS & FALL MARKET 4 SHOPS AUTO-SCAN)
+-- BACKEND LOOP AUTO BUY (MAIN SHOPS & FALL MARKET 4 SHOPS)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 1. FALL MARKET AUTO BUY (AUTO-SCAN UI LENGKAP + ANTI-TYPO) ===
+            -- === 1. FALL MARKET AUTO BUY ===
             if getgenv().ZedHubConfig.FallMarketBuy.Active then
-                pcall(function()
-                    local fallShops = {
-                        { SelectedList = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items, ShopName = "Fall Market Seed Shop", UIPath = PlayerGui:FindFirstChild("FallMarket_UI") and PlayerGui.FallMarket_UI.Frame:FindFirstChild("SeedShop") },
-                        { SelectedList = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items, ShopName = "Fall Market Gear Shop", UIPath = PlayerGui:FindFirstChild("FallMarket_UI") and PlayerGui.FallMarket_UI.Frame:FindFirstChild("GearShop") },
-                        { SelectedList = getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items, ShopName = "Fall Market Cosmetic Shop", UIPath = PlayerGui:FindFirstChild("FallMarket_UI") and PlayerGui.FallMarket_UI.Frame:FindFirstChild("CosmeticShop") },
-                        { SelectedList = getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items, ShopName = "Fall Market Pet Shop", UIPath = PlayerGui:FindFirstChild("FallMarket_UI") and PlayerGui.FallMarket_UI.Frame:FindFirstChild("PetShop") }
-                    }
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Seed Shop")
+                    task.wait(0.5)
+                end
 
-                    for _, shopInfo in ipairs(fallShops) do
-                        local itemsToBuy = {}
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Gear Shop")
+                    task.wait(0.5)
+                end
 
-                        -- Scan otomatis langsung dari UI game agar semua item terlist tanpa typo
-                        if shopInfo.UIPath and shopInfo.UIPath:FindFirstChild("ScrollingFrame") then
-                            for _, child in ipairs(shopInfo.UIPath.ScrollingFrame:GetChildren()) do
-                                if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
-                                    table.insert(itemsToBuy, child.Name)
-                                end
-                            end
-                        end
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Cosmetic Shop")
+                    task.wait(0.5)
+                end
 
-                        -- Fallback ke selected list jika UI tertutup
-                        if #itemsToBuy == 0 then
-                            itemsToBuy = shopInfo.SelectedList
-                        end
-
-                        for _, v_6 in ipairs(itemsToBuy) do
-                            gameEvents.BuyEventShopStock:FireServer(v_6, shopInfo.ShopName)
-                            task.wait(0.2)
-                        end
-                    end
-                end)
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Pet Shop")
+                    task.wait(0.5)
+                end
             end
 
             -- === 2. MAIN SHOP: SEEDS ===
