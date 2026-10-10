@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (AUTO BUY & AUTO BUY ALL FIXED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY: MAIN SHOP + FALL SHOP)
 ]]
 
 local Players = game:GetService("Players")
@@ -18,7 +18,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE
+-- CONFIGURATION STATE (TERMASUK FALL MARKET & MAIN SHOP)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -42,6 +42,14 @@ getgenv().ZedHubConfig = {
         MainSeed = { Active = false, BuyAll = false, Items = {} },
         MainGear = { Active = false, BuyAll = false, Items = {} }
     }
+}
+
+-- Tabel 'enabled' agar sinkron dengan logika kode callback dropdown/toggle Fall Shop kamu
+local enabled = {
+    ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
+    ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
+    ["Select Fall Market Cosmetic Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items,
+    ["Select Fall Market Pet Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items,
 }
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -77,7 +85,7 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Parent = MainFrame
-MainStroke.Color = Color3.fromRGB(59, 130, 246) -- Neon Blue Border
+MainStroke.Color = Color3.fromRGB(59, 130, 246)
 MainStroke.Thickness = 1.5
 
 -- Top Bar
@@ -678,25 +686,49 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY (PERBAIKAN DUA MODE: SELECTED & AUTO BUY ALL)
+-- BACKEND LOOP AUTO BUY (MAIN SHOPS & FALL MARKET 4 SHOPS)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- 1. AUTO BUY SEEDS
+            local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
+
+            -- === 1. FALL MARKET AUTO BUY ===
+            if getgenv().ZedHubConfig.FallMarketBuy.Active then
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Seed Shop")
+                    task.wait(0.5)
+                end
+
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Gear Shop")
+                    task.wait(0.5)
+                end
+
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Cosmetic Shop")
+                    task.wait(0.5)
+                end
+
+                for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items) do
+                    gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Pet Shop")
+                    task.wait(0.5)
+                end
+            end
+
+            -- === 2. MAIN SHOP: SEEDS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active then
                 for _, seedName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items) do
-                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName) or seedName
+                    local v_6 = getStock(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName)
                     if v_6 and gameEvents:FindFirstChild("BuySeedStock") then
                         gameEvents.BuySeedStock:FireServer("Shop", v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then
-                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", nil)
+                local v_6 = getStock(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", nil)
                 if v_6 and gameEvents:FindFirstChild("BuySeedStock") then
                     gameEvents.BuySeedStock:FireServer("Shop", v_6)
                 else
-                    -- Fallback: Beli seluruh item yang ada di scrolling frame UI
                     local scrollFrame = PlayerGui.Seed_Shop.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
                         if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
@@ -708,20 +740,19 @@ task.spawn(function()
                 end
             end
 
-            -- 2. AUTO BUY EGGS
+            -- === 3. MAIN SHOP: EGGS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active then
                 for _, eggName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items) do
-                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName) or eggName
+                    local v_6 = getStock(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName)
                     if v_6 and gameEvents:FindFirstChild("BuyPetEgg") then
                         gameEvents.BuyPetEgg:FireServer(v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then
-                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", nil)
+                local v_6 = getStock(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", nil)
                 if v_6 and gameEvents:FindFirstChild("BuyPetEgg") then
                     gameEvents.BuyPetEgg:FireServer(v_6)
                 else
-                    -- Fallback: Beli seluruh egg di scrolling frame UI
                     local scrollFrame = PlayerGui.PetShop_UI.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
                         if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
@@ -733,20 +764,19 @@ task.spawn(function()
                 end
             end
 
-            -- 3. AUTO BUY GEARS
+            -- === 4. MAIN SHOP: GEARS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainGear.Active then
                 for _, gearName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainGear.Items) do
-                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName) or gearName
+                    local v_6 = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName)
                     if v_6 and gameEvents:FindFirstChild("BuyGearStock") then
                         gameEvents.BuyGearStock:FireServer(v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then
-                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", nil)
+                local v_6 = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", nil)
                 if v_6 and gameEvents:FindFirstChild("BuyGearStock") then
                     gameEvents.BuyGearStock:FireServer(v_6)
                 else
-                    -- Fallback: Beli seluruh gear di scrolling frame UI
                     local scrollFrame = PlayerGui.Gear_Shop.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
                         if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
@@ -799,4 +829,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Premium Midnight Slate & Neon Blue Theme Loaded Successfully!")
+print("ZedHub Fall Market & Main Shop Auto Buy Loaded Successfully!")
