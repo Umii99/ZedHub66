@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & AUTO SELL INTEGRATED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY: MAIN SHOP + FALL SHOP)
 ]]
 
 local Players = game:GetService("Players")
@@ -12,15 +12,13 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- Ambil Referensi Game Events & Shop Module
 local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
 local shop = rawget(getgenv(), "shop") or {}
-local sellFunction = rawget(getgenv(), "sellFunction") or {}
-local toolFunction = rawget(getgenv(), "toolFunction") or {}
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (TERMASUK FALL MARKET, MAIN SHOP & AUTO SELL)
+-- CONFIGURATION STATE (TERMASUK FALL MARKET & MAIN SHOP)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -607,7 +605,7 @@ local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
 
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphofia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 
 CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
@@ -688,38 +686,12 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & AUTO SELL
+-- BACKEND LOOP AUTO BUY (MAIN SHOPS & FALL MARKET 4 SHOPS)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
-
-            -- === AUTO SELL FRUIT LOGIC ===
-            if getgenv().ZedHubConfig.AutoSellFruit then
-                local shouldSell = false
-                local isMax = false
-                
-                if toolFunction and type(toolFunction.IsMaxInventory) == "function" then
-                    isMax = toolFunction.IsMaxInventory()
-                end
-
-                if not getgenv().ZedHubConfig.AllowSellIfBackpackFull then
-                    shouldSell = true
-                elseif isMax then
-                    shouldSell = true
-                end
-
-                if shouldSell then
-                    if sellFunction and type(sellFunction.CallSell) == "function" then
-                        sellFunction.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellEvent") then
-                        gameEvents.SellEvent:FireServer()
-                    elseif gameEvents:FindFirstChild("SellFruit") then
-                        gameEvents.SellFruit:FireServer()
-                    end
-                end
-            end
 
             -- === 1. FALL MARKET AUTO BUY ===
             if getgenv().ZedHubConfig.FallMarketBuy.Active then
@@ -857,4 +829,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Full Features Loaded Successfully!")
+print("ZedHub Fall Market & Main Shop Auto Buy Loaded Successfully!") 
