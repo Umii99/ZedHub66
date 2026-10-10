@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (UI + FULL ZEDHUB INTEGRATION)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (WITH DEBUGGER)
 ]]
 
 local Players = game:GetService("Players")
@@ -73,7 +73,7 @@ Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Parent = MainFrame
-MainStroke.Color = Color3.fromRGB(59, 130, 246) -- Neon Blue Border
+MainStroke.Color = Color3.fromRGB(59, 130, 246)
 MainStroke.Thickness = 1.5
 
 -- Top Bar
@@ -344,7 +344,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up dengan List Lengkap
+-- Dropdown Pop-up dengan List Lengkap + Debug Print
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -498,6 +498,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
                 summaryLabel.Text = "[" .. #selectedItems .. " Items Selected]"
             end
             
+            print("[ZedHub Dropdown] Dipilih di " .. titleText .. ": " .. itemName)
             if onItemsChanged then onItemsChanged(selectedItems) end
         end)
     end
@@ -539,7 +540,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle
+-- Fungsi Action Toggle + Debug Print
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -579,6 +580,7 @@ local function CreateActionToggle(parentSec, text, callback)
             knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
             knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
+        print("[ZedHub Toggle] " .. text .. " status: " .. tostring(state))
         if callback then callback(state) end
     end)
     return row
@@ -674,7 +676,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- ENGINE LOGIKA PEMBELIAN (MENYATU KE UI ZEDHUB)
+-- ENGINE LOGIKA PEMBELIAN DENGAN PEMBACAAN UI ZEDHUB
 -- =========================================================================
 local function fn14(configPath, callback)
     task.spawn(function()
@@ -695,9 +697,11 @@ fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active end, f
     local items = getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items
     local selectedItem = #items > 0 and items[#items] or ""
     
-    local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-    if v_6 then
-        gameEvents.BuySeedStock:FireServer("Shop", v_6)
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuySeedStock:FireServer("Shop", v_6)
+        end
     end
 end)
 
@@ -719,9 +723,11 @@ fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active end, fu
     local items = getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items
     local selectedItem = #items > 0 and items[#items] or ""
     
-    local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", selectedItem)
-    if v_6 then
-        gameEvents.BuyPetEgg:FireServer(v_6)
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuyPetEgg:FireServer(v_6)
+        end
     end
     task.wait(0.5)
 end)
@@ -744,9 +750,11 @@ fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.Active end, f
     local items = getgenv().ZedHubConfig.MainShopBuy.MainGear.Items
     local selectedItem = #items > 0 and items[#items] or ""
     
-    local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-    if v_6 then
-        gameEvents.BuyGearStock:FireServer(v_6)
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuyGearStock:FireServer(v_6)
+        end
     end
 end)
 
@@ -799,4 +807,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub UI & Features Integrated Successfully!")
+print("ZedHub Debug Version Loaded Successfully!")
