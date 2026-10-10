@@ -1,13 +1,19 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME + INTEGRATED LOGIC)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME + AUTO BUY INTEGRATION)
 ]]
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local playerGui = PlayerGui
+
+-- Ambil Referensi Remote Events & Shop Module (Sesuaikan path game jika diperlukan)
+local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
+local shop = {} -- Placeholder atau modul asli game kamu jika ada
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
@@ -523,19 +529,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         dropArrow.Text = isListOpen and "▲" or "▼"
     end)
 
-    MainFrame.InputBegan:Connect(function(input)
-        if isListOpen and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            task.delay(0.05, function()
-                if isListOpen then
-                    isListOpen = false
-                    popupOverlay.Visible = false
-                    dropArrow.Text = "▼"
-                    searchBox.Text = ""
-                end
-            end)
-        end
-    end)
-
     return dropFrame
 end
 
@@ -585,200 +578,76 @@ local function CreateActionToggle(parentSec, text, callback)
 end
 
 -- === TAB EVENT & SHOP ===
-local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST")
-CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
-CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
-
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
-
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
 
-local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
-CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
-    if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
-end)
-CreateToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
-
-local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
-CreateToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
-
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
-CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
 CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
 CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
 
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED")
-CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Corn", "Pumpkin"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
 CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
 CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
-CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Godly Sprinkler", "Master Sprinkler"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
 CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
-
--- === TAB AUTO SELLING ===
-local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
-
-CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
-    getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
-end)
-
-CreateToggle(SecSell, "Auto Sell Fruit", function(state)
-    getgenv().ZedHubConfig.AutoSellFruit = state
-end)
-
-local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
-local WebhookBox = Instance.new("TextBox", WebhookBody)
-WebhookBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-WebhookBox.Size = UDim2.new(1, 0, 0, 32)
-WebhookBox.Font = Enum.Font.Gotham
-WebhookBox.PlaceholderText = "URL Webhook Discord..."
-WebhookBox.Text = ""
-WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
-WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-WebhookBox.TextSize = 13
-Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
-
-local ServerBody = CreateAccordionSection(TabInfo, "SERVER")
-local ServerRow = Instance.new("Frame", ServerBody)
-ServerRow.BackgroundTransparency = 1
-ServerRow.Size = UDim2.new(1, 0, 0, 32)
-
-local ServerInput = Instance.new("TextBox", ServerRow)
-ServerInput.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
-ServerInput.Font = Enum.Font.Gotham
-ServerInput.PlaceholderText = "2007"
-ServerInput.Text = ""
-ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
-ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize = 13
-Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
-
-local ClickBtn = Instance.new("TextButton", ServerRow)
-ClickBtn.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-ClickBtn.Position = UDim2.new(0.71, 0, 0, 0)
-ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
-ClickBtn.Font = Enum.Font.GothamBold
-ClickBtn.Text = "Click"
-ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ClickBtn.TextSize = 13
-Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
-
-
--- =========================================================================
--- ENGINE LOGIKA PEMBELIAN (TERINTEGRASI DENGAN ZedHubConfig)
--- =========================================================================
-local function fn14(conditionFunc, callback)
-    task.spawn(function()
-        while task.wait(0.3) do
-            pcall(function()
-                if conditionFunc() then
-                    callback()
+-- === LOOP EKSEKUSHI AUTO BUY (BACKEND LOGIC) ===
+task.spawn(function()
+    while task.wait(0.5) do
+        pcall(function()
+            -- 1. Auto Buy Main Seeds
+            if getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active then
+                for _, seedName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items) do
+                    local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName)
+                    if stockItem and gameEvents:FindFirstChild("BuySeedStock") then
+                        gameEvents.BuySeedStock:FireServer("Shop", stockItem)
+                    end
                 end
-            end)
-        end
-    end)
-end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then
+                local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", "no")
+                if stockItem and gameEvents:FindFirstChild("BuySeedStock") then
+                    gameEvents.BuySeedStock:FireServer("Shop", stockItem)
+                end
+            end
 
--- 1. Auto Buy (Selected) & Auto Buy All Seeds
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuySeedStock:FireServer("Shop", v_6)
-        end
+            -- 2. Auto Buy Main Eggs
+            if getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active then
+                for _, eggName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items) do
+                    local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName)
+                    if stockItem and gameEvents:FindFirstChild("BuyPetEgg") then
+                        gameEvents.BuyPetEgg:FireServer(stockItem)
+                    end
+                end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then
+                local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", "no")
+                if stockItem and gameEvents:FindFirstChild("BuyPetEgg") then
+                    gameEvents.BuyPetEgg:FireServer(stockItem)
+                end
+            end
+
+            -- 3. Auto Buy Main Gears
+            if getgenv().ZedHubConfig.MainShopBuy.MainGear.Active then
+                for _, gearName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainGear.Items) do
+                    local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName)
+                    if stockItem and gameEvents:FindFirstChild("BuyGearStock") then
+                        gameEvents.BuyGearStock:FireServer(stockItem)
+                    end
+                end
+            elseif getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then
+                local stockItem = shop.GetStockGeneric and shop.GetStockGeneric(playerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", "no")
+                if stockItem and gameEvents:FindFirstChild("BuyGearStock") then
+                    gameEvents.BuyGearStock:FireServer(stockItem)
+                end
+            end
+        end)
     end
 end)
-
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local seedList = {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}
-    
-    for _, itemName in ipairs(seedList) do
-        if not getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then break end
-        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", itemName)
-        if v_6 then
-            gameEvents.BuySeedStock:FireServer("Shop", v_6)
-            task.wait(0.1)
-        end
-    end
-end)
-
--- 2. Auto Buy (Selected) & Auto Buy All Eggs
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuyPetEgg:FireServer(v_6)
-        end
-    end
-    task.wait(0.5)
-end)
-
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local eggList = {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}
-    
-    for _, itemName in ipairs(eggList) do
-        if not getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then break end
-        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", itemName)
-        if v_6 then
-            gameEvents.BuyPetEgg:FireServer(v_6)
-            task.wait(0.1)
-        end
-    end
-end)
-
--- 3. Auto Buy (Selected) & Auto Buy All Gears
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.Active end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainGear.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuyGearStock:FireServer(v_6)
-        end
-    end
-end)
-
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll end, function()
-    local shop = require(ReplicatedStorage.Modules.Shop)
-    local gameEvents = ReplicatedStorage.GameEvents
-    local gearList = {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}
-    
-    for _, itemName in ipairs(gearList) do
-        if not getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then break end
-        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", itemName)
-        if v_6 then
-            gameEvents.BuyGearStock:FireServer(v_6)
-            task.wait(0.1)
-        end
-    end
-end)
-
 
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
@@ -795,26 +664,4 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-local dragging, dragStart, startPos
-TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
-print("ZedHub Premium Midnight Slate & Neon Blue Theme + Full Shop Logic Loaded Successfully!")
+print("ZedHub UI + Auto Buy Integrated Successfully!")
