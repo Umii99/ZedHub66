@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME + WORKING AUTO BUY)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (AUTO BUY & AUTO BUY ALL FIXED)
 ]]
 
 local Players = game:GetService("Players")
@@ -622,7 +622,6 @@ CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
--- Trowel dan Watering Can telah ditambahkan ke Shop Gear List di bawah ini:
 CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Trowel", "Watering Can", "Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
 CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
@@ -679,55 +678,83 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY (MAIN SHOP: SEED, EGG, GEAR)
+-- BACKEND LOOP AUTO BUY (PERBAIKAN DUA MODE: SELECTED & AUTO BUY ALL)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
-
-            -- 1. Auto Buy Seeds
+            -- 1. AUTO BUY SEEDS
             if getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active then
                 for _, seedName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items) do
-                    local stockItem = getStock(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName)
-                    if stockItem and gameEvents:FindFirstChild("BuySeedStock") then
-                        gameEvents.BuySeedStock:FireServer("Shop", stockItem)
+                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName) or seedName
+                    if v_6 and gameEvents:FindFirstChild("BuySeedStock") then
+                        gameEvents.BuySeedStock:FireServer("Shop", v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then
-                local stockItem = getStock(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", "no")
-                if stockItem and gameEvents:FindFirstChild("BuySeedStock") then
-                    gameEvents.BuySeedStock:FireServer("Shop", stockItem)
+                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", nil)
+                if v_6 and gameEvents:FindFirstChild("BuySeedStock") then
+                    gameEvents.BuySeedStock:FireServer("Shop", v_6)
+                else
+                    -- Fallback: Beli seluruh item yang ada di scrolling frame UI
+                    local scrollFrame = PlayerGui.Seed_Shop.Frame.ScrollingFrame
+                    for _, child in ipairs(scrollFrame:GetChildren()) do
+                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
+                            if gameEvents:FindFirstChild("BuySeedStock") then
+                                gameEvents.BuySeedStock:FireServer("Shop", child.Name)
+                            end
+                        end
+                    end
                 end
             end
 
-            -- 2. Auto Buy Eggs
+            -- 2. AUTO BUY EGGS
             if getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active then
                 for _, eggName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items) do
-                    local stockItem = getStock(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName)
-                    if stockItem and gameEvents:FindFirstChild("BuyPetEgg") then
-                        gameEvents.BuyPetEgg:FireServer(stockItem)
+                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName) or eggName
+                    if v_6 and gameEvents:FindFirstChild("BuyPetEgg") then
+                        gameEvents.BuyPetEgg:FireServer(v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then
-                local stockItem = getStock(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", "no")
-                if stockItem and gameEvents:FindFirstChild("BuyPetEgg") then
-                    gameEvents.BuyPetEgg:FireServer(stockItem)
+                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", nil)
+                if v_6 and gameEvents:FindFirstChild("BuyPetEgg") then
+                    gameEvents.BuyPetEgg:FireServer(v_6)
+                else
+                    -- Fallback: Beli seluruh egg di scrolling frame UI
+                    local scrollFrame = PlayerGui.PetShop_UI.Frame.ScrollingFrame
+                    for _, child in ipairs(scrollFrame:GetChildren()) do
+                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
+                            if gameEvents:FindFirstChild("BuyPetEgg") then
+                                gameEvents.BuyPetEgg:FireServer(child.Name)
+                            end
+                        end
+                    end
                 end
             end
 
-            -- 3. Auto Buy Gears
+            -- 3. AUTO BUY GEARS
             if getgenv().ZedHubConfig.MainShopBuy.MainGear.Active then
                 for _, gearName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainGear.Items) do
-                    local stockItem = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName)
-                    if stockItem and gameEvents:FindFirstChild("BuyGearStock") then
-                        gameEvents.BuyGearStock:FireServer(stockItem)
+                    local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName) or gearName
+                    if v_6 and gameEvents:FindFirstChild("BuyGearStock") then
+                        gameEvents.BuyGearStock:FireServer(v_6)
                     end
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then
-                local stockItem = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", "no")
-                if stockItem and gameEvents:FindFirstChild("BuyGearStock") then
-                    gameEvents.BuyGearStock:FireServer(stockItem)
+                local v_6 = shop.GetStockGeneric and shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", nil)
+                if v_6 and gameEvents:FindFirstChild("BuyGearStock") then
+                    gameEvents.BuyGearStock:FireServer(v_6)
+                else
+                    -- Fallback: Beli seluruh gear di scrolling frame UI
+                    local scrollFrame = PlayerGui.Gear_Shop.Frame.ScrollingFrame
+                    for _, child in ipairs(scrollFrame:GetChildren()) do
+                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
+                            if gameEvents:FindFirstChild("BuyGearStock") then
+                                gameEvents.BuyGearStock:FireServer(child.Name)
+                            end
+                        end
+                    end
                 end
             end
         end)
