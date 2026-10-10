@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & AUTO SELL)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & AUTO SELL INTEGRATED)
 ]]
 
 local Players = game:GetService("Players")
@@ -20,7 +20,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (TERMASUK AUTO SELL & BACKPACK CHECK)
+-- CONFIGURATION STATE (TERMASUK FALL MARKET, MAIN SHOP & AUTO SELL)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -695,17 +695,29 @@ task.spawn(function()
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === AUTO SELL FRUIT ===
+            -- === AUTO SELL FRUIT LOGIC ===
             if getgenv().ZedHubConfig.AutoSellFruit then
                 local shouldSell = false
+                local isMax = false
+                
+                if toolFunction and type(toolFunction.IsMaxInventory) == "function" then
+                    isMax = toolFunction.IsMaxInventory()
+                end
+
                 if not getgenv().ZedHubConfig.AllowSellIfBackpackFull then
                     shouldSell = true
-                elseif toolFunction.IsMaxInventory and toolFunction.IsMaxInventory() then
+                elseif isMax then
                     shouldSell = true
                 end
 
-                if shouldSell and sellFunction.CallSell then
-                    sellFunction.CallSell("Auto Sell")
+                if shouldSell then
+                    if sellFunction and type(sellFunction.CallSell) == "function" then
+                        sellFunction.CallSell("Auto Sell")
+                    elseif gameEvents:FindFirstChild("SellEvent") then
+                        gameEvents.SellEvent:FireServer()
+                    elseif gameEvents:FindFirstChild("SellFruit") then
+                        gameEvents.SellFruit:FireServer()
+                    end
                 end
             end
 
