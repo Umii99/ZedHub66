@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + AUTO SELL INTEGRATED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + AUTO SELL SPEED HUB INTEGRATED)
 ]]
 
 local Players = game:GetService("Players")
@@ -686,33 +686,23 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & AUTO SELL (TERINTEGRASI 100% WORK)
+-- BACKEND LOOP AUTO BUY & AUTO SELL (SPEED HUB LOGIC INTEGRATED)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 0. AUTO SELL FRUIT (DARI SPEED HUB) ===
+            -- === 0. AUTO SELL FRUIT (SPEED HUB LOGIC) ===
             if getgenv().ZedHubConfig.AutoSellFruit then
-                local allowSell = getgenv().ZedHubConfig.AllowSellIfBackpackFull
-                local canSell = false
-
-                -- Mengecek fungsi cek inventory penuh jika ada, atau langsung eksekusi jika logic terpenuhi
-                local toolFunc = rawget(getgenv(), "toolFunction")
                 local sellFunc = rawget(getgenv(), "sellFunction")
-
-                if not allowSell then
-                    canSell = true
-                elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
-                    canSell = true
-                end
-
-                if canSell then
-                    if sellFunc and sellFunc.CallSell then
+                local toolFunc = rawget(getgenv(), "toolFunction")
+                
+                if sellFunc and sellFunc.CallSell then
+                    if not getgenv().ZedHubConfig.AllowSellIfBackpackFull then
                         sellFunc.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellFruit") then
-                        gameEvents.SellFruit:FireServer()
+                    elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
+                        sellFunc.CallSell("Auto Sell")
                     end
                 end
             end
@@ -798,7 +788,7 @@ task.spawn(function()
                 end
             elseif getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then
                 local v_6 = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", nil)
-                if v_6 and gameEvents:FindFirstChild("BuyGearStatus") then
+                if v_6 and gameEvents:FindFirstChild("BuyGearStock") then
                     gameEvents.BuyGearStock:FireServer(v_6)
                 else
                     local scrollFrame = PlayerGui.Gear_Shop.Frame.ScrollingFrame
@@ -853,4 +843,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Market, Main Shop & Auto Sell Fruit Loaded Successfully!")
+print("ZedHub Fall Market, Main Shop & Auto Sell Integrated Successfully!")
