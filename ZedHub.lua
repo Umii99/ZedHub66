@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (PREMIUM THEME + INTEGRATED LOGIC)
 ]]
 
 local Players = game:GetService("Players")
@@ -673,6 +673,113 @@ ClickBtn.TextSize = 13
 Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
+-- =========================================================================
+-- ENGINE LOGIKA PEMBELIAN (TERINTEGRASI DENGAN ZedHubConfig)
+-- =========================================================================
+local function fn14(conditionFunc, callback)
+    task.spawn(function()
+        while task.wait(0.3) do
+            pcall(function()
+                if conditionFunc() then
+                    callback()
+                end
+            end)
+        end
+    end)
+end
+
+-- 1. Auto Buy (Selected) & Auto Buy All Seeds
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local items = getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items
+    local selectedItem = #items > 0 and items[#items] or ""
+    
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuySeedStock:FireServer("Shop", v_6)
+        end
+    end
+end)
+
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local seedList = {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}
+    
+    for _, itemName in ipairs(seedList) do
+        if not getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll then break end
+        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", itemName)
+        if v_6 then
+            gameEvents.BuySeedStock:FireServer("Shop", v_6)
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- 2. Auto Buy (Selected) & Auto Buy All Eggs
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local items = getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items
+    local selectedItem = #items > 0 and items[#items] or ""
+    
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuyPetEgg:FireServer(v_6)
+        end
+    end
+    task.wait(0.5)
+end)
+
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local eggList = {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}
+    
+    for _, itemName in ipairs(eggList) do
+        if not getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll then break end
+        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", itemName)
+        if v_6 then
+            gameEvents.BuyPetEgg:FireServer(v_6)
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- 3. Auto Buy (Selected) & Auto Buy All Gears
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.Active end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local items = getgenv().ZedHubConfig.MainShopBuy.MainGear.Items
+    local selectedItem = #items > 0 and items[#items] or ""
+    
+    if selectedItem ~= "" then
+        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
+        if v_6 then
+            gameEvents.BuyGearStock:FireServer(v_6)
+        end
+    end
+end)
+
+fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll end, function()
+    local shop = require(ReplicatedStorage.Modules.Shop)
+    local gameEvents = ReplicatedStorage.GameEvents
+    local gearList = {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}
+    
+    for _, itemName in ipairs(gearList) do
+        if not getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll then break end
+        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", itemName)
+        if v_6 then
+            gameEvents.BuyGearStock:FireServer(v_6)
+            task.wait(0.1)
+        end
+    end
+end)
+
+
 -- === KONTROL JENDELA (Minimize, Close, Draggable) ===
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
@@ -710,4 +817,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Premium Midnight Slate & Neon Blue Theme Loaded Successfully!")
+print("ZedHub Premium Midnight Slate & Neon Blue Theme + Full Shop Logic Loaded Successfully!")
