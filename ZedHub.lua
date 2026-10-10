@@ -1,10 +1,11 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (WITH DEBUGGER)
+    ZEDHUB - FULL INTEGRATION WITH TABLE tbl2.Enabled
 ]]
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -13,32 +14,15 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
 end
 
--- =========================================================================
--- CONFIGURATION STATE
--- =========================================================================
-getgenv().ZedHubConfig = {
-    AutoCollect = false,
-    AutoSubmit = false,
-    GiveASeed = false,
-    AutoShovel = false,
-    ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AllowSellIfBackpackFull = false,
-    AutoSellFruit = false,
-    
-    FallMarketBuy = {
-        Active = false,
-        FallGear = { Items = {} },
-        FallSeed = { Items = {} },
-        FallPets = { Items = {} },
-        FallCrate = { Items = {} }
-    },
-    
-    MainShopBuy = {
-        MainEgg = { Active = false, BuyAll = false, Items = {} },
-        MainSeed = { Active = false, BuyAll = false, Items = {} },
-        MainGear = { Active = false, BuyAll = false, Items = {} }
-    }
+-- Pastikan tbl2 sudah tersedia dari script utama
+getgenv().tbl2 = getgenv().tbl2 or {
+    Module = {},
+    Cached = { JSON = {} },
+    Stored = {},
+    Enabled = {}
 }
+
+local enabled = getgenv().tbl2.Enabled
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZedHubStrictUI"
@@ -95,18 +79,6 @@ Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 13
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- FPS Label di Top Bar
-local FPSLabel = Instance.new("TextLabel")
-FPSLabel.Parent = TopBar
-FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-FPSLabel.Position = UDim2.new(1, -115, 0.5, -10)
-FPSLabel.Size = UDim2.new(0, 48, 0, 20)
-FPSLabel.Font = Enum.Font.GothamMedium
-FPSLabel.Text = "60 FPS"
-FPSLabel.TextColor3 = Color3.fromRGB(148, 163, 184)
-FPSLabel.TextSize = 11
-Instance.new("UICorner", FPSLabel).CornerRadius = UDim.new(0, 4)
-
 -- Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
@@ -149,20 +121,6 @@ local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SBLayout.Padding = UDim.new(0, 3)
 
--- User Profile Box di Bawah Sidebar
-local UserBox = Instance.new("Frame", Sidebar)
-UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-UserBox.Size = UDim2.new(1, -6, 0, 38)
-UserBox.Position = UDim2.new(0, 3, 0, 210)
-Instance.new("UICorner", UserBox).CornerRadius = UDim.new(0, 5)
-local UserTxt = Instance.new("TextLabel", UserBox)
-UserTxt.BackgroundTransparency = 1
-UserTxt.Size = UDim2.new(1, 0, 1, 0)
-UserTxt.Font = Enum.Font.GothamBold
-UserTxt.Text = "  👤 user_123\n  💎 Premium"
-UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
-UserTxt.TextSize = 10.5
-
 -- Content Holder Kanan
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -177,7 +135,7 @@ local function CreateTab(tabName)
     Page.Name = tabName .. "Page"
     Page.BackgroundTransparency = 1
     Page.Size = UDim2.new(1, -8, 1, 0)
-    Page.CanvasSize = UDim2.new(0, 0, 0, 2500)
+    Page.CanvasSize = UDim2.new(0, 0, 0, 2000)
     Page.ScrollBarThickness = 3
     Page.Visible = false
 
@@ -233,11 +191,9 @@ local function CreateTab(tabName)
     return Page
 end
 
-local TabInfo = CreateTab("Info")
 local TabEvent = CreateTab("Event")
 local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
-local TabSettings = CreateTab("Settings")
 
 -- Fungsi Accordion Section
 local function CreateAccordionSection(parent, titleText)
@@ -265,15 +221,6 @@ local function CreateAccordionSection(parent, titleText)
     headerBtn.TextSize = 15
     headerBtn.TextXAlignment = Enum.TextXAlignment.Left
 
-    local chevron = Instance.new("TextLabel", headerBtn)
-    chevron.BackgroundTransparency = 1
-    chevron.Position = UDim2.new(1, -22, 0, 0)
-    chevron.Size = UDim2.new(0, 18, 1, 0)
-    chevron.Font = Enum.Font.GothamBold
-    chevron.Text = "▲"
-    chevron.TextColor3 = Color3.fromRGB(147, 197, 253)
-    chevron.TextSize = 12
-
     local container = Instance.new("Frame", sec)
     container.BackgroundTransparency = 1
     container.Size = UDim2.new(1, 0, 0, 0)
@@ -293,14 +240,13 @@ local function CreateAccordionSection(parent, titleText)
     headerBtn.MouseButton1Click:Connect(function()
         isOpen = not isOpen
         container.Visible = isOpen
-        chevron.Text = isOpen and "▲" or "▼"
     end)
 
     return container
 end
 
--- Fungsi Toggle Standar
-local function CreateToggle(parentSec, text, callback)
+-- Fungsi Toggle Standar (Menghubungkan ke tbl2.Enabled)
+local function CreateToggle(parentSec, text, enabledKey)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
     row.BackgroundTransparency = 0.5
@@ -317,15 +263,13 @@ local function CreateToggle(parentSec, text, callback)
     pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     pill.Position = UDim2.new(1, -42, 0.5, -8)
     pill.Size = UDim2.new(0, 36, 0, 16)
-    local pillCorner = Instance.new("UICorner", pill)
-    pillCorner.CornerRadius = UDim.new(1, 0)
+    Instance.new("UICorner", pill).CornerRadius = UDim.new(1, 0)
 
     local knob = Instance.new("Frame", pill)
     knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
     knob.Position = UDim2.new(0, 2, 0.5, -6)
     knob.Size = UDim2.new(0, 12, 0, 12)
-    local knobCorner = Instance.new("UICorner", knob)
-    knobCorner.CornerRadius = UDim.new(1, 0)
+    Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
 
     local state = false
     row.MouseButton1Click:Connect(function()
@@ -339,13 +283,15 @@ local function CreateToggle(parentSec, text, callback)
             knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
             knob.Position = UDim2.new(0, 2, 0.5, -6)
         end
-        if callback then callback(state) end
+        if enabledKey then
+            enabled[enabledKey] = state
+        end
     end)
     return row
 end
 
--- Dropdown Pop-up dengan List Lengkap + Debug Print
-local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
+-- Dropdown Pop-up (Menghubungkan langsung ke enabledKey asli)
+local function CreateSelectedDropdown(parentSec, titleText, itemsTable, enabledKey)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
     dropFrame.BackgroundTransparency = 0.5
@@ -359,28 +305,19 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     dropBtn.Font = Enum.Font.GothamBold
     dropBtn.Text = "  📂 " .. titleText
     dropBtn.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropBtn.TextSize = 14.5
+    dropBtn.TextSize = 13.5
     dropBtn.TextXAlignment = Enum.TextXAlignment.Left
     Instance.new("UICorner", dropBtn).CornerRadius = UDim.new(0, 4)
 
     local summaryLabel = Instance.new("TextLabel", dropBtn)
     summaryLabel.BackgroundTransparency = 1
-    summaryLabel.Position = UDim2.new(1, -230, 0, 0)
-    summaryLabel.Size = UDim2.new(0, 210, 1, 0)
+    summaryLabel.Position = UDim2.new(1, -210, 0, 0)
+    summaryLabel.Size = UDim2.new(0, 190, 1, 0)
     summaryLabel.Font = Enum.Font.GothamBold
-    summaryLabel.Text = "[0 Selected]"
+    summaryLabel.Text = "[Pilih Item]"
     summaryLabel.TextColor3 = Color3.fromRGB(96, 165, 250)
-    summaryLabel.TextSize = 13.5
+    summaryLabel.TextSize = 12
     summaryLabel.TextXAlignment = Enum.TextXAlignment.Right
-
-    local dropArrow = Instance.new("TextLabel", dropBtn)
-    dropArrow.BackgroundTransparency = 1
-    dropArrow.Position = UDim2.new(1, -20, 0, 0)
-    dropArrow.Size = UDim2.new(0, 15, 1, 0)
-    dropArrow.Font = Enum.Font.GothamBold
-    dropArrow.Text = "▼"
-    dropArrow.TextColor3 = Color3.fromRGB(147, 197, 253)
-    dropArrow.TextSize = 11
 
     local popupOverlay = Instance.new("Frame", ScreenGui)
     popupOverlay.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -391,10 +328,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     popupOverlay.Visible = false
     popupOverlay.ZIndex = 10
     Instance.new("UICorner", popupOverlay).CornerRadius = UDim.new(0, 8)
-
-    local popupStroke = Instance.new("UIStroke", popupOverlay)
-    popupStroke.Color = Color3.fromRGB(59, 130, 246)
-    popupStroke.Thickness = 1.5
+    Instance.new("UIStroke", popupOverlay).Color = Color3.fromRGB(59, 130, 246)
 
     local popupHeader = Instance.new("Frame", popupOverlay)
     popupHeader.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -423,38 +357,15 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     pbLayout.SortOrder = Enum.SortOrder.LayoutOrder
     pbLayout.Padding = UDim.new(0, 5)
 
-    local pbPadding = Instance.new("UIPadding", popupBody)
-    pbPadding.PaddingTop = UDim.new(0, 4)
-    pbPadding.PaddingLeft = UDim.new(0, 8)
-    pbPadding.PaddingRight = UDim.new(0, 8)
-    pbPadding.PaddingBottom = UDim.new(0, 8)
-
-    local searchBox = Instance.new("TextBox", popupBody)
-    searchBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    searchBox.BackgroundTransparency = 0.3
-    searchBox.Size = UDim2.new(1, 0, 0, 28)
-    searchBox.Font = Enum.Font.Gotham
-    searchBox.PlaceholderText = "🔍 Search item..."
-    searchBox.Text = ""
-    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    searchBox.PlaceholderColor3 = Color3.fromRGB(160, 185, 220)
-    searchBox.TextSize = 13
-    searchBox.ZIndex = 12
-    Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 4)
-
     local listContainer = Instance.new("ScrollingFrame", popupBody)
     listContainer.BackgroundTransparency = 1
-    listContainer.Size = UDim2.new(1, 0, 0, 185)
+    listContainer.Size = UDim2.new(1, 0, 0, 210)
     listContainer.CanvasSize = UDim2.new(0, 0, 0, (#itemsTable * 32) + 10)
     listContainer.ScrollBarThickness = 3
     listContainer.ZIndex = 12
-
     local listLayout = Instance.new("UIListLayout", listContainer)
     listLayout.SortOrder = Enum.SortOrder.LayoutOrder
     listLayout.Padding = UDim.new(0, 4)
-
-    local selectedItems = {}
-    local itemRows = {}
 
     for _, itemName in ipairs(itemsTable) do
         local itemRow = Instance.new("TextButton", listContainer)
@@ -465,224 +376,52 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
         itemRow.Font = Enum.Font.GothamBold
         itemRow.Text = "    " .. itemName
         itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
-        itemRow.TextSize = 14.5
+        itemRow.TextSize = 13.5
         itemRow.TextXAlignment = Enum.TextXAlignment.Left
         itemRow.ZIndex = 13
         Instance.new("UICorner", itemRow).CornerRadius = UDim.new(0, 3)
 
-        table.insert(itemRows, {Btn = itemRow, Name = itemName})
-
-        local isSelected = false
         itemRow.MouseButton1Click:Connect(function()
-            isSelected = not isSelected
-            
-            if isSelected then
-                itemRow.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-                itemRow.BackgroundTransparency = 0.1
-                itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
-                table.insert(selectedItems, itemName)
-            else
-                itemRow.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-                itemRow.BackgroundTransparency = 0.4
-                itemRow.TextColor3 = Color3.fromRGB(255, 255, 255)
-                for i, v in ipairs(selectedItems) do
-                    if v == itemName then table.remove(selectedItems, i) end
-                end
+            summaryLabel.Text = "[" .. itemName .. "]"
+            popupOverlay.Visible = false
+            if enabledKey then
+                enabled[enabledKey] = itemName
             end
-
-            if #selectedItems == 0 then
-                summaryLabel.Text = "[0 Selected]"
-            elseif #selectedItems == 1 then
-                summaryLabel.Text = "[" .. selectedItems[1] .. "]"
-            else
-                summaryLabel.Text = "[" .. #selectedItems .. " Items Selected]"
-            end
-            
-            print("[ZedHub Dropdown] Dipilih di " .. titleText .. ": " .. itemName)
-            if onItemsChanged then onItemsChanged(selectedItems) end
         end)
     end
 
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-        local query = searchBox.Text:lower()
-        local visibleCount = 0
-        for _, rowData in ipairs(itemRows) do
-            if query == "" or string.find(rowData.Name:lower(), query) then
-                rowData.Btn.Visible = true
-                visibleCount = visibleCount + 1
-            else
-                rowData.Btn.Visible = false
-            end
-        end
-        listContainer.CanvasSize = UDim2.new(0, 0, 0, (visibleCount * 32) + 10)
-    end)
-
-    local isListOpen = false
     dropBtn.MouseButton1Click:Connect(function()
-        isListOpen = not isListOpen
-        popupOverlay.Visible = isListOpen
-        dropArrow.Text = isListOpen and "▲" or "▼"
-    end)
-
-    MainFrame.InputBegan:Connect(function(input)
-        if isListOpen and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-            task.delay(0.05, function()
-                if isListOpen then
-                    isListOpen = false
-                    popupOverlay.Visible = false
-                    dropArrow.Text = "▼"
-                    searchBox.Text = ""
-                end
-            end)
-        end
+        popupOverlay.Visible = not popupOverlay.Visible
     end)
 
     return dropFrame
 end
 
--- Fungsi Action Toggle + Debug Print
-local function CreateActionToggle(parentSec, text, callback)
-    local row = Instance.new("TextButton", parentSec)
-    row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-    row.BackgroundTransparency = 0.5
-    row.Size = UDim2.new(1, 0, 0, 28)
-    row.AutoButtonColor = false
-    row.Font = Enum.Font.GothamBold
-    row.Text = "    ⚡ " .. text
-    row.TextColor3 = Color3.fromRGB(255, 255, 255)
-    row.TextSize = 13.5
-    row.TextXAlignment = Enum.TextXAlignment.Left
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 4)
-
-    local pill = Instance.new("Frame", row)
-    pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-    pill.Position = UDim2.new(1, -42, 0.5, -8)
-    pill.Size = UDim2.new(0, 36, 0, 16)
-    local pillCorner = Instance.new("UICorner", pill)
-    pillCorner.CornerRadius = UDim.new(1, 0)
-
-    local knob = Instance.new("Frame", pill)
-    knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
-    knob.Position = UDim2.new(0, 2, 0.5, -6)
-    knob.Size = UDim2.new(0, 12, 0, 12)
-    local knobCorner = Instance.new("UICorner", knob)
-    knobCorner.CornerRadius = UDim.new(1, 0)
-
-    local state = false
-    row.MouseButton1Click:Connect(function()
-        state = not state
-        if state then
-            pill.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-            knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            knob.Position = UDim2.new(1, -14, 0.5, -6)
-        else
-            pill.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
-            knob.BackgroundColor3 = Color3.fromRGB(148, 163, 184)
-            knob.Position = UDim2.new(0, 2, 0.5, -6)
-        end
-        print("[ZedHub Toggle] " .. text .. " status: " .. tostring(state))
-        if callback then callback(state) end
-    end)
-    return row
-end
-
--- === TAB EVENT & SHOP ===
-local SecFallHarvest = CreateAccordionSection(TabEvent, "FALL HARVEST")
-CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgenv().ZedHubConfig.AutoCollect = state end)
-CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
-
-local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip Seed", "Parsley Seed", "Autumn Seed Pack", "Meyers Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
-
-CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
-
-local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
-CreateSelectedDropdown(SecShadyScarecrown, "Selected Seed", {"All Seed", "Gold Egg Seed"}, function(items)
-    if #items > 0 then getgenv().ZedHubConfig.ShadyScarecrowMode = (items[#items] == "All Seed") and "ALL_SEED" or "GOLD_EGG_SEED" end
-end)
-CreateToggle(SecShadyScarecrown, "Give A Seed On/Off", function(state) getgenv().ZedHubConfig.GiveASeed = state end)
-
-local SecAutoAcorn = CreateAccordionSection(TabEvent, "AUTO ACORN")
-CreateToggle(SecAutoAcorn, "Auto Shovel Acorn On/Off", function(state) getgenv().ZedHubConfig.AutoShovel = state end)
-
+-- === PEMBUATAN MENU TOKO DI UI ZEDHUB ===
 local SecShopEgg = CreateAccordionSection(TabShop, "SHOP EGG")
-CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items = items end)
-CreateActionToggle(SecShopEgg, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active = state end)
-CreateActionToggle(SecShopEgg, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll = state end)
+CreateSelectedDropdown(SecShopEgg, "Shop Egg List", {"Common Egg", "Uncommon Egg", "Rare Egg", "Mythichal Egg", "Bugg Egg", "Junggle Egg"}, "Select Eggs  ")
+CreateToggle(SecShopEgg, "Auto Buy (Selected)", "Auto Buy Eggs")
+CreateToggle(SecShopEgg, "Auto Buy All", "Auto Buy All Eggs")
 
 local SecShopSeed = CreateAccordionSection(TabShop, "SHOP SEED")
-CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape", "Dragon Fruit", "Cactus", "Papper", "Mushroom", "Cacao Bean", "Beanstalk", "Ember Lily", "Suggar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco", "Crimson Thorn", "Zebra", "Zinkle", "Octobloom", "Alien Apple", "Aurum Spire"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items = items end)
-CreateActionToggle(SecShopSeed, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active = state end)
-CreateActionToggle(SecShopSeed, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll = state end)
+CreateSelectedDropdown(SecShopSeed, "Shop Seed List", {"Carrot", "Strawberry", "Blueberry", "Tomato", "Buttercup", "Daffodil", "Corn", "Tulip", "Bamboo", "Watermelon", "Pumpkin", "Coconut", "Manggo", "Pineapple", "Apple", "Grape"}, "Select Seed ")
+CreateToggle(SecShopSeed, "Auto Buy (Selected)", "Auto Buy Seeds")
+CreateToggle(SecShopSeed, "Auto Buy All", "Auto Buy All Seeds")
 
 local SecShopGear = CreateAccordionSection(TabShop, "SHOP GEAR")
-CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools", "Favorite Tools", "Recall Wrench", "Cleaning Spray", "Cleansing Shard", "Level Up Lollipop"}, function(items) getgenv().ZedHubConfig.MainShopBuy.MainGear.Items = items end)
-CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.Active = state end)
-CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
-
-
--- === TAB AUTO SELLING ===
-local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
-
-CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
-    getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
-end)
-
-CreateToggle(SecSell, "Auto Sell Fruit", function(state)
-    getgenv().ZedHubConfig.AutoSellFruit = state
-end)
-
-local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
-local WebhookBox = Instance.new("TextBox", WebhookBody)
-WebhookBox.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-WebhookBox.Size = UDim2.new(1, 0, 0, 32)
-WebhookBox.Font = Enum.Font.Gotham
-WebhookBox.PlaceholderText = "URL Webhook Discord..."
-WebhookBox.Text = ""
-WebhookBox.TextColor3 = Color3.fromRGB(240, 240, 255)
-WebhookBox.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-WebhookBox.TextSize = 13
-Instance.new("UICorner", WebhookBox).CornerRadius = UDim.new(0, 4)
-
-local ServerBody = CreateAccordionSection(TabInfo, "SERVER")
-local ServerRow = Instance.new("Frame", ServerBody)
-ServerRow.BackgroundTransparency = 1
-ServerRow.Size = UDim2.new(1, 0, 0, 32)
-
-local ServerInput = Instance.new("TextBox", ServerRow)
-ServerInput.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
-ServerInput.Size = UDim2.new(0.68, 0, 1, 0)
-ServerInput.Font = Enum.Font.Gotham
-ServerInput.PlaceholderText = "2007"
-ServerInput.Text = ""
-ServerInput.TextColor3 = Color3.fromRGB(240, 240, 255)
-ServerInput.PlaceholderColor3 = Color3.fromRGB(100, 116, 139)
-ServerInput.TextSize = 13
-Instance.new("UICorner", ServerInput).CornerRadius = UDim.new(0, 4)
-
-local ClickBtn = Instance.new("TextButton", ServerRow)
-ClickBtn.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
-ClickBtn.Position = UDim2.new(0.71, 0, 0, 0)
-ClickBtn.Size = UDim2.new(0.29, 0, 1, 0)
-ClickBtn.Font = Enum.Font.GothamBold
-ClickBtn.Text = "Click"
-ClickBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ClickBtn.TextSize = 13
-Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
+CreateSelectedDropdown(SecShopGear, "Shop Gear List", {"Advanced Sprinkler", "Grandmaster", "Godly Sprinkler", "Master Sprinkler", "Basic Sprinkler", "Harvest Tools"}, "Select Gears")
+CreateToggle(SecShopGear, "Auto Buy (Selected)", "Auto Buy Gears")
+CreateToggle(SecShopGear, "Auto Buy All", "Auto Buy All Gears")
 
 
 -- =========================================================================
--- ENGINE LOGIKA PEMBELIAN DENGAN PEMBACAAN UI ZEDHUB
+-- ENGINE LOGIKA PEMBELIAN (MENGGUNAKAN tbl2.Enabled & fn14)
 -- =========================================================================
-local function fn14(configPath, callback)
+local function fn14(conditionKey, callback)
     task.spawn(function()
         while task.wait(0.3) do
             pcall(function()
-                if configPath() then
+                if enabled[conditionKey] then
                     callback()
                 end
             end)
@@ -690,23 +429,18 @@ local function fn14(configPath, callback)
     end)
 end
 
--- 1. Auto Buy (Selected) Seeds
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active end, function()
+-- Eksekusi otomatis sesuai format asli
+fn14("Auto Buy Seeds", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuySeedStock:FireServer("Shop", v_6)
-        end
+    local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", enabled["Select Seed "])
+
+    if v_6 then
+        gameEvents.BuySeedStock:FireServer("Shop", v_6)
     end
 end)
 
--- 2. Auto Buy All Seeds
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll end, function()
+fn14("Auto Buy All Seeds", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
     local v_6 = shop.GetStockGeneric(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", "no")
@@ -716,24 +450,18 @@ fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainSeed.BuyAll end, f
     end
 end)
 
--- 3. Auto Buy (Selected) Eggs
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active end, function()
+fn14("Auto Buy Eggs", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuyPetEgg:FireServer(v_6)
-        end
+    local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", enabled["Select Eggs  "])
+
+    if v_6 then
+        gameEvents.BuyPetEgg:FireServer(v_6)
     end
     task.wait(0.5)
 end)
 
--- 4. Auto Buy All Eggs
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll end, function()
+fn14("Auto Buy All Eggs", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
     local v_6 = shop.GetStockGeneric(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", "no")
@@ -743,23 +471,17 @@ fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainEgg.BuyAll end, fu
     end
 end)
 
--- 5. Auto Buy (Selected) Gears
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.Active end, function()
+fn14("Auto Buy Gears", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
-    local items = getgenv().ZedHubConfig.MainShopBuy.MainGear.Items
-    local selectedItem = #items > 0 and items[#items] or ""
-    
-    if selectedItem ~= "" then
-        local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", selectedItem)
-        if v_6 then
-            gameEvents.BuyGearStock:FireServer(v_6)
-        end
+    local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", enabled["Select Gears"])
+
+    if v_6 then
+        gameEvents.BuyGearStock:FireServer(v_6)
     end
 end)
 
--- 6. Auto Buy All Gears
-fn14(function() return getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll end, function()
+fn14("Auto Buy All Gears", function()
     local shop = require(ReplicatedStorage.Modules.Shop)
     local gameEvents = ReplicatedStorage.GameEvents
     local v_6 = shop.GetStockGeneric(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", "no")
@@ -807,4 +529,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Debug Version Loaded Successfully!")
+print("ZedHub Fully Integrated & Loaded Successfully!")
