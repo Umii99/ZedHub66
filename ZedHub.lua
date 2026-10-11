@@ -18,7 +18,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (DENGAN NAMA VARIABEL BARU)
+-- CONFIGURATION STATE
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -26,8 +26,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AllowSellIfBackpackIsMax = false, -- Diubah sesuai permintaan
-    AutoSell = false,                 -- Diubah sesuai permintaan
+    AllowSellIfBackpackIsMax = false,
+    AutoSell = false,
     
     FallMarketBuy = {
         Active = false,
@@ -635,7 +635,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (DENGAN NAMA BARU) ===
+-- === TAB AUTO SELLING (DIPERBAIKI TEKSNYA) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
@@ -686,14 +686,14 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & AUTO SELL (SPEED HUB LOGIC INTEGRATED)
+-- BACKEND LOOP AUTO BUY & AUTO SELL
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 0. AUTO SELL (LOGIKA ASLI SPEED HUB) ===
+            -- === 0. AUTO SELL (SPEED HUB LOGIC) ===
             if getgenv().ZedHubConfig.AutoSell then
                 local sellFunc = rawget(getgenv(), "sellFunction")
                 local toolFunc = rawget(getgenv(), "toolFunction")
@@ -850,4 +850,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Loaded Successfully with Auto Sell & Allow Sell If Backpack Is Max!")
+print("ZedHub Loaded Successfully with Fixed UI Text!")
