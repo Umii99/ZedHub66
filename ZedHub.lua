@@ -13,10 +13,13 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
 local shop = rawget(getgenv(), "shop") or {}
 
--- Ambil modul fungsi asli dari memori game (Sesuai struktur Speed Hub)
+-- =========================================================================
+-- SYSTEM DETECTION FOR AUTO SELL & BACKPACK CHECK
+-- =========================================================================
 local sellFunction = rawget(getgenv(), "sellFunction") or {}
 local toolFunction = rawget(getgenv(), "toolFunction") or {}
 
+-- Ambil via garbage collector jika dijalankan berdampingan dengan Speed Hub
 if (not sellFunction.CallSell or not toolFunction.IsMaxInventory) and getgc then
     pcall(function()
         for _, v in ipairs(getgc(true)) do
@@ -32,28 +35,36 @@ if (not sellFunction.CallSell or not toolFunction.IsMaxInventory) and getgc then
     end)
 end
 
--- Fallback jika fungsi modul tidak tertangkap
-if not sellFunction.CallSell then
-    sellFunction.CallSell = function(mode)
+-- FALLBACK MANDIRI (Jika dijalankan tanpa Speed Hub):
+local function ExecuteSell()
+    if sellFunction and type(sellFunction.CallSell) == "function" then
+        sellFunction.CallSell("Auto Sell")
+    else
         pcall(function()
             if gameEvents:FindFirstChild("SellEvent") then
-                gameEvents.SellEvent:FireServer(mode)
+                gameEvents.SellEvent:FireServer("Auto Sell")
+            elseif gameEvents:FindFirstChild("SellFruit") then
+                gameEvents.SellFruit:FireServer()
+            elseif gameEvents:FindFirstChild("SellItems") then
+                gameEvents.SellItems:FireServer()
             end
         end)
     end
 end
 
-if not toolFunction.IsMaxInventory then
-    toolFunction.IsMaxInventory = function()
-        local maxed = false
-        pcall(function()
-            local backpack = LocalPlayer:FindFirstChild("Backpack")
-            if backpack and #backpack:GetChildren() >= 25 then
-                maxed = true
-            end
-        end)
-        return maxed
+local function CheckBackpackFull()
+    if toolFunction and type(toolFunction.IsMaxInventory) == "function" then
+        return toolFunction.IsMaxInventory()
     end
+    
+    local isFull = false
+    pcall(function()
+        local backpack = LocalPlayer:FindFirstChild("Backpack")
+        if backpack and #backpack:GetChildren() >= 25 then
+            isFull = true
+        end
+    end)
+    return isFull
 end
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
@@ -87,7 +98,6 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' disamakan persis seperti struktur Speed Hub di foto
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
@@ -119,7 +129,7 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 13.5
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame (Midnight Slate Dark Base)
+-- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -153,7 +163,7 @@ Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 13
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- FPS Label di Top Bar
+-- FPS Label
 local FPSLabel = Instance.new("TextLabel")
 FPSLabel.Parent = TopBar
 FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -195,7 +205,7 @@ Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 32)
 Body.Size = UDim2.new(1, 0, 1, -32)
 
--- Sidebar Kiri Utama
+-- Sidebar
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 Sidebar.BackgroundTransparency = 0.5
@@ -207,7 +217,7 @@ local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SBLayout.Padding = UDim.new(0, 3)
 
--- User Profile Box di Bawah Sidebar
+-- Profile Box
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 UserBox.Size = UDim2.new(1, -6, 0, 38)
@@ -221,7 +231,7 @@ UserTxt.Text = "  👤 user_123\n  💎 Premium"
 UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
 UserTxt.TextSize = 10.5
 
--- Content Holder Kanan
+-- Content Holder
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 ContentHolder.BackgroundTransparency = 1
@@ -402,7 +412,7 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up dengan List Lengkap
+-- Dropdown Pop-up
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -597,7 +607,7 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Fungsi Action Toggle
+-- Action Toggle
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -684,7 +694,6 @@ CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHub
 -- === TAB AUTO SELLING ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
 
--- Menghubungkan Tombol UI Langsung ke Tabel enabled Backend
 CreateToggle(SecSell, "ALLOW SELL IF BACKPACK IS MAX", function(state)
     enabled["Allow Sell If Backpack Is Max"] = state
     getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
@@ -735,21 +744,17 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & SPEED HUB AUTO SELL LOGIC
+-- BACKEND LOOP (LOGIKA AUTO BUY & AUTO SELL TERUJI)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- Eksekusi Logika Auto Sell persis seperti skrip Speed Hub aslinya
+            -- Eksekusi Auto Sell Menggunakan Fungsi Standar + Fallback
             if enabled["Auto Sell"] then
                 if not enabled["Allow Sell If Backpack Is Max"] then
-                    if sellFunction and type(sellFunction.CallSell) == "function" then
-                        sellFunction.CallSell("Auto Sell")
-                    end
-                elseif toolFunction and type(toolFunction.IsMaxInventory) == "function" and toolFunction.IsMaxInventory() then
-                    if sellFunction and type(sellFunction.CallSell) == "function" then
-                        sellFunction.CallSell("Auto Sell")
-                    end
+                    ExecuteSell()
+                elseif CheckBackpackFull() then
+                    ExecuteSell()
                 end
                 task.wait(tonumber(enabled["Delay To Sell Inventory"]) or 1)
             end
@@ -892,4 +897,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Connected & Auto Sell Active!")
+print("ZedHub Auto Sell Fixed & Active!")
