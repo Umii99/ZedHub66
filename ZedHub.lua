@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + AUTO SELL SPEED HUB INTEGRATED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + SPEED HUB AUTO SELL INTEGRATED)
 ]]
 
 local Players = game:GetService("Players")
@@ -18,7 +18,7 @@ if PlayerGui:FindFirstChild("ZedHubStrictUI") then
 end
 
 -- =========================================================================
--- CONFIGURATION STATE (TERMASUK FALL MARKET, MAIN SHOP, & AUTO SELL)
+-- CONFIGURATION STATE (DENGAN NAMA VARIABEL BARU)
 -- =========================================================================
 getgenv().ZedHubConfig = {
     AutoCollect = false,
@@ -26,8 +26,8 @@ getgenv().ZedHubConfig = {
     GiveASeed = false,
     AutoShovel = false,
     ShadyScarecrowMode = "GOLD_EGG_SEED",
-    AllowSellIfBackpackFull = false,
-    AutoSellFruit = false,
+    AllowSellIfBackpackIsMax = false, -- Diubah sesuai permintaan
+    AutoSell = false,                 -- Diubah sesuai permintaan
     
     FallMarketBuy = {
         Active = false,
@@ -635,15 +635,15 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING ===
-local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
+-- === TAB AUTO SELLING (DENGAN NAMA BARU) ===
+local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
-CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
-    getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
+CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
+    getgenv().ZedHubConfig.AllowSellIfBackpackIsMax = state
 end)
 
-CreateToggle(SecSell, "Auto Sell Fruit", function(state)
-    getgenv().ZedHubConfig.AutoSellFruit = state
+CreateToggle(SecSell, "Auto Sell", function(state)
+    getgenv().ZedHubConfig.AutoSell = state
 end)
 
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
@@ -693,16 +693,23 @@ task.spawn(function()
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 0. AUTO SELL FRUIT (SPEED HUB LOGIC) ===
-            if getgenv().ZedHubConfig.AutoSellFruit then
+            -- === 0. AUTO SELL (LOGIKA ASLI SPEED HUB) ===
+            if getgenv().ZedHubConfig.AutoSell then
                 local sellFunc = rawget(getgenv(), "sellFunction")
                 local toolFunc = rawget(getgenv(), "toolFunction")
                 
-                if sellFunc and sellFunc.CallSell then
-                    if not getgenv().ZedHubConfig.AllowSellIfBackpackFull then
+                local canSell = false
+                if not getgenv().ZedHubConfig.AllowSellIfBackpackIsMax then
+                    canSell = true
+                elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
+                    canSell = true
+                end
+
+                if canSell then
+                    if sellFunc and sellFunc.CallSell then
                         sellFunc.CallSell("Auto Sell")
-                    elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
-                        sellFunc.CallSell("Auto Sell")
+                    elseif gameEvents:FindFirstChild("SellFruit") then
+                        gameEvents.SellFruit:FireServer()
                     end
                 end
             end
@@ -843,4 +850,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Market, Main Shop & Auto Sell Integrated Successfully!")
+print("ZedHub Loaded Successfully with Auto Sell & Allow Sell If Backpack Is Max!")
