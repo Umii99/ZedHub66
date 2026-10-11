@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (UI & AUTO SELL LINKED FIX)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO SELL INTEGRATED & FIXED)
 ]]
 
 local Players = game:GetService("Players")
@@ -12,51 +12,6 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- Ambil Referensi Game Events & Shop Module
 local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
 local shop = rawget(getgenv(), "shop") or {}
-
--- Ambil modul fungsi asli dari memori game (Speed Hub standard)
-local sellFunction = rawget(getgenv(), "sellFunction") or {}
-local toolFunction = rawget(getgenv(), "toolFunction") or {}
-
-if (not sellFunction.CallSell or not toolFunction.IsMaxInventory) and getgc then
-    pcall(function()
-        for _, v in ipairs(getgc(true)) do
-            if type(v) == "table" then
-                if rawget(v, "CallSell") and not sellFunction.CallSell then
-                    sellFunction = v
-                end
-                if rawget(v, "IsMaxInventory") and not toolFunction.IsMaxInventory then
-                    toolFunction = v
-                end
-            end
-        end
-    end)
-end
-
--- Fallback mandiri jika modul tidak tertangkap
-if not sellFunction.CallSell then
-    sellFunction.CallSell = function(mode)
-        pcall(function()
-            if gameEvents:FindFirstChild("SellEvent") then
-                gameEvents.SellEvent:FireServer(mode)
-            elseif gameEvents:FindFirstChild("SellFruit") then
-                gameEvents.SellFruit:FireServer()
-            end
-        end)
-    end
-end
-
-if not toolFunction.IsMaxInventory then
-    toolFunction.IsMaxInventory = function()
-        local maxed = false
-        pcall(function()
-            local backpack = LocalPlayer:FindFirstChild("Backpack")
-            if backpack and #backpack:GetChildren() >= 25 then
-                maxed = true
-            end
-        end)
-        return maxed
-    end
-end
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
@@ -89,7 +44,7 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' sebagai pemicu backend
+-- Tabel 'enabled' sebagai pemicu backend logika Speed Hub
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
@@ -100,6 +55,97 @@ local enabled = {
     ["Delay To Sell Inventory"] = 1,
 }
 
+-- =========================================================================
+-- INTEGRATED SELL & TOOL FUNCTIONS (SPEED HUB ENGINE)
+-- =========================================================================
+local sellFunction = {
+    Sell = function()
+        local character = LocalPlayer and LocalPlayer.Character
+        if not character then return end
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if not humanoidRootPart then return end
+        local cFrame = humanoidRootPart.CFrame
+        
+        -- Teleport ke lokasi NPC Penjual
+        humanoidRootPart.CFrame = CFrame.new(36.5854721, 2.76619363, 0.426784277, 0, 0, -1, 0, 1, 0, 1, 0, 0)
+        task.wait(0.3)
+        if gameEvents:FindFirstChild("Sell_Item") then
+            gameEvents.Sell_Item:FireServer()
+        elseif gameEvents:FindFirstChild("SellFruit") then
+            gameEvents.SellFruit:FireServer()
+        end
+        task.wait(0.3)
+        -- Kembalikan posisi karakter ke posisi semula
+        humanoidRootPart.CFrame = cFrame
+    end,
+    
+    CallSell = function(arg)
+        local tbl7 = {}
+        local tbl8 = {}
+
+        if LocalPlayer:FindFirstChild("Backpack") then
+            for _, child in ipairs(LocalPlayer.Backpack:GetChildren()) do
+                if not (arg and not enabled[arg]) then
+                    if child:IsA("Tool") and child:GetAttribute("b") == "j" and not child:GetAttribute("d") then
+                        table.insert(tbl7, child)
+                    end
+                else
+                    break
+                end
+            end
+        end
+
+        if LocalPlayer.Character then
+            for _, v_7 in ipairs(LocalPlayer.Character:GetChildren()) do
+                if v_7:IsA("Tool") then
+                    v_7.Parent = LocalPlayer.Backpack
+                end
+            end
+        end
+
+        for _, v_7 in ipairs(tbl7) do
+            if not (arg and not enabled[arg]) then
+                pcall(function()
+                    for _, v_8 in ipairs(v_7:GetDescendants()) do
+                        if v_8:IsA("BasePart") then v_8:Destroy() end
+                    end
+                end)
+
+                v_7.Parent = LocalPlayer.Character
+                table.insert(tbl8, v_7)
+            else
+                break
+            end
+        end
+
+        if #tbl8 > 0 then
+            sellFunction.Sell()
+        end
+    end,
+}
+
+local toolFunction = {
+    IsMaxInventory = function()
+        local maxed = false
+        pcall(function()
+            local backpack = LocalPlayer:FindFirstChild("Backpack")
+            local character = LocalPlayer.Character
+            local count = 0
+            if backpack then count = count + #backpack:GetChildren() end
+            if character then
+                for _, v in ipairs(character:GetChildren()) do
+                    if v:IsA("Tool") then count = count + 1 end
+                end
+            end
+            if count >= 25 then maxed = true end
+        end)
+        return maxed
+    end
+}
+
+-- =========================================================================
+-- UI INITIALIZATION
+-- =========================================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "ZedHubStrictUI"
 ScreenGui.ResetOnSpawn = false
@@ -683,15 +729,15 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (TERHUBUNG LANGSUNG KE BACKEND) ===
-local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
+-- === TAB AUTO SELLING (TERHUBUNG LANGSUNG KE BACKEND ENABLED) ===
+local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
-CreateToggle(SecSell, "ALLOW SELL IF BACKPACK IS MAX", function(state)
+CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
     enabled["Allow Sell If Backpack Is Max"] = state
     getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
 end)
 
-CreateToggle(SecSell, "AUTO SELL", function(state)
+CreateToggle(SecSell, "Auto Sell", function(state)
     enabled["Auto Sell"] = state
     getgenv().ZedHubConfig.AutoSellFruit = state
 end)
@@ -741,16 +787,12 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- Eksekusi Logika Auto Sell Sesuai Struktur Speed Hub Asli
+            -- Logika Auto Sell Sesuai Struktur Speed Hub Asli
             if enabled["Auto Sell"] then
                 if not enabled["Allow Sell If Backpack Is Max"] then
-                    if sellFunction and type(sellFunction.CallSell) == "function" then
-                        sellFunction.CallSell("Auto Sell")
-                    end
-                elseif toolFunction and type(toolFunction.IsMaxInventory) == "function" and toolFunction.IsMaxInventory() then
-                    if sellFunction and type(sellFunction.CallSell) == "function" then
-                        sellFunction.CallSell("Auto Sell")
-                    end
+                    sellFunction.CallSell("Auto Sell")
+                elseif toolFunction.IsMaxInventory() then
+                    sellFunction.CallSell("Auto Sell")
                 end
                 task.wait(tonumber(enabled["Delay To Sell Inventory"]) or 1)
             end
@@ -893,4 +935,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Linked Successfully!")
+print("ZedHub Auto Sell Standalone Integrated Successfully!")
