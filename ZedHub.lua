@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FINAL CLEAN AUTO SELL INTEGRATED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FINAL INTEGRATED AUTO SELL & PREVENT MODE)
 ]]
 
 local Players = game:GetService("Players")
@@ -27,6 +27,11 @@ getgenv().ZedHubConfig = {
     ShadyScarecrowMode = "GOLD_EGG_SEED",
     AllowSellIfBackpackFull = false,
     AutoSellFruit = false,
+    EnablePreventMode = false,
+    
+    PreventSellFruits = {},
+    PreventSellMutation = {},
+    PreventSellVariant = {},
     
     FallMarketBuy = {
         Active = false,
@@ -51,11 +56,107 @@ local enabled = {
     ["Select Fall Market Pet Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items,
     ["Auto Sell"] = false,
     ["Allow Sell If Backpack Is Max"] = false,
+    ["Enable Prevent Mode"] = false,
+    ["Prevent Sell Fruits"] = {},
+    ["Prevent Sell Mutation"] = {},
+    ["Prevent Sell Variant"] = {},
     ["Delay To Sell Inventory"] = 1,
 }
 
 -- =========================================================================
--- FUNGSI SELL & TOOL (BERSIH TANPA PREVENT MODE)
+-- HELPER & AUTO SCAN (SINKRON DENGAN SPEED HUB BACKEND)
+-- =========================================================================
+-- 1. Cleansing String Name (StipFlavourText)
+local function StipFlavourText(arg)
+    if arg and arg ~= "" then
+        return arg:gsub("%b[]", ""):gsub("^%s*(.-)%s*$", "%1")
+    end
+    return nil
+end
+
+-- 2. Scan Dinamis Data Game untuk List Dropdown Prevent
+local scannedFruits = {}
+local scannedMutations = {}
+local scannedVariants = {"Normal", "Silver", "Gold", "Rainbow"}
+
+local function FetchGameAPIData()
+    pcall(function()
+        for _, module in ipairs(ReplicatedStorage:GetDescendants()) do
+            if module:IsA("ModuleScript") then
+                if module.Name:lower():find("fruit") or module.Name:lower():find("crop") then
+                    local data = require(module)
+                    if type(data) == "table" then
+                        for name, _ in pairs(data) do
+                            if type(name) == "string" and not table.find(scannedFruits, name) then
+                                table.insert(scannedFruits, name)
+                            end
+                        end
+                    end
+                elseif module.Name:lower():find("mutation") then
+                    local data = require(module)
+                    if type(data) == "table" then
+                        for name, _ in pairs(data) do
+                            if type(name) == "string" and not table.find(scannedMutations, name) then
+                                table.insert(scannedMutations, name)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    if #scannedFruits == 0 then
+        scannedFruits = {
+            "Golden Peach", "Meyer Lemon", "Carnival Pumpkin", "Kniphofia", "Turnip", 
+            "Parsley", "Aurum Spire", "Alien Apple", "Elder Strawberry", "Crimson Thorn",
+            "Carrot", "Strawberry", "Blueberry", "Tomato", "Watermelon", "Pumpkin", "Dragon Fruit"
+        }
+    end
+
+    if #scannedMutations == 0 then
+        scannedMutations = {
+            "Gigantic", "Golden", "Rainbow", "Shocked", "Frozen", "Glossy", 
+            "Wet", "Chilled", "Sandy", "Pollinated", "Bloodlit", "Eclipsed", "Aurora", "Celestial"
+        }
+    end
+end
+
+FetchGameAPIData()
+
+-- 3. Filter Pengecekan Item Prevent Mode
+local function ShouldPreventItem(tool)
+    if not enabled["Enable Prevent Mode"] then return false end
+
+    local rawName = tool.Name
+    local cleanName = StipFlavourText(rawName) or rawName
+
+    local preventFruits = enabled["Prevent Sell Fruits"] or {}
+    local preventMutations = enabled["Prevent Sell Mutation"] or {}
+    local preventVariants = enabled["Prevent Sell Variant"] or {}
+
+    -- Filter Buah
+    if table.find(preventFruits, cleanName) or table.find(preventFruits, rawName) then
+        return true
+    end
+
+    -- Filter Mutasi dari Atribut
+    local mut = tool:GetAttribute("Mutation") or tool:GetAttribute("m")
+    if mut and table.find(preventMutations, tostring(mut)) then
+        return true
+    end
+
+    -- Filter Varian dari Atribut
+    local var = tool:GetAttribute("Variant") or tool:GetAttribute("v")
+    if var and table.find(preventVariants, tostring(var)) then
+        return true
+    end
+
+    return false
+end
+
+-- =========================================================================
+-- FUNGSI SELL & TOOL (LENGKAP DENGAN PREVENT MODE)
 -- =========================================================================
 local sellFunction = {}
 local tbl6 = {
@@ -84,8 +185,11 @@ local tbl6 = {
         if LocalPlayer:FindFirstChild("Backpack") then
             for _, child in ipairs(LocalPlayer.Backpack:GetChildren()) do
                 if not (arg and not enabled[arg]) then
+                    -- Integrasi Filter Prevent Mode
                     if child:IsA("Tool") and child:GetAttribute("b") == "j" and not child:GetAttribute("d") then
-                        table.insert(tbl7, child)
+                        if not ShouldPreventItem(child) then
+                            table.insert(tbl7, child)
+                        end
                     end
                     continue
                 end
@@ -711,7 +815,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (TERHUBUNG KE BACKEND) ===
+-- === TAB AUTO SELLING & PREVENT MODE (TERHUBUNG FULL KE BACKEND) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
@@ -723,6 +827,29 @@ CreateToggle(SecSell, "Auto Sell", function(state)
     enabled["Auto Sell"] = state
     getgenv().ZedHubConfig.AutoSellFruit = state
 end)
+
+local SecPrevent = CreateAccordionSection(TabSelling, "PREVENT MODE")
+
+CreateToggle(SecPrevent, "Enable Prevent Mode", function(state)
+    enabled["Enable Prevent Mode"] = state
+    getgenv().ZedHubConfig.EnablePreventMode = state
+end)
+
+CreateSelectedDropdown(SecPrevent, "Prevent Sell Fruits", scannedFruits, function(items)
+    enabled["Prevent Sell Fruits"] = items
+    getgenv().ZedHubConfig.PreventSellFruits = items
+end)
+
+CreateSelectedDropdown(SecPrevent, "Prevent Sell Mutation", scannedMutations, function(items)
+    enabled["Prevent Sell Mutation"] = items
+    getgenv().ZedHubConfig.PreventSellMutation = items
+end)
+
+CreateSelectedDropdown(SecPrevent, "Prevent Sell Variant", scannedVariants, function(items)
+    enabled["Prevent Sell Variant"] = items
+    getgenv().ZedHubConfig.PreventSellVariant = items
+end)
+
 
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
 local WebhookBox = Instance.new("TextBox", WebhookBody)
@@ -769,7 +896,7 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- Logika Auto Sell Sesuai Struktur Anda
+            -- Logika Auto Sell + Prevent Filter Sesuai Struktur Anda
             if enabled["Auto Sell"] then
                 if not enabled["Allow Sell If Backpack Is Max"] then
                     sellFunction.CallSell("Auto Sell")
@@ -903,4 +1030,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Final Auto Sell Loaded Successfully!")
+print("ZedHub Final Auto Sell & Prevent Mode Loaded Successfully!")
