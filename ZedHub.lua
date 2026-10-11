@@ -605,7 +605,7 @@ local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
 
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
-CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphopia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
+CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphofia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
 
 CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
@@ -638,11 +638,11 @@ CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHub
 -- === TAB AUTO SELLING ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING FRUIT")
 
-CreateToggle(SecSell, "Allow Sell If Backpack Full", function(state)
+CreateToggle(SecSell, "ALLOW SELL IF BACKPACK IS MAX", function(state)
     getgenv().ZedHubConfig.AllowSellIfBackpackFull = state
 end)
 
-CreateToggle(SecSell, "Auto Sell Fruit", function(state)
+CreateToggle(SecSell, "AUTO SELL", function(state)
     getgenv().ZedHubConfig.AutoSellFruit = state
 end)
 
@@ -829,4 +829,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Fall Market & Main Shop Auto Buy Loaded Successfully!")  
+print("ZedHub Fall Market & Main Shop Auto Buy Loaded Successfully!")
