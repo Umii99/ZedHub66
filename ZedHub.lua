@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO SELL INTEGRATED & FIXED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FINAL CLEAN AUTO SELL INTEGRATED)
 ]]
 
 local Players = game:GetService("Players")
@@ -9,7 +9,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Ambil Referensi Game Events & Shop Module
 local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
 local shop = rawget(getgenv(), "shop") or {}
 
@@ -44,7 +43,7 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' sebagai pemicu backend logika Speed Hub
+-- Tabel 'enabled' sebagai pemicu backend
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
@@ -56,9 +55,10 @@ local enabled = {
 }
 
 -- =========================================================================
--- INTEGRATED SELL & TOOL FUNCTIONS (SPEED HUB ENGINE)
+-- FUNGSI SELL & TOOL (BERSIH TANPA PREVENT MODE)
 -- =========================================================================
-local sellFunction = {
+local sellFunction = {}
+local tbl6 = {
     Sell = function()
         local character = LocalPlayer and LocalPlayer.Character
         if not character then return end
@@ -66,7 +66,6 @@ local sellFunction = {
         if not humanoidRootPart then return end
         local cFrame = humanoidRootPart.CFrame
         
-        -- Teleport ke lokasi NPC Penjual
         humanoidRootPart.CFrame = CFrame.new(36.5854721, 2.76619363, 0.426784277, 0, 0, -1, 0, 1, 0, 1, 0, 0)
         task.wait(0.3)
         if gameEvents:FindFirstChild("Sell_Item") then
@@ -75,7 +74,6 @@ local sellFunction = {
             gameEvents.SellFruit:FireServer()
         end
         task.wait(0.3)
-        -- Kembalikan posisi karakter ke posisi semula
         humanoidRootPart.CFrame = cFrame
     end,
     
@@ -89,9 +87,9 @@ local sellFunction = {
                     if child:IsA("Tool") and child:GetAttribute("b") == "j" and not child:GetAttribute("d") then
                         table.insert(tbl7, child)
                     end
-                else
-                    break
+                    continue
                 end
+                break
             end
         end
 
@@ -113,16 +111,17 @@ local sellFunction = {
 
                 v_7.Parent = LocalPlayer.Character
                 table.insert(tbl8, v_7)
-            else
-                break
+                continue
             end
+            break
         end
 
         if #tbl8 > 0 then
-            sellFunction.Sell()
+            tbl6.Sell()
         end
     end,
 }
+sellFunction = tbl6
 
 local toolFunction = {
     IsMaxInventory = function()
@@ -137,7 +136,7 @@ local toolFunction = {
                     if v:IsA("Tool") then count = count + 1 end
                 end
             end
-            if count >= 25 then maxed = true end
+            if count >= 20 then maxed = true end
         end)
         return maxed
     end
@@ -151,7 +150,6 @@ ScreenGui.Name = "ZedHubStrictUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Floating Button (Minimize State)
 local FloatingBtn = Instance.new("TextButton")
 FloatingBtn.Name = "FloatingBtn"
 FloatingBtn.Parent = ScreenGui
@@ -167,7 +165,6 @@ FloatingBtn.TextColor3 = Color3.fromRGB(96, 165, 250)
 FloatingBtn.TextSize = 13.5
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(0, 8)
 
--- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
@@ -182,7 +179,6 @@ MainStroke.Parent = MainFrame
 MainStroke.Color = Color3.fromRGB(59, 130, 246)
 MainStroke.Thickness = 1.5
 
--- Top Bar
 local TopBar = Instance.new("Frame")
 TopBar.Parent = MainFrame
 TopBar.BackgroundColor3 = Color3.fromRGB(2, 6, 23)
@@ -201,7 +197,6 @@ Title.TextColor3 = Color3.fromRGB(240, 240, 255)
 Title.TextSize = 13
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- FPS Label
 local FPSLabel = Instance.new("TextLabel")
 FPSLabel.Parent = TopBar
 FPSLabel.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -213,7 +208,6 @@ FPSLabel.TextColor3 = Color3.fromRGB(148, 163, 184)
 FPSLabel.TextSize = 11
 Instance.new("UICorner", FPSLabel).CornerRadius = UDim.new(0, 4)
 
--- Tombol Minimize (-)
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = TopBar
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -225,7 +219,6 @@ MinimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
 MinimizeBtn.TextSize = 15
 Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 4)
 
--- Tombol Close (X)
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = TopBar
 CloseBtn.BackgroundColor3 = Color3.fromRGB(239, 68, 68)
@@ -237,13 +230,11 @@ CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseBtn.TextSize = 11
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 4)
 
--- Body Layout
 local Body = Instance.new("Frame", MainFrame)
 Body.BackgroundTransparency = 1
 Body.Position = UDim2.new(0, 0, 0, 32)
 Body.Size = UDim2.new(1, 0, 1, -32)
 
--- Sidebar
 local Sidebar = Instance.new("ScrollingFrame", Body)
 Sidebar.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 Sidebar.BackgroundTransparency = 0.5
@@ -255,7 +246,6 @@ local SBLayout = Instance.new("UIListLayout", Sidebar)
 SBLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SBLayout.Padding = UDim.new(0, 3)
 
--- Profile Box
 local UserBox = Instance.new("Frame", Sidebar)
 UserBox.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
 UserBox.Size = UDim2.new(1, -6, 0, 38)
@@ -269,7 +259,6 @@ UserTxt.Text = "  👤 user_123\n  💎 Premium"
 UserTxt.TextColor3 = Color3.fromRGB(148, 163, 184)
 UserTxt.TextSize = 10.5
 
--- Content Holder
 local ContentHolder = Instance.new("Frame", Body)
 ContentHolder.BackgroundColor3 = Color3.fromRGB(11, 17, 30)
 ContentHolder.BackgroundTransparency = 1
@@ -277,7 +266,6 @@ ContentHolder.BorderSizePixel = 0
 ContentHolder.Position = UDim2.new(0, 130, 0, 0)
 ContentHolder.Size = UDim2.new(1, -130, 1, 0)
 
--- Fungsi Tab
 local function CreateTab(tabName)
     local Page = Instance.new("ScrollingFrame", ContentHolder)
     Page.Name = tabName .. "Page"
@@ -345,7 +333,6 @@ local TabShop = CreateTab("Shop")
 local TabSelling = CreateTab("Auto Selling")
 local TabSettings = CreateTab("Settings")
 
--- Fungsi Accordion Section
 local function CreateAccordionSection(parent, titleText)
     local sec = Instance.new("Frame", parent)
     sec.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -405,7 +392,6 @@ local function CreateAccordionSection(parent, titleText)
     return container
 end
 
--- Fungsi Toggle Standar
 local function CreateToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -450,7 +436,6 @@ local function CreateToggle(parentSec, text, callback)
     return row
 end
 
--- Dropdown Pop-up
 local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsChanged)
     local dropFrame = Instance.new("Frame", parentSec)
     dropFrame.BackgroundColor3 = Color3.fromRGB(15, 23, 42)
@@ -645,7 +630,6 @@ local function CreateSelectedDropdown(parentSec, titleText, itemsTable, onItemsC
     return dropFrame
 end
 
--- Action Toggle
 local function CreateActionToggle(parentSec, text, callback)
     local row = Instance.new("TextButton", parentSec)
     row.BackgroundColor3 = Color3.fromRGB(30, 41, 59)
@@ -696,12 +680,10 @@ CreateToggle(SecFallHarvest, "Required Collection Plant", function(state) getgen
 CreateToggle(SecFallHarvest, "Required Submit Plant", function(state) getgenv().ZedHubConfig.AutoSubmit = state end)
 
 local SecFallShop = CreateAccordionSection(TabEvent, "FALL SHOP")
-
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Pet Shop", {"Fall Egg", "Salmon", "Chipmunk", "Woodpecker", "Red Squirrel", "Marmot", "Mallard", "Sugar Glider", "Space Squirrel", "Red Panda"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Cosmetic Shop", {"Fall Leaf Chair", "Fall Crate", "Maple Flag", "Maple Wreath", "Fall Haybale", "Pile Of Leaves", "Flying Kit", "Autumn Crate", "Fall Mountain"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Seed Shop", {"Turnip", "Parsley", "Autumn Seed Pack", "Meyer Lemon", "Carnival Pumpkin", "Golden Peach", "Kniphofia", "Maple Resin"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items = items end)
 CreateSelectedDropdown(SecFallShop, "Select Fall Market Gear Shop", {"Firefly Jar", "Sky Lantern", "Maple Leaf Kite", "Maple Blower", "Maple Syrup", "Maple Sprinkler", "Bonfire", "Harvest Basket", "Acorn Lollipop", "Golden Acorn"}, function(items) getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items = items end)
-
 CreateActionToggle(SecFallShop, "Auto Buy Fall Shop", function(state) getgenv().ZedHubConfig.FallMarketBuy.Active = state end)
 
 local SecShadyScarecrown = CreateAccordionSection(TabEvent, "SHADY SCARECROW")
@@ -729,7 +711,7 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (TERHUBUNG LANGSUNG KE BACKEND ENABLED) ===
+-- === TAB AUTO SELLING (TERHUBUNG KE BACKEND) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
@@ -782,12 +764,12 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP (AUTO BUY + SPEED HUB AUTO SELL LOGIC)
+-- BACKEND LOOP (AUTO BUY + AUTO SELL LOGIC)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- Logika Auto Sell Sesuai Struktur Speed Hub Asli
+            -- Logika Auto Sell Sesuai Struktur Anda
             if enabled["Auto Sell"] then
                 if not enabled["Allow Sell If Backpack Is Max"] then
                     sellFunction.CallSell("Auto Sell")
@@ -799,30 +781,25 @@ task.spawn(function()
 
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 1. FALL MARKET AUTO BUY ===
             if getgenv().ZedHubConfig.FallMarketBuy.Active then
                 for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items) do
                     gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Seed Shop")
                     task.wait(0.5)
                 end
-
                 for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items) do
                     gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Gear Shop")
                     task.wait(0.5)
                 end
-
                 for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items) do
                     gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Cosmetic Shop")
                     task.wait(0.5)
                 end
-
                 for _, v_6 in ipairs(getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items) do
                     gameEvents.BuyEventShopStock:FireServer(v_6, "Fall Market Pet Shop")
                     task.wait(0.5)
                 end
             end
 
-            -- === 2. MAIN SHOP: SEEDS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainSeed.Active then
                 for _, seedName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainSeed.Items) do
                     local v_6 = getStock(PlayerGui.Seed_Shop.Frame.ScrollingFrame, "Normal", seedName)
@@ -837,16 +814,13 @@ task.spawn(function()
                 else
                     local scrollFrame = PlayerGui.Seed_Shop.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
-                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
-                            if gameEvents:FindFirstChild("BuySeedStock") then
-                                gameEvents.BuySeedStock:FireServer("Shop", child.Name)
-                            end
+                        if gameEvents:FindFirstChild("BuySeedStock") then
+                            gameEvents.BuySeedStock:FireServer("Shop", child.Name)
                         end
                     end
                 end
             end
 
-            -- === 3. MAIN SHOP: EGGS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainEgg.Active then
                 for _, eggName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainEgg.Items) do
                     local v_6 = getStock(PlayerGui.PetShop_UI.Frame.ScrollingFrame, "Normal", eggName)
@@ -861,16 +835,13 @@ task.spawn(function()
                 else
                     local scrollFrame = PlayerGui.PetShop_UI.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
-                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
-                            if gameEvents:FindFirstChild("BuyPetEgg") then
-                                gameEvents.BuyPetEgg:FireServer(child.Name)
-                            end
+                        if gameEvents:FindFirstChild("BuyPetEgg") then
+                            gameEvents.BuyPetEgg:FireServer(child.Name)
                         end
                     end
                 end
             end
 
-            -- === 4. MAIN SHOP: GEARS ===
             if getgenv().ZedHubConfig.MainShopBuy.MainGear.Active then
                 for _, gearName in ipairs(getgenv().ZedHubConfig.MainShopBuy.MainGear.Items) do
                     local v_6 = getStock(PlayerGui.Gear_Shop.Frame.ScrollingFrame, "Normal", gearName)
@@ -885,10 +856,8 @@ task.spawn(function()
                 else
                     local scrollFrame = PlayerGui.Gear_Shop.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
-                        if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
-                            if gameEvents:FindFirstChild("BuyGearStock") then
-                                gameEvents.BuyGearStock:FireServer("Shop", child.Name)
-                            end
+                        if gameEvents:FindFirstChild("BuyGearStock") then
+                            gameEvents.BuyGearStock:FireServer("Shop", child.Name)
                         end
                     end
                 end
@@ -897,8 +866,7 @@ task.spawn(function()
     end
 end)
 
-
--- === KONTROL JENDELA (Minimize, Close, Draggable) ===
+-- Window Controls
 MinimizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
     FloatingBtn.Visible = true
@@ -935,4 +903,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Auto Sell Standalone Integrated Successfully!")
+print("ZedHub Final Auto Sell Loaded Successfully!")
