@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + SPEED HUB AUTO SELL INTEGRATED)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY + AUTO SELL CONNECTED VIA ENABLED TABLE)
 ]]
 
 local Players = game:GetService("Players")
@@ -44,12 +44,14 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' agar sinkron dengan logika kode callback dropdown/toggle Fall Shop kamu
+-- TABEL 'enabled' DIPERBARUI DENGAN KEY AUTO SELL AGAR SINKRON DENGAN SPEED HUB
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
     ["Select Fall Market Cosmetic Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallCrate.Items,
     ["Select Fall Market Pet Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallPets.Items,
+    ["Auto Sell"] = false,
+    ["Allow Sell If Backpack Is Max"] = false,
 }
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -635,15 +637,17 @@ CreateActionToggle(SecShopGear, "Auto Buy (Selected)", function(state) getgenv()
 CreateActionToggle(SecShopGear, "Auto Buy All", function(state) getgenv().ZedHubConfig.MainShopBuy.MainGear.BuyAll = state end)
 
 
--- === TAB AUTO SELLING (DIPERBAIKI TEKSNYA) ===
+-- === TAB AUTO SELLING (DIPERBARUI CALLBACK-NYA KE TABEL ENABLED) ===
 local SecSell = CreateAccordionSection(TabSelling, "AUTO SELLING")
 
 CreateToggle(SecSell, "Allow Sell If Backpack Is Max", function(state)
     getgenv().ZedHubConfig.AllowSellIfBackpackIsMax = state
+    enabled["Allow Sell If Backpack Is Max"] = state -- Terhubung langsung ke tabel enabled
 end)
 
 CreateToggle(SecSell, "Auto Sell", function(state)
     getgenv().ZedHubConfig.AutoSell = state
+    enabled["Auto Sell"] = state -- Terhubung langsung ke tabel enabled
 end)
 
 local WebhookBody = CreateAccordionSection(TabInfo, "WEBHOOK")
@@ -686,29 +690,27 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 
 
 -- =========================================================================
--- BACKEND LOOP AUTO BUY & AUTO SELL
+-- BACKEND LOOP AUTO BUY & AUTO SELL (SPEED HUB LOGIC EXACTLY)
 -- =========================================================================
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
 
-            -- === 0. AUTO SELL (SPEED HUB LOGIC) ===
-            if getgenv().ZedHubConfig.AutoSell then
+            -- === 0. AUTO SELL (MENGGUNAKAN LOGIKA DARI SPEED HUB ASLI) ===
+            if enabled["Auto Sell"] then
                 local sellFunc = rawget(getgenv(), "sellFunction")
                 local toolFunc = rawget(getgenv(), "toolFunction")
-                
-                local canSell = false
-                if not getgenv().ZedHubConfig.AllowSellIfBackpackIsMax then
-                    canSell = true
-                elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
-                    canSell = true
-                end
 
-                if canSell then
-                    if sellFunc and sellFunc.CallSell then
+                if sellFunc and sellFunc.CallSell then
+                    if not enabled["Allow Sell If Backpack Is Max"] then
                         sellFunc.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellFruit") then
+                    elseif toolFunc and toolFunc.IsMaxInventory and toolFunc.IsMaxInventory() then
+                        sellFunc.CallSell("Auto Sell")
+                    end
+                elseif gameEvents:FindFirstChild("SellFruit") then
+                    -- Fallback langsung ke RemoteEvent game jika fungsi Speed Hub tidak dimuat
+                    if not enabled["Allow Sell If Backpack Is Max"] then
                         gameEvents.SellFruit:FireServer()
                     end
                 end
@@ -830,7 +832,7 @@ end)
 
 local dragging, dragStart, startPos
 TopBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
         dragging = true
         dragStart = input.Position
         startPos = MainFrame.Position
@@ -845,9 +847,9 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
         dragging = false
     end
 end)
 
-print("ZedHub Loaded Successfully with Fixed UI Text!")
+print("ZedHub Auto Sell Bridge Loaded Successfully!")
