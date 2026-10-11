@@ -1,5 +1,4 @@
-Berikut adalah skrip lengkapnya dengan teks tombol pada bagian Auto Selling yang sudah diubah persis menjadi "ALLOW SELL IF BACKPACK IS MAX" dan "AUTO SELL" tanpa menambah atau merubah fungsi/fitur apa pun di dalamnya:
---[[
+[[
     ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY: MAIN SHOP + FALL SHOP)
 ]]
 
