@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & AUTO SELL FIXED UI)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FULL AUTO BUY & AUTO SELL FIXED)
 ]]
 
 local Players = game:GetService("Players")
@@ -12,8 +12,49 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- Ambil Referensi Game Events & Shop Module
 local gameEvents = ReplicatedStorage:WaitForChild("GameEvents", 5) or ReplicatedStorage
 local shop = rawget(getgenv(), "shop") or {}
+
+-- Ambil modul fungsi asli dari memori game (Sesuai struktur Speed Hub)
 local sellFunction = rawget(getgenv(), "sellFunction") or {}
 local toolFunction = rawget(getgenv(), "toolFunction") or {}
+
+if (not sellFunction.CallSell or not toolFunction.IsMaxInventory) and getgc then
+    pcall(function()
+        for _, v in ipairs(getgc(true)) do
+            if type(v) == "table" then
+                if rawget(v, "CallSell") and not sellFunction.CallSell then
+                    sellFunction = v
+                end
+                if rawget(v, "IsMaxInventory") and not toolFunction.IsMaxInventory then
+                    toolFunction = v
+                end
+            end
+        end
+    end)
+end
+
+-- Fallback jika fungsi modul tidak tertangkap
+if not sellFunction.CallSell then
+    sellFunction.CallSell = function(mode)
+        pcall(function()
+            if gameEvents:FindFirstChild("SellEvent") then
+                gameEvents.SellEvent:FireServer(mode)
+            end
+        end)
+    end
+end
+
+if not toolFunction.IsMaxInventory then
+    toolFunction.IsMaxInventory = function()
+        local maxed = false
+        pcall(function()
+            local backpack = LocalPlayer:FindFirstChild("Backpack")
+            if backpack and #backpack:GetChildren() >= 25 then
+                maxed = true
+            end
+        end)
+        return maxed
+    end
+end
 
 if PlayerGui:FindFirstChild("ZedHubStrictUI") then
     PlayerGui.ZedHubStrictUI:Destroy()
@@ -46,7 +87,7 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' persis seperti logika Speed Hub agar terhubung ke backend
+-- Tabel 'enabled' disamakan persis seperti struktur Speed Hub di foto
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
@@ -699,21 +740,18 @@ Instance.new("UICorner", ClickBtn).CornerRadius = UDim.new(0, 4)
 task.spawn(function()
     while task.wait(0.5) do
         pcall(function()
-            -- Eksekusi Logika Auto Sell milik Speed Hub
+            -- Eksekusi Logika Auto Sell persis seperti skrip Speed Hub aslinya
             if enabled["Auto Sell"] then
                 if not enabled["Allow Sell If Backpack Is Max"] then
                     if sellFunction and type(sellFunction.CallSell) == "function" then
                         sellFunction.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellEvent") then
-                        gameEvents.SellEvent:FireServer("Auto Sell")
                     end
                 elseif toolFunction and type(toolFunction.IsMaxInventory) == "function" and toolFunction.IsMaxInventory() then
                     if sellFunction and type(sellFunction.CallSell) == "function" then
                         sellFunction.CallSell("Auto Sell")
-                    elseif gameEvents:FindFirstChild("SellEvent") then
-                        gameEvents.SellEvent:FireServer("Auto Sell")
                     end
                 end
+                task.wait(tonumber(enabled["Delay To Sell Inventory"]) or 1)
             end
 
             local getStock = shop.GetStockGeneric or function(container, mode, item) return item end
@@ -806,7 +844,7 @@ task.spawn(function()
                     for _, child in ipairs(scrollFrame:GetChildren()) do
                         if child:IsA("Frame") or child:IsA("ImageLabel") or child:IsA("GuiObject") then
                             if gameEvents:FindFirstChild("BuyGearStock") then
-                                gameEvents.BuyGearStock:FireServer(child.Name)
+                                gameEvents.BuyGearStock:FireServer("Shop", child.Name)
                             end
                         end
                     end
