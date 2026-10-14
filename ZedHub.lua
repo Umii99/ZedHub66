@@ -1,5 +1,5 @@
 --[[
-    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (FINAL SAFE AUTO SELL & PREVENT MODE)
+    ZEDHUB - MIDNIGHT SLATE & NEON BLUE (STABLE FIXED AUTO SELL & PREVENT MODE)
 ]]
 
 local Players = game:GetService("Players")
@@ -48,7 +48,6 @@ getgenv().ZedHubConfig = {
     }
 }
 
--- Tabel 'enabled' sebagai pemicu backend
 local enabled = {
     ["Select Fall Market Seed Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallSeed.Items,
     ["Select Fall Market Gear Shop"] = getgenv().ZedHubConfig.FallMarketBuy.FallGear.Items,
@@ -64,57 +63,29 @@ local enabled = {
 }
 
 -- =========================================================================
--- HELPER & AUTO SCAN (PRESISI KHUSUS CROP & MUTASI)
+-- DATA LIST BUAH & MUTASI RESMI (BERSIH DARI ERROR COIN)
 -- =========================================================================
+local scannedFruits = {
+    "Golden Peach", "Meyer Lemon", "Carnival Pumpkin", "Kniphofia", "Turnip", 
+    "Parsley", "Aurum Spire", "Alien Apple", "Elder Strawberry", "Crimson Thorn",
+    "Octobloom", "Zinkle", "Dragon Fruit", "Ember Lily", "Sugar Apple", "Burning Bud",
+    "Giant Pinecone", "Romanesco", "Carrot", "Strawberry", "Blueberry", "Tomato", 
+    "Watermelon", "Pumpkin", "Apple", "Grape", "Cactus", "Coconut", "Mango", "Pineapple"
+}
+
+local scannedMutations = {
+    "Gigantic", "Golden", "Rainbow", "Shocked", "Frozen", "Glossy", 
+    "Wet", "Chilled", "Sandy", "Pollinated", "Bloodlit", "Eclipsed", "Aurora", "Celestial", "Dawnbound"
+}
+
+local scannedVariants = {"Normal", "Silver", "Gold", "Rainbow"}
+
 local function StipFlavourText(arg)
     if arg and arg ~= "" then
         return arg:gsub("%b[]", ""):gsub("^%s*(.-)%s*$", "%1")
     end
     return nil
 end
-
-local scannedFruits = {}
-local scannedMutations = {}
-local scannedVariants = {"Normal", "Silver", "Gold", "Rainbow"}
-
-local function FetchGameAPIData()
-    table.clear(scannedFruits)
-    table.clear(scannedMutations)
-
-    pcall(function()
-        for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do
-            if obj:IsA("ModuleScript") and (obj.Name:find("Crop") or obj.Name:find("Fruit")) then
-                local success, data = pcall(require, obj)
-                if success and type(data) == "table" then
-                    for key, val in pairs(data) do
-                        if type(key) == "string" and not key:find("Frame") and not key:find("UI") and #key > 2 then
-                            if not table.find(scannedFruits, key) then
-                                table.insert(scannedFruits, key)
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
-
-    if #scannedFruits < 5 then
-        scannedFruits = {
-            "Golden Peach", "Meyer Lemon", "Carnival Pumpkin", "Kniphofia", "Turnip", 
-            "Parsley", "Aurum Spire", "Alien Apple", "Elder Strawberry", "Crimson Thorn",
-            "Octobloom", "Zinkle", "Dragon Fruit", "Ember Lily", "Sugar Apple", "Burning Bud",
-            "Giant Pinecone", "Romanesco", "Carrot", "Strawberry", "Blueberry", "Tomato", 
-            "Watermelon", "Pumpkin", "Apple", "Grape", "Cactus"
-        }
-    end
-
-    scannedMutations = {
-        "Gigantic", "Golden", "Rainbow", "Shocked", "Frozen", "Glossy", 
-        "Wet", "Chilled", "Sandy", "Pollinated", "Bloodlit", "Eclipsed", "Aurora", "Celestial", "Dawnbound"
-    }
-end
-
-FetchGameAPIData()
 
 local function ShouldPreventItem(tool)
     if not enabled["Enable Prevent Mode"] then return false end
@@ -126,8 +97,10 @@ local function ShouldPreventItem(tool)
     local preventMutations = enabled["Prevent Sell Mutation"] or {}
     local preventVariants = enabled["Prevent Sell Variant"] or {}
 
-    if table.find(preventFruits, cleanName) or table.find(preventFruits, rawName) then
-        return true
+    for _, fName in ipairs(preventFruits) do
+        if cleanName:lower() == fName:lower() or rawName:lower():find(fName:lower()) then
+            return true
+        end
     end
 
     local mut = tool:GetAttribute("Mutation") or tool:GetAttribute("m")
@@ -144,29 +117,31 @@ local function ShouldPreventItem(tool)
 end
 
 -- =========================================================================
--- FUNGSI SELL & TOOL (SAFE SELLING - ANTI JUAL PET/GEAR)
+-- FUNGSI SELL & TOOL (STABIL & AMAN)
 -- =========================================================================
 local sellFunction = {}
 local tbl6 = {
     Sell = function()
         pcall(function()
             local char = LocalPlayer.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                local oldCFrame = char.HumanoidRootPart.CFrame
-                char.HumanoidRootPart.CFrame = CFrame.new(36.5854721, 2.76619363, 0.426784277, 0, 0, -1, 0, 1, 0, 1, 0, 0)
-                task.wait(0.2)
-                
-                if gameEvents:FindFirstChild("Sell_Item") then
-                    gameEvents.Sell_Item:FireServer()
-                elseif gameEvents:FindFirstChild("SellFruit") then
-                    gameEvents.SellFruit:FireServer()
-                elseif gameEvents:FindFirstChild("Sell_Crop") then
-                    gameEvents.Sell_Crop:FireServer()
-                end
-                
-                task.wait(0.2)
-                char.HumanoidRootPart.CFrame = oldCFrame
+            if not char then return end
+            local humanoidRootPart = char:FindFirstChild("HumanoidRootPart")
+            if not humanoidRootPart then return end
+            
+            local cFrame = humanoidRootPart.CFrame
+            humanoidRootPart.CFrame = CFrame.new(36.5854721, 2.76619363, 0.426784277, 0, 0, -1, 0, 1, 0, 1, 0, 0)
+            task.wait(0.3)
+            
+            if gameEvents:FindFirstChild("Sell_Item") then
+                gameEvents.Sell_Item:FireServer()
+            elseif gameEvents:FindFirstChild("SellFruit") then
+                gameEvents.SellFruit:FireServer()
+            elseif gameEvents:FindFirstChild("Sell_Crop") then
+                gameEvents.Sell_Crop:FireServer()
             end
+            
+            task.wait(0.3)
+            humanoidRootPart.CFrame = cFrame
         end)
     end,
     
@@ -182,14 +157,12 @@ local tbl6 = {
         for _, child in ipairs(backpack:GetChildren()) do
             if child:IsA("Tool") then
                 local name = child.Name:lower()
-                -- FILTER KEAMANAN: Jangan sentuh Pet, Egg, Seed, atau Gear
+                -- Pastikan bukan alat, benih, pet, atau telur
                 local isSafeItem = not (name:find("trowel") or name:find("shovel") or name:find("can") or 
                                        name:find("sprinkler") or name:find("wand") or name:find("egg") or 
                                        name:find("seed") or name:find("pet") or name:find("basket") or name:find("jar"))
                 
-                local isFruitAttribute = (child:GetAttribute("b") == "j") or not child:GetAttribute("d")
-
-                if isSafeItem and isFruitAttribute then
+                if isSafeItem then
                     if not ShouldPreventItem(child) then
                         table.insert(itemsToSell, child)
                     end
@@ -968,7 +941,7 @@ task.spawn(function()
                 else
                     local scrollFrame = PlayerGui.Gear_Shop.Frame.ScrollingFrame
                     for _, child in ipairs(scrollFrame:GetChildren()) do
-                        if gameEvents:FindFirstChild("BuyGearStock") then
+                        if gameEvents:FindFirstChild("BuyGearShop") then
                             gameEvents.BuyGearStock:FireServer("Shop", child.Name)
                         end
                     end
@@ -1015,4 +988,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Final Auto Sell Loaded Successfully!")
+print("ZedHub Stable Version Loaded Successfully!")
