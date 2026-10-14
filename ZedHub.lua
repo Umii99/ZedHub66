@@ -170,7 +170,7 @@ local function ShouldPreventItem(tool)
 end
 
 -- =========================================================================
--- FUNGSI SELL & TOOL (SAFE SELLING - ANTI JUAL PET/GEAR)
+-- FUNGSI SELL & TOOL (FIXED: ANTI HOLD ITEM / NYANGKUT DI TANGAN)
 -- =========================================================================
 local sellFunction = {}
 local tbl6 = {
@@ -200,10 +200,9 @@ local tbl6 = {
         if not enabled["Auto Sell"] then return end
 
         local backpack = LocalPlayer:FindFirstChild("Backpack")
-        local character = LocalPlayer.Character
-        if not backpack or not character then return end
+        if not backpack then return end
 
-        local itemsToSell = {}
+        local itemsToSellCount = 0
 
         for _, child in ipairs(backpack:GetChildren()) do
             if child:IsA("Tool") then
@@ -217,22 +216,14 @@ local tbl6 = {
 
                 if isSafeItem and isFruitAttribute then
                     if not ShouldPreventItem(child) then
-                        table.insert(itemsToSell, child)
+                        itemsToSellCount = itemsToSellCount + 1
                     end
                 end
             end
         end
 
-        if #itemsToSell > 0 then
-            for _, tool in ipairs(itemsToSell) do
-                pcall(function()
-                    for _, v_8 in ipairs(tool:GetDescendants()) do
-                        if v_8:IsA("BasePart") then v_8:Destroy() end
-                    end
-                end)
-                tool.Parent = character
-            end
-            task.wait(0.1)
+        -- Jika ada item yang valid untuk dijual, langsung panggil fungsi Sell tanpa memindahkannya ke tangan
+        if itemsToSellCount > 0 then
             tbl6.Sell()
         end
     end,
@@ -917,7 +908,7 @@ local Fn14 = function(optionName, callback)
     end)
 end
 
--- Eksekusi Pemicu Auto Sell Menggunakan Fn14
+-- Eksekusi Pemicu Auto Sell Menggunakan Fn14 (Tanpa Hold Item)
 Fn14("Auto Sell", function()
     if not enabled["Auto Sell"] then
         return
@@ -1060,4 +1051,4 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-print("ZedHub Dynamic Scan & Fn14 Auto Sell Loaded Successfully!")
+print("ZedHub Anti-Hold Auto Sell & Fn14 Loaded Successfully!")
